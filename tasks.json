@@ -1,0 +1,47 @@
+[
+  {
+    "label": "Lazygit",
+    "command": "lazygit",
+    "use_new_terminal": false,
+    "allow_concurrent_runs": false,
+    "hide": "always",
+    "reveal": "always",
+    "shell": {
+      "with_arguments": {
+        "program": "sh",
+        "args": ["--noediting", "--norc", "--noprofile"]
+      }
+    }
+  },
+  {
+    "label": "File Finder",
+    "command": "zed \"$(tv files)\"",
+    "hide": "always",
+    "allow_concurrent_runs": true,
+    "use_new_terminal": true
+  },
+  {
+    "label": "Find in Files",
+    "command": "zed \"$(tv text)\"",
+    "hide": "always",
+    "allow_concurrent_runs": true,
+    "use_new_terminal": true
+  },
+  {
+    "label": "Find in Selected",
+    "command": "zed \"$(tv text -i \"$ZED_SELECTED_TEXT\")\"",
+    "allow_concurrent_runs": true,
+    "use_new_terminal": true
+  },
+  {
+    "label": "GitHub Browse",
+    "command": "gh",
+    "args": ["browse", "$ZED_RELATIVE_FILE", "--commit=$(git rev-parse HEAD)"],
+    "use_new_terminal": false,
+    "allow_concurrent_runs": false,
+    "reveal": "never",
+    "reveal_target": "dock",
+    "hide": "always",
+    "shell": "system"
+  }
+]

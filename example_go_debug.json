@@ -1,0 +1,24 @@
+[
+  {
+    "adapter": "Go",
+    "label": "BBDDSS",
+    "request": "launch",
+    "mode": "debug",
+    "program": "./blockd/cmd/blockd.go",
+    "args": [
+      "--url",
+      "https://op-pokt.nodies.app",
+      "--blockscout-url",
+      "https://optimism.blockscout.com",
+      "--blocks-back",
+      "1000",
+      "--queue-length",
+      "10000",
+      "--daemon"
+    ],
+    "cwd": "${ZED_WORKTREE_ROOT}",
+    "env": {
+      "key": "value"
+    }
+  }
+]

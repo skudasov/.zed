@@ -1,0 +1,9 @@
+[
+  {
+    "label": "Run pytest with marker",
+    "command": "python3",
+    "args": [".zed/run_tests.py"],
+    "use_new_terminal": true,
+    "cwd": "$ZED_WORKTREE_ROOT"
+  }
+]

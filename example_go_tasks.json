@@ -1,0 +1,23 @@
+[
+  {
+    "label": "Run Blockd",
+    "command": "go",
+    "args": [
+      "run",
+      "${ZED_WORKTREE_ROOT}/blockd/cmd/blockd.go",
+      "--url",
+      "https://op-pokt.nodies.app",
+      "--blockscout-url",
+      "https://optimism.blockscout.com",
+      "--blocks-back",
+      "1000",
+      "--queue-length",
+      "10000",
+      "--daemon"
+    ],
+    "env": {
+      "key": "value"
+    },
+    "reveal": "always"
+  }
+]
