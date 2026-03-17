@@ -11,9 +11,8 @@
       // ai (doesn't work with Claude)
       "space a i": "assistant::InlineAssist",
       // goto
-      // "g I": "editor::GoToImplementation",
       "g t": "editor::GoToTypeDefinition",
-      "g I": "editor::GoToImplementationSplit", // in a split
+      "g I": "editor::GoToImplementationSplit",
       // tabs
       "space b r": "pane::ReopenClosedItem",
       // docks
@@ -136,12 +135,11 @@
       "space g B": "editor::OpenPermalinkToLine",
       // copy permalink to a line
       "space g Y": "editor::CopyPermalinkToLine",
-      "space g h d": "editor::ExpandAllDiffHunks",
       "space g d": "git::Diff",
-      "space g h r": "git::Restore",
-      "space g h s": "git::StageAndNext",
-      "space g h u": "git::UnstageAndNext",
-      "space g h R": "git::RestoreFile",
+      "space g h d": "editor::ExpandAllDiffHunks",
+      "space h r": "git::Restore",
+      "space h s": "git::StageAndNext",
+      "space h u": "git::UnstageAndNext",
       // markdown
       "space m p": "markdown::OpenPreview",
       "space m P": "markdown::OpenPreviewToTheSide",
