@@ -1,6 +1,11 @@
 {
+  "agent_servers": {
+    "claude-acp": {
+      "type": "registry",
+    },
+  },
   "load_direnv": "shell_hook",
-  "disable_ai": true,
+  "disable_ai": false,
   "centered_layout": {
     "left_padding": 0.15,
     "right_padding": 0.15,
