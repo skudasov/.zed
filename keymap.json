@@ -4,20 +4,20 @@
     "bindings": {
       "cmd-+": ["zed::IncreaseBufferFontSize", { "persist": false }],
       "cmd--": ["zed::DecreaseBufferFontSize", { "persist": false }],
-      "cmd-_": ["zed::ResetBufferFontSize", { "persist": false }]
-    }
+      "cmd-_": ["zed::ResetBufferFontSize", { "persist": false }],
+    },
   },
   {
     "context": "Workspace",
     "bindings": {
-      "ctrl-z": "workspace::ToggleZoom"
-    }
+      "ctrl-z": "workspace::ToggleZoom",
+    },
   },
   {
     "context": "Workspace",
     "bindings": {
-      "space space": "file_finder::Toggle"
-    }
+      "space space": "file_finder::Toggle",
+    },
   },
   {
     // put key-bindings here if you want them to work in normal & visual mode & project panel
@@ -47,14 +47,14 @@
       "space d c": "debugger::Continue",
       "space d b": "editor::ToggleBreakpoint",
       "space d p": "debugger::Pause",
-      
+
       // diagnostics
       "space s d": "diagnostics::Deploy",
-      
+
       // projects
       "space f p": ["projects::OpenRecent", { "create_new_window": false }],
       "space f P": ["projects::OpenRecent", { "create_new_window": true }],
-      
+
       // notification
       "space u n": "workspace::ClearAllNotifications",
 
@@ -63,23 +63,23 @@
       // Git
       "space g g": [
         "task::Spawn",
-        { "task_name": "Lazygit", "reveal_target": "center" }
+        { "task_name": "Lazygit", "reveal_target": "center" },
       ],
       // fuzzy search
       "space s f": [
         "task::Spawn",
-        { "task_name": "File Finder", "reveal_target": "center" }
+        { "task_name": "File Finder", "reveal_target": "center" },
       ],
       "space s g": [
         "task::Spawn",
-        { "task_name": "Find in Files", "reveal_target": "center" }
+        { "task_name": "Find in Files", "reveal_target": "center" },
       ],
       "space s t": [
         "task::Spawn",
         // Find in Files Selected Text
-        { "task_name": "Find in Selected", "reveal_target": "center" }
-      ]
-    }
+        { "task_name": "Find in Selected", "reveal_target": "center" },
+      ],
+    },
   },
   {
     // put key-bindings here if you want them to work in normal & visual mode
@@ -100,14 +100,18 @@
       // copy permalink to a line
       "space g Y": "editor::CopyPermalinkToLine",
       "space g h d": "editor::ExpandAllDiffHunks",
-      "space g h D": "git::Diff",
+      "space g d": "git::Diff",
       "space g h r": "git::Restore",
+      "space g h s": "git::StageAndNext",
       "space g h R": "git::RestoreFile",
       // markdown
       "space m p": "markdown::OpenPreview",
       "space m P": "markdown::OpenPreviewToTheSide",
       "space s r": ["pane::DeploySearch", { "replace_enabled": true }],
-      "space s w": ["task::Spawn", { "task_name": "find in files - selected text" }],
+      "space s w": [
+        "task::Spawn",
+        { "task_name": "find in files - selected text" },
+      ],
       "space t L": ["task::Rerun", { "reevaluate_context": true }],
       "space t l": "task::Rerun",
       "space t n": ["editor::SpawnNearestTask", { "reveal": "no_focus" }],
@@ -127,8 +131,8 @@
       "] e": ["editor::GoToDiagnostic", { "severity": "error" }],
       "[ e": ["editor::GoToPreviousDiagnostic", { "severity": "error" }],
       "alt-k": "editor::MoveLineUp",
-      "alt-j": "editor::MoveLineDown"
-    }
+      "alt-j": "editor::MoveLineDown",
+    },
   },
   {
     // Vim specific overrides
@@ -137,21 +141,27 @@
       "J": ["workspace::SendKeystrokes", "m z J ` z"],
       "f": ["vim::PushFindForward", { "before": false, "multiline": true }],
       "t": ["vim::PushFindForward", { "before": true, "multiline": true }],
-      "shift-f": ["vim::PushFindBackward", { "after": false, "multiline": true }],
-      "shift-t": ["vim::PushFindBackward", { "after": true, "multiline": true }],
+      "shift-f": [
+        "vim::PushFindBackward",
+        { "after": false, "multiline": true },
+      ],
+      "shift-t": [
+        "vim::PushFindBackward",
+        { "after": true, "multiline": true },
+      ],
       "g s a": "vim::PushAddSurrounds",
       "g s r": ["vim::PushChangeSurrounds", {}],
       "g s d": "vim::PushDeleteSurrounds",
       "ctrl-u": ["workspace::SendKeystrokes", "ctrl-u z z"],
-      "ctrl-d": ["workspace::SendKeystrokes", "ctrl-d z z"]
-    }
+      "ctrl-d": ["workspace::SendKeystrokes", "ctrl-d z z"],
+    },
   },
   {
     "context": "vim_mode == normal || vim_mode == visual",
     "bindings": {
       "s": "vim::PushSneak",
-      "S": "vim::PushSneakBackward"
-    }
+      "S": "vim::PushSneakBackward",
+    },
   },
   {
     // Vim: File Tree ("ProjectPanel") actions
@@ -170,21 +180,21 @@
       "shift-a": "project_panel::NewDirectory",
       "shift-y": "workspace::CopyRelativePath",
       "g y": "workspace::CopyPath",
-      "q": "workspace::ToggleLeftDock"
-    }
+      "q": "workspace::ToggleLeftDock",
+    },
   },
   {
     "context": "TabSwitcher",
     "bindings": {
       "k": "menu::SelectPrevious",
       "j": "menu::SelectNext",
-      "x": "tab_switcher::CloseSelectedItem"
-    }
+      "x": "tab_switcher::CloseSelectedItem",
+    },
   },
   {
     "context": "vim_mode == visual",
     "bindings": {
-      "shift-x": "vim::Exchange"
-    }
-  }
+      "shift-x": "vim::Exchange",
+    },
+  },
 ]
