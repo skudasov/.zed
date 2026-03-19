@@ -1,11 +1,23 @@
 {
+  "disable_ai": false,
   "agent_servers": {
     "claude-acp": {
       "type": "registry",
     },
   },
+  "edit_predictions": {
+    "disabled_globs": [
+      "**/*.go",
+      "**/.env*",
+      "**/*.pem",
+      "**/*.key",
+      "**/*.cert",
+      "**/*.crt",
+      "**/.dev.vars",
+      "**/secrets.yml",
+    ],
+  },
   "load_direnv": "shell_hook",
-  "disable_ai": false,
   "centered_layout": {
     "left_padding": 0.15,
     "right_padding": 0.15,

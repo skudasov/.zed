@@ -1,0 +1,82 @@
+{
+  "struct with constructor": {
+    "prefix": "$ctor",
+    "body": "type ${1:Name} struct {\n\t${2}\n}\n\nfunc New${1}(${3}) *${1} {\n\treturn &${1}{\n\t\t${0}\n\t}\n}",
+    "description": "Struct declaration with constructor"
+  },
+  "interface declaration": {
+    "prefix": "$iface",
+    "body": "type ${1:Name} interface {\n\t${0}\n}",
+    "description": "Interface type declaration"
+  },
+  "method declaration": {
+    "prefix": "$meth",
+    "body": "func (${1:r} *${2:Type}) ${3:Method}(${4}) ${5} {\n\t${0}\n}",
+    "description": "Method on a type"
+  },
+  "method declaration with ctx": {
+    "prefix": "$methctx",
+    "body": "func (${1:r} *${2:Type}) ${3:Method}(ctx context.Context, ${4}) ${5} {\n\t${0}\n}",
+    "description": "Method on a type"
+  },
+  "if err != nil": {
+    "prefix": "$iferr",
+    "body": "if err != nil {\n\treturn ${1:nil, }err\n}",
+    "description": "Error check and return"
+  },
+  "for range": {
+    "prefix": "$forr",
+    "body": "for ${1:_}, ${2:v} := range ${3:items} {\n\t${0}\n}",
+    "description": "For range loop"
+  },
+  "goroutine": {
+    "prefix": "$go",
+    "body": "go func() {\n\t${0}\n}()",
+    "description": "Anonymous goroutine"
+  },
+  "select with timeout": {
+    "prefix": "$sel",
+    "body": "select {\ncase ${1:v} := <-${2:ch}:\n\t${3}\ncase <-time.After(${4:5 * time.Second}):\n\t${0}\n}",
+    "description": "Select with timeout"
+  },
+  "waitgroup": {
+    "prefix": "$wg",
+    "body": "var wg sync.WaitGroup\nfor ${1:_, v} := range ${2:items} {\n\twg.Add(1)\n\tgo func(${3:v} ${4:type}) {\n\t\tdefer wg.Done()\n\t\t${0}\n\t}(${3:v})\n}\nwg.Wait()",
+    "description": "WaitGroup with concurrent goroutines"
+  },
+  "test function": {
+    "prefix": "$test",
+    "body": "func Test${1:Name}(t *testing.T) {\n\t${0}\n}",
+    "description": "Test function"
+  },
+  "table driven test": {
+    "prefix": "$tdt",
+    "body": "func Test${1:Name}(t *testing.T) {\n\ttests := []struct {\n\t\tname string\n\t\t${2}\n\t}{\n\t\t{name: \"${3}\", ${4}},\n\t}\n\tfor _, tt := range tests {\n\t\tt.Run(tt.name, func(t *testing.T) {\n\t\t\t${0}\n\t\t})\n\t}\n}",
+    "description": "Table driven test"
+  },
+  "benchmark function": {
+    "prefix": "$bench",
+    "body": "func Benchmark${1:Name}(b *testing.B) {\n\tfor b.Loop() {\n\t\t${0}\n\t}\n}",
+    "description": "Benchmark function"
+  },
+  "errgroup": {
+    "prefix": "$eg",
+    "body": "eg, ctx := errgroup.WithContext(${1:ctx})\neg.Go(func() error {\n\t${0}\n\treturn nil\n})\nif err := eg.Wait(); err != nil {\n\treturn err\n}",
+    "description": "errgroup.WithContext with goroutine and Wait"
+  },
+  "context with timeout": {
+    "prefix": "$ctx",
+    "body": "ctx, cancel := context.WithTimeout(${1:ctx}, ${2:time.Second})\ndefer cancel()",
+    "description": "context with timeout and deferred cancel"
+  },
+  "ticker with context": {
+    "prefix": "$tick",
+    "body": "ticker := time.NewTicker(${1:time.Second})\ndefer ticker.Stop()\nfor {\n\tselect {\n\tcase <-ticker.C:\n\t\t${0}\n\tcase <-ctx.Done():\n\t\treturn ctx.Err()\n\t}\n}",
+    "description": "Ticker loop with context cancellation"
+  },
+  "package main": {
+    "prefix": "$main",
+    "body": "package main\n\nfunc main() {\n\t${0}\n}",
+    "description": "Package main with main function"
+  }
+}
