@@ -3,12 +3,14 @@
 Copy files to `~/.config/zed`
 
 ## Television Search
+
 ```
 brew install television
 tv update-channels
 ```
 
 Create a file in `~/.config/television/cable/files.toml`
+
 ```
 [metadata]
 name = "files"
@@ -39,5 +41,17 @@ mode = "execute"
 description = "Removes the selected entries"
 command = "rm {}"
 ```
+
 ## Setting up project tasks and debug
+
 Create a directory `.zed/` with `tasks.json` and `debug.json` and copy examples for `Go` and `Python`
+
+## Linking Hammerspoon Keys
+
+Enable `Hammerspoon` to access window API.
+**System Settings → Privacy & Security → Accessibility → Hammerspoon**
+
+```bash
+brew install --cask hammerspoon
+just install
+```

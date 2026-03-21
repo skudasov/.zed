@@ -13,8 +13,6 @@
       // goto
       "g t": "editor::GoToTypeDefinition",
       "g I": "editor::GoToImplementationSplit",
-      // tabs
-      "space b r": "pane::ReopenClosedItem",
       // docks
       "space u b": "workspace::ToggleBottomDock",
       "space u r": "workspace::ToggleRightDock",
