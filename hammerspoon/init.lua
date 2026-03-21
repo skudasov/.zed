@@ -10,6 +10,7 @@ end
 hs.hotkey.bind({ "cmd" }, "i", function() focusFull("Zed") end)
 hs.hotkey.bind({ "cmd" }, "b", function() focusFull("Google Chrome") end)
 hs.hotkey.bind({ "cmd" }, "p", function() focusFull("Slack") end)
+hs.hotkey.bind({ "cmd" }, "g", function() focusFull("Ghostty") end)
 
 hs.hotkey.bind({ "cmd" }, "'", function()
     hs.window.animationDuration = 0
@@ -17,12 +18,12 @@ hs.hotkey.bind({ "cmd" }, "'", function()
 
     local zed = hs.application.get("Zed")
     if zed and zed:mainWindow() then
-        zed:mainWindow():setFrame({x=f.x, y=f.y, w=f.w/2, h=f.h})
+        zed:mainWindow():setFrame({ x = f.x, y = f.y, w = f.w / 2, h = f.h })
     end
 
     local chrome = hs.application.get("Google Chrome")
     if chrome and chrome:mainWindow() then
-        chrome:mainWindow():setFrame({x=f.x + f.w/2, y=f.y, w=f.w/2, h=f.h})
+        chrome:mainWindow():setFrame({ x = f.x + f.w / 2, y = f.y, w = f.w / 2, h = f.h })
         chrome:activate()
     end
 end)
