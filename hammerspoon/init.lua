@@ -27,3 +27,26 @@ hs.hotkey.bind({ "cmd" }, "'", function()
         chrome:activate()
     end
 end)
+
+-- Chrome tabs (create modal to isolate key bindings)
+local chromeMod = hs.hotkey.modal.new()
+
+chromeMod:bind({ "cmd" }, "]", function()
+    hs.eventtap.keyStroke({ "ctrl" }, "tab", 0)
+end)
+
+chromeMod:bind({ "cmd" }, "[", function()
+    hs.eventtap.keyStroke({ "ctrl", "shift" }, "tab", 0)
+end)
+
+local appWatcher = hs.application.watcher.new(function(name, event, app)
+    if event == hs.application.watcher.activated then
+        if name == "Google Chrome" then
+            chromeMod:enter()
+        else
+            chromeMod:exit()
+        end
+    end
+end)
+
+appWatcher:start()
