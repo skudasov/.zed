@@ -11,7 +11,7 @@ hs.hotkey.bind({ "cmd" }, "i", function() focusFull("Zed") end)
 hs.hotkey.bind({ "cmd" }, "b", function() focusFull("Google Chrome") end)
 hs.hotkey.bind({ "cmd" }, "p", function() focusFull("Slack") end)
 hs.hotkey.bind({ "cmd" }, "g", function() focusFull("Ghostty") end)
-
+--
 hs.hotkey.bind({ "cmd" }, "'", function()
     hs.window.animationDuration = 0
     local f = hs.screen.mainScreen():fullFrame()

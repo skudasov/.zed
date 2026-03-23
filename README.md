@@ -55,3 +55,15 @@ Enable `Hammerspoon` to access window API.
 brew install --cask hammerspoon
 just install
 ```
+
+## Linux VM
+
+Just use `OrbStack` to create `Nix` VM, choose unstable.
+
+```bash
+orb create -a arm64 nixos:unstable nix
+# apply configuration
+sudo nixos-rebuild switch --flake flake.nix
+```
+
+Use `Ctrl+Option+O` to select default SSH: `orb`.
