@@ -77,7 +77,10 @@
     // {
       nixosConfigurations.nix = nixpkgs.lib.nixosSystem {
         system = "aarch64-linux";
-        modules = [ ./vms/orb-nix.nix ];
+        modules = [
+          /etc/nixos/configuration.nix
+          ./vms/orb-nix.nix
+        ];
       };
     };
 }
