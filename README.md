@@ -62,8 +62,9 @@ Just use `OrbStack` to create `Nix` VM, choose unstable.
 
 ```bash
 orb create -a arm64 nixos:unstable nix
-# apply configuration
-sudo nixos-rebuild switch --flake flake.nix
+# apply configuration, OrbStack has hardware configs generated including incus.nix and hardware.nix, they may change so '--impure' is fine in this case
+ssh nix@orb
+sudo nixos-rebuild switch --flake --impure
 ```
 
 Use `Ctrl+Option+O` to select default SSH: `orb`.
