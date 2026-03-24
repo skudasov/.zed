@@ -6,6 +6,7 @@
 {
   environment.systemPackages = with pkgs; [
     # Zig
+    zig
     valgrind
 
     # JSON / data wrangling
