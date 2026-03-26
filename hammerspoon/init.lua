@@ -1,14 +1,27 @@
 local function focusFull(name)
     hs.window.animationDuration = 0
-    hs.application.launchOrFocus(name)
-    local app = hs.application.get(name)
-    if app and app:mainWindow() then
-        app:mainWindow():setFrame(hs.screen.mainScreen():fullFrame())
+
+    for _, win in ipairs(hs.window.filter.defaultCurrentSpace:getWindows()) do
+        if win:application():name() == name then
+            win:focus()
+            win:setFrame(win:screen():fullFrame())
+            return
+        end
     end
+
+    -- No window on current space: launch or switch to it
+    hs.application.launchOrFocus(name)
 end
 
 hs.hotkey.bind({ "cmd" }, "i", function() focusFull("Zed") end)
 hs.hotkey.bind({ "cmd" }, "b", function() focusFull("Google Chrome") end)
+
+hs.hotkey.bind({ "cmd", "shift" }, "g", function() hs.execute("open -na Ghostty") end)
+hs.hotkey.bind({ "cmd", "shift" }, "i", function() hs.execute("/bin/zsh -l -c 'zed -n'") end)
+hs.hotkey.bind({ "cmd", "shift" }, "b", function()
+    hs.application.launchOrFocus("Google Chrome")
+    hs.eventtap.keyStroke({ "cmd" }, "n", 100000)
+end)
 hs.hotkey.bind({ "cmd" }, "p", function() focusFull("Slack") end)
 hs.hotkey.bind({ "cmd" }, "g", function() focusFull("Ghostty") end)
 --
