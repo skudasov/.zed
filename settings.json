@@ -47,6 +47,18 @@
   "search": { "button": true },
   "diagnostics": { "button": true },
   "agent": {
+    "tool_permissions": {
+      "tools": {
+        "terminal": {
+          "default": "allow"
+        }
+      }
+    },
+    "default_model": {
+      "provider": "anthropic",
+      "model": "claude-haiku-4-5-latest",
+      "enable_thinking": false
+    },
     "single_file_review": false,
     "model_parameters": [],
   },
@@ -135,7 +147,7 @@
   "theme": {
     "mode": "system",
     "light": "One Light",
-    "dark": "GitHub Dark Dimmed",
+    "dark": "Spiceflow Dark",
   },
   "autosave": {
     "after_delay": {
