@@ -70,7 +70,24 @@
             p7zip
           ];
 
-          shellHook = "";
+          shellHook = ''
+            # rtk — Rust Token Killer: compresses command output before it hits Claude's context
+            # Saves ~60-90% tokens per session. Hook rewrites Bash tool calls transparently.
+            if ! brew list rtk &>/dev/null 2>&1; then
+              echo "Installing rtk via Homebrew..."
+              brew install rtk
+              echo "Wiring rtk into Claude Code (PreToolUse hook)..."
+              rtk init -g
+              echo "Restart Claude Code for the rtk hook to take effect."
+            fi
+
+            # caveman — Claude Code plugin: caveman-speak output cuts ~65% of response tokens
+            # Installs skills + PreToolUse/PostToolUse hooks into ~/.claude
+            if [ ! -f "$HOME/.claude/plugins/caveman/.claude-plugin" ]; then
+              echo "Installing caveman Claude Code plugin..."
+              bash <(curl -fsSL https://raw.githubusercontent.com/JuliusBrussee/caveman/main/hooks/install.sh)
+            fi
+          '';
         };
       }
     )

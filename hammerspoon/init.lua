@@ -13,7 +13,16 @@ local function focusFull(name)
     hs.application.launchOrFocus(name)
 end
 
-hs.hotkey.bind({ "cmd" }, "i", function() focusFull("Zed") end)
+hs.hotkey.bind({ "cmd" }, "i", function()
+    hs.window.animationDuration = 0
+    local focused = hs.window.focusedWindow()
+    local focusedApp = focused and focused:application():name()
+    if focusedApp == "Zed" then
+        focusFull("Ghostty")
+    else
+        focusFull("Zed")
+    end
+end)
 hs.hotkey.bind({ "cmd" }, "b", function() focusFull("Google Chrome") end)
 
 hs.hotkey.bind({ "cmd", "shift" }, "g", function() hs.execute("open -na Ghostty") end)
@@ -23,7 +32,6 @@ hs.hotkey.bind({ "cmd", "shift" }, "b", function()
     hs.eventtap.keyStroke({ "cmd" }, "n", 100000)
 end)
 hs.hotkey.bind({ "cmd" }, "p", function() focusFull("Slack") end)
-hs.hotkey.bind({ "cmd" }, "g", function() focusFull("Ghostty") end)
 --
 hs.hotkey.bind({ "cmd" }, "'", function()
     hs.window.animationDuration = 0
