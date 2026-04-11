@@ -20,9 +20,6 @@
       {
         devShells.default = pkgs.mkShell {
           packages = with pkgs; [
-            # Zig
-            valgrind
-
             # JSON / data wrangling
             jq
             yq-go # yq for YAML, TOML, XML — same syntax as jq
