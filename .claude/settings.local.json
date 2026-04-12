@@ -12,7 +12,8 @@
       "WebSearch",
       "WebFetch(domain:raw.githubusercontent.com)",
       "Bash(python3:*)",
-      "Bash(rtk curl:*)"
+      "Bash(rtk curl:*)",
+      "Bash(just color:*)"
     ]
   }
 }

@@ -7,45 +7,70 @@ from types import SimpleNamespace
 #  EDIT HERE — define your dark and light palettes
 # ══════════════════════════════════════════════════════════════════════════════
 
+# 10 shades: g0 (darkest) → g9 (lightest)
+g = [
+    "#252525",  # g0 — background
+    "#3c3c3c",  # g1
+    "#494949",  # g2
+    "#585858",  # g3
+    "#696969",  # g4
+    "#848484",  # g5
+    "#a0a0a0",  # g6
+    "#bcbcbc",  # g7
+    "#d6d6d6",  # g8
+    "#e8e8e8",  # g9
+]
+
 dark = SimpleNamespace(
+    # ── Shades (for reference and reuse)
+    g0=g[0],
+    g1=g[1],
+    g2=g[2],
+    g3=g[3],
+    g4=g[4],
+    g5=g[5],
+    g6=g[6],
+    g7=g[7],
+    g8=g[8],
+    g9=g[9],
     # ── Base
-    background="#24283b",
-    foreground="#c0caf5",
-    cursor="#dad1e3",
-    selection_bg="#c2a9db",
-    selection_fg="#c2a9db",
+    background=g[0],
+    foreground=g[7],  # default text
+    cursor=g[9],
+    selection_bg=g[9],
+    selection_fg="#4a3f2f",
     # ── ANSI 0-7
-    black="#1d202f",
-    red="#f7768e",
-    green="#9ece6a",
-    yellow="#e0af68",
-    blue="#7aa2f7",
-    magenta="#bb9af7",
-    cyan="#7dcfff",
-    white="#a9b1d6",
+    black=g[1],
+    red="#c46060",
+    green="#5a9960",
+    yellow="#b8996a",  # gold-gray — same as syn_string
+    blue="#b8996a",  # gold-gray — was gray, rendered as blue in Ghostty
+    magenta=g[7],
+    cyan=g[7],
+    white=g[8],
     # ── ANSI 8-15 (bright)
-    bright_black="#414868",
-    bright_red="#f7768e",
-    bright_green="#9ece6a",
-    bright_yellow="#e0af68",
-    bright_blue="#7aa2f7",
-    bright_magenta="#bb9af7",
-    bright_cyan="#7dcfff",
-    bright_white="#c0caf5",
-    # ── Syntax (Zed editor only — set to None to inherit from ANSI colors above)
-    syn_keyword="#9d7cd8",
-    syn_string="#9ece6a",
-    syn_comment="#565f89",
-    syn_function="#7aa2f7",
-    syn_type="#2ac3de",
-    syn_constant="#ff9e64",
-    syn_number="#ff9e64",
-    syn_operator="#89ddff",
-    syn_property="#73daca",
-    syn_variable="#c0caf5",
-    syn_tag="#f7768e",
-    syn_attribute="#e0af68",
-    syn_punctuation="#89ddff",
+    bright_black=g[3],
+    bright_red="#d47070",
+    bright_green="#6aaa70",
+    bright_yellow="#cca97a",  # gold-gray lifted
+    bright_blue="#cca97a",
+    bright_magenta=g[8],
+    bright_cyan=g[8],
+    bright_white=g[9],
+    # ── Syntax (brighter = more important)
+    syn_function=g[9],  # brightest — what's being called
+    syn_type=g[8],  # second — what data looks like
+    syn_constant=g[7],  # third — literal values
+    syn_number=g[7],
+    syn_keyword=g[6],  # structural but not data
+    syn_string="#b8996a",  # gold-gray — stands out without full color
+    syn_property=g[5],
+    syn_variable=g[6],
+    syn_operator=g[5],
+    syn_attribute=g[5],
+    syn_tag=g[5],
+    syn_punctuation=g[6],
+    syn_comment=g[4],  # least prominent — recedes into bg
 )
 
 # ── Theme registry: (filename, zed appearance, palette)
@@ -106,10 +131,10 @@ def zed(name, appearance, p):
     dark_mode = appearance == "dark"
     bg, fg = p.background, p.foreground
     hi = "#ffffff" if dark_mode else "#000000"
-    surface = _mix(bg, hi, 0.05)
-    elevated = _mix(bg, hi, 0.08)
-    border = _mix(bg, hi, 0.12)
-    subtle = _mix(fg, bg, 0.5)
+    surface = _mix(bg, hi, 0.1)
+    elevated = _mix(bg, hi, 0.05)
+    border = _mix(bg, hi, 0.32)
+    subtle = _mix(fg, bg, 0.05)  # closer to fg — readable in menus/popups
 
     style = {
         "background": bg,
@@ -139,9 +164,9 @@ def zed(name, appearance, p):
         "element.active": _mix(p.blue, bg, 0.8),
         "element.selected": _mix(p.blue, bg, 0.85),
         "element.disabled": border,
-        "ghost_element.hover": _mix(fg, bg, 0.08),
-        "ghost_element.active": _mix(fg, bg, 0.12),
-        "ghost_element.selected": _mix(fg, bg, 0.1),
+        "ghost_element.hover": _mix(fg, bg, 0.8),
+        "ghost_element.active": _mix(fg, bg, 0.8),
+        "ghost_element.selected": _mix(fg, bg, 0.8),
         "editor.foreground": fg,
         "editor.background": bg,
         "editor.gutter.background": bg,
