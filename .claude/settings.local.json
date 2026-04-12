@@ -2,7 +2,12 @@
   "permissions": {
     "allow": [
       "Bash(gh api:*)",
-      "WebFetch(domain:github.com)"
+      "WebFetch(domain:github.com)",
+      "Bash(rtk --version)",
+      "Bash(rtk read:*)",
+      "Bash(rtk gain:*)",
+      "Bash(rtk ls:*)",
+      "Bash(just install-ghostty:*)"
     ]
   }
 }

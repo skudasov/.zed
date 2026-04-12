@@ -1,0 +1,35 @@
+# Ghostty config — sourced from ~/.config/zed/ghostty/config
+# Install: `just install-ghostty` from ~/.config/zed
+
+# ── Theme ────────────────────────────────────────────────────────────────────
+# Matches Zed: dark = "GitHub Dark Dimmed", light = "One Light"
+# Custom theme files live in ~/.config/ghostty/themes/ (symlinked from repo)
+theme = dark:github-dark-dimmed,light:one-light
+
+# ── Font ─────────────────────────────────────────────────────────────────────
+# Zed uses .ZedMono (bundled). Use any monospace you have installed.
+# Uncomment and change to your preferred font:
+# font-family = "ZedMono Nerd Font"
+# font-family = "JetBrains Mono"
+font-size = 15
+
+# Ligatures — mirrors Zed terminal font_features
+font-feature = +liga
+font-feature = +ss02
+font-feature = +ss03
+font-feature = +ss05
+font-feature = +ss07
+
+# ── Cursor ───────────────────────────────────────────────────────────────────
+cursor-style = block
+cursor-style-blink = false
+
+# ── Window ───────────────────────────────────────────────────────────────────
+window-padding-x = 8
+window-padding-y = 8
+
+# ── Scrollback ───────────────────────────────────────────────────────────────
+scrollback-limit = 30000
+
+# ── Shell ────────────────────────────────────────────────────────────────────
+# shell-integration = fish   # uncomment if using fish

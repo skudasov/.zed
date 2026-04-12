@@ -58,6 +58,9 @@
       "space j": "workspace::ActivatePaneDown",
       "space k": "workspace::ActivatePaneUp",
       "space l": "workspace::ActivatePaneRight",
+      
+      "cmd-]": "workspace::ActivatePaneRight",
+      "cmd-[": "workspace::ActivatePaneLeft",
 
       // debugger
       "space d s": "debugger::Start",

@@ -1,5 +1,5 @@
 ---
-description: Review code for security issues and bugs
+description: ls
 allowed-tools: Read, Grep
 argument-hint: [file-or-dir]
 ---
