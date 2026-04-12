@@ -1,4 +1,9 @@
 {
+  "icon_theme": {
+    "mode": "dark",
+    "light": "Zed (Default)",
+    "dark": "Zed (Default)",
+  },
   "ssh_connections": [
     {
       "host": "orb",
@@ -7,12 +12,10 @@
       "args": [],
       "projects": [
         {
-          "paths": [
-            "/Users/skudasov/zig-projects/peery"
-          ]
-        }
-      ]
-    }
+          "paths": ["/Users/skudasov/zig-projects/peery"],
+        },
+      ],
+    },
   ],
   "disable_ai": false,
   "agent_servers": {
@@ -50,14 +53,14 @@
     "tool_permissions": {
       "tools": {
         "terminal": {
-          "default": "allow"
-        }
-      }
+          "default": "allow",
+        },
+      },
     },
     "default_model": {
       "provider": "anthropic",
       "model": "claude-haiku-4-5-latest",
-      "enable_thinking": false
+      "enable_thinking": false,
     },
     "single_file_review": false,
     "model_parameters": [],
@@ -145,9 +148,9 @@
   "ui_font_size": 15,
   "buffer_font_size": 15,
   "theme": {
-    "mode": "system",
-    "light": "One Light",
-    "dark": "GitHub Dark Dimmed",
+    "mode": "dark",
+    "dark": "user-theme",
+    "light": "Hex Solarized Light Theme",
   },
   "autosave": {
     "after_delay": {
