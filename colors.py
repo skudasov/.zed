@@ -37,7 +37,7 @@ dark = SimpleNamespace(
     background=g[0],
     foreground=g[7],  # default text
     cursor=g[9],
-    selection_bg=g[9],
+    selection_bg=g[3],
     selection_fg="#4a3f2f",
     # ── ANSI 0-7
     black=g[1],
@@ -218,7 +218,7 @@ def zed(name, appearance, p):
         "hidden": subtle,
         "hidden.background": bg,
         "hidden.border": border,
-        "ignored": subtle,
+        "ignored": _mix(fg, bg, 0.5),
         "ignored.background": bg,
         "ignored.border": border,
         "renamed": p.cyan,
