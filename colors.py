@@ -7,18 +7,18 @@ from types import SimpleNamespace
 #  EDIT HERE — define your dark and light palettes
 # ══════════════════════════════════════════════════════════════════════════════
 
-# 10 shades: g0 (darkest) → g9 (lightest)
+# 10 shades: g0 (darkest) → g9 (lightest), cool slate blue-gray
 g = [
-    "#252525",  # g0 — background
-    "#3c3c3c",  # g1
-    "#494949",  # g2
-    "#585858",  # g3
-    "#696969",  # g4
-    "#848484",  # g5
-    "#a0a0a0",  # g6
-    "#bcbcbc",  # g7
-    "#d6d6d6",  # g8
-    "#e8e8e8",  # g9
+    "#1a1e24",  # g0 — background
+    "#282e38",  # g1
+    "#343c48",  # g2
+    "#444e5c",  # g3
+    "#566070",  # g4
+    "#6e7d90",  # g5
+    "#8e9db0",  # g6
+    "#aebdce",  # g7
+    "#c8d6e4",  # g8
+    "#dce4ee",  # g9
 ]
 
 dark = SimpleNamespace(
@@ -38,13 +38,13 @@ dark = SimpleNamespace(
     foreground=g[7],  # default text
     cursor=g[9],
     selection_bg=g[3],
-    selection_fg="#4a3f2f",
+    selection_fg="#1e2a3a",
     # ── ANSI 0-7
     black=g[1],
     red="#c46060",
     green="#5a9960",
-    yellow="#b8996a",  # gold-gray — same as syn_string
-    blue="#b8996a",  # gold-gray — was gray, rendered as blue in Ghostty
+    yellow="#d4925a",  # amber — same as syn_string
+    blue="#d4925a",  # amber — was gray, rendered as blue in Ghostty
     magenta=g[7],
     cyan=g[7],
     white=g[8],
@@ -52,8 +52,8 @@ dark = SimpleNamespace(
     bright_black=g[3],
     bright_red="#d47070",
     bright_green="#6aaa70",
-    bright_yellow="#cca97a",  # gold-gray lifted
-    bright_blue="#cca97a",
+    bright_yellow="#e8a86e",  # amber lifted
+    bright_blue="#e8a86e",
     bright_magenta=g[8],
     bright_cyan=g[8],
     bright_white=g[9],
@@ -63,7 +63,7 @@ dark = SimpleNamespace(
     syn_constant=g[7],  # third — literal values
     syn_number=g[7],
     syn_keyword=g[6],  # structural but not data
-    syn_string="#b8996a",  # gold-gray — stands out without full color
+    syn_string="#d4925a",  # amber — warm contrast against cool slate
     syn_property=g[5],
     syn_variable=g[6],
     syn_operator=g[5],
