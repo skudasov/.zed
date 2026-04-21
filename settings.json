@@ -149,7 +149,7 @@
   "buffer_font_size": 15,
   "theme": {
     "mode": "dark",
-    "dark": "user-theme",
+    "dark": "Ultimate Dark Neo",
     "light": "Hex Solarized Light Theme",
   },
   "autosave": {
