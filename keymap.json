@@ -124,6 +124,7 @@
       "space c r ": "editor::Rename",
       "space e": "pane::RevealInProjectPanel",
       "space g b": "git::Blame",
+      "space g D": "git::BranchDiff",
       "space g B": "editor::OpenPermalinkToLine",
       // copy permalink to a line
       "space g Y": "editor::CopyPermalinkToLine",
