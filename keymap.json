@@ -7,7 +7,7 @@
       "ctrl-i": "pane::GoForward",
       // agents
       "space a a": "agent::NewThread",
-      "space a h": "agent::OpenHistory",
+      "cmd-2": "multi_workspace::ToggleWorkspaceSidebar",
       // ai (doesn't work with Claude)
       "space a i": "assistant::InlineAssist",
       // goto
@@ -58,7 +58,7 @@
       "space j": "workspace::ActivatePaneDown",
       "space k": "workspace::ActivatePaneUp",
       "space l": "workspace::ActivatePaneRight",
-      
+
       "cmd-]": "workspace::ActivatePaneRight",
       "cmd-[": "workspace::ActivatePaneLeft",
 
@@ -98,19 +98,10 @@
       "] h": "editor::GoToHunk",
       "[ h": "editor::GoToPreviousHunk",
 
-      "space g g": [
-        "task::Spawn",
-        { "task_name": "Lazygit", "reveal_target": "center" },
-      ],
+      "space g g": ["task::Spawn", { "task_name": "Lazygit", "reveal_target": "center" }],
       // fuzzy search
-      "space s f": [
-        "task::Spawn",
-        { "task_name": "File Finder", "reveal_target": "center" },
-      ],
-      "space s g": [
-        "task::Spawn",
-        { "task_name": "Find in Files", "reveal_target": "center" },
-      ],
+      "space s f": ["task::Spawn", { "task_name": "File Finder", "reveal_target": "center" }],
+      "space s g": ["task::Spawn", { "task_name": "Find in Files", "reveal_target": "center" }],
       "space s t": [
         "task::Spawn",
         // Find in Files Selected Text
@@ -145,10 +136,7 @@
       "space m p": "markdown::OpenPreview",
       "space m P": "markdown::OpenPreviewToTheSide",
       "space s r": ["pane::DeploySearch", { "replace_enabled": true }],
-      "space s w": [
-        "task::Spawn",
-        { "task_name": "find in files - selected text" },
-      ],
+      "space s w": ["task::Spawn", { "task_name": "find in files - selected text" }],
       "space t L": ["task::Rerun", { "reevaluate_context": true }],
       "space t l": "task::Rerun",
       "space t n": ["editor::SpawnNearestTask", { "reveal": "no_focus" }],
@@ -178,14 +166,8 @@
       "J": ["workspace::SendKeystrokes", "m z J ` z"],
       "f": ["vim::PushFindForward", { "before": false, "multiline": true }],
       "t": ["vim::PushFindForward", { "before": true, "multiline": true }],
-      "shift-f": [
-        "vim::PushFindBackward",
-        { "after": false, "multiline": true },
-      ],
-      "shift-t": [
-        "vim::PushFindBackward",
-        { "after": true, "multiline": true },
-      ],
+      "shift-f": ["vim::PushFindBackward", { "after": false, "multiline": true }],
+      "shift-t": ["vim::PushFindBackward", { "after": true, "multiline": true }],
       "g s a": "vim::PushAddSurrounds",
       "g s r": ["vim::PushChangeSurrounds", {}],
       "g s d": "vim::PushDeleteSurrounds",

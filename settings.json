@@ -1,4 +1,7 @@
 {
+  "collaboration_panel": {
+    "dock": "left"
+  },
   "icon_theme": {
     "mode": "dark",
     "light": "Zed (Default)",
@@ -50,6 +53,7 @@
   "search": { "button": true },
   "diagnostics": { "button": true },
   "agent": {
+    "dock": "right",
     "tool_permissions": {
       "tools": {
         "terminal": {
@@ -137,6 +141,7 @@
     "button": true,
   },
   "git_panel": {
+    "dock": "left",
     "sort_by_path": true,
     "default_width": 300,
     "button": true,
@@ -226,6 +231,14 @@
     },
   },
   "lsp": {
+    "zls": {
+      "binary": {
+        "path": "/Users/skudasov/zls/zls",
+      },
+      // "settings": {
+      //   "zls": {},
+      // },
+    },
     "rust-analyzer": {
       "initialization_options": {
         "check": {
@@ -274,13 +287,7 @@
           "useany": true,
         },
         "semanticTokens": true,
-        "directoryFilters": [
-          "-.git",
-          "-.vscode",
-          "-.idea",
-          "-.vscode-test",
-          "-node_modules",
-        ],
+        "directoryFilters": ["-.git", "-.vscode", "-.idea", "-.vscode-test", "-node_modules"],
         "experimentalPostfixCompletions": true,
         "codelenses": {
           "gc_details": false,
