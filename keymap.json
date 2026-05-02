@@ -73,6 +73,12 @@
       "space d b": "editor::ToggleBreakpoint",
       "space d p": "debugger::Pause",
 
+      // bookmarks
+      "space b v": "editor::ViewBookmarks",
+      "space b m": "editor::ToggleBookmark",
+      "space b n": "editor::GoToNextBookmark",
+      "space b p": "editor::GoToPreviousBookmark",
+
       // diagnostics
       "space s d": "diagnostics::Deploy",
 
