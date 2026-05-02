@@ -37,16 +37,17 @@ hs.hotkey.bind({ "cmd" }, "'", function()
     hs.window.animationDuration = 0
     local f = hs.screen.mainScreen():fullFrame()
 
-    local zed = hs.application.get("Zed")
-    if zed and zed:mainWindow() then
-        zed:mainWindow():setFrame({ x = f.x, y = f.y, w = f.w / 2, h = f.h })
+    for _, win in ipairs(hs.window.filter.defaultCurrentSpace:getWindows()) do
+        local name = win:application():name()
+        if name == "Zed" then
+            win:setFrame({ x = f.x, y = f.y, w = f.w / 2, h = f.h })
+        elseif name == "Google Chrome" then
+            win:setFrame({ x = f.x + f.w / 2, y = f.y, w = f.w / 2, h = f.h })
+        end
     end
 
     local chrome = hs.application.get("Google Chrome")
-    if chrome and chrome:mainWindow() then
-        chrome:mainWindow():setFrame({ x = f.x + f.w / 2, y = f.y, w = f.w / 2, h = f.h })
-        chrome:activate()
-    end
+    if chrome then chrome:activate() end
 end)
 
 -- Chrome tabs (create modal to isolate key bindings)
