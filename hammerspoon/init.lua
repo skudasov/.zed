@@ -40,13 +40,14 @@ end)
 hs.hotkey.bind({ "cmd" }, "u", function() focusFull("Ghostty") end)
 hs.hotkey.bind({ "cmd" }, "b", function() focusFull("Google Chrome") end)
 
-hs.hotkey.bind({ "cmd", "shift" }, "g", function() hs.execute("open -na Ghostty") end)
+hs.hotkey.bind({ "cmd", "shift" }, "u", function() hs.execute("open -na Ghostty") end)
 hs.hotkey.bind({ "cmd", "shift" }, "i", function() hs.execute("/bin/zsh -l -c 'zed -n'") end)
 hs.hotkey.bind({ "cmd", "shift" }, "b", function()
     hs.application.launchOrFocus("Google Chrome")
     hs.eventtap.keyStroke({ "cmd" }, "n", 100000)
 end)
 hs.hotkey.bind({ "cmd" }, "p", function() focusFull("Slack") end)
+
 --
 hs.hotkey.bind({ "cmd" }, "'", function()
     hs.window.animationDuration = 0

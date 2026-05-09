@@ -101,6 +101,8 @@
       "m c": "editor::AddSelectionBelow",
 
       // Git
+      "space v c": "git::ViewCommit",
+
       "] h": "editor::GoToHunk",
       "[ h": "editor::GoToPreviousHunk",
 
