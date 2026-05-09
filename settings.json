@@ -1,7 +1,10 @@
 {
+  "focus_follows_mouse": {
+    "enabled": true,
+  },
   "code_lens": "on",
   "collaboration_panel": {
-    "dock": "left"
+    "dock": "left",
   },
   "icon_theme": {
     "mode": "dark",
@@ -64,7 +67,7 @@
     },
     "default_model": {
       "provider": "anthropic",
-      "model": "claude-haiku-4-5-latest",
+      "model": "claude-sonnet-4-6",
       "enable_thinking": false,
     },
     "single_file_review": false,
