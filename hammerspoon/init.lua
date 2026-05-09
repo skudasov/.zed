@@ -15,14 +15,29 @@ end
 
 hs.hotkey.bind({ "cmd" }, "i", function()
     hs.window.animationDuration = 0
-    local focused = hs.window.focusedWindow()
-    local focusedApp = focused and focused:application():name()
-    if focusedApp == "Zed" then
-        focusFull("Ghostty")
-    else
-        focusFull("Zed")
+    local zedWins = {}
+    for _, win in ipairs(hs.window.filter.defaultCurrentSpace:getWindows()) do
+        if win:application():name() == "Zed" then
+            table.insert(zedWins, win)
+        end
     end
+    if #zedWins == 0 then
+        hs.application.launchOrFocus("Zed")
+        return
+    end
+    local focused = hs.window.focusedWindow()
+    local idx = 1
+    for i, win in ipairs(zedWins) do
+        if win:id() == (focused and focused:id()) then
+            idx = i % #zedWins + 1
+            break
+        end
+    end
+    local win = zedWins[idx]
+    win:focus()
+    win:setFrame(win:screen():fullFrame())
 end)
+hs.hotkey.bind({ "cmd" }, "u", function() focusFull("Ghostty") end)
 hs.hotkey.bind({ "cmd" }, "b", function() focusFull("Google Chrome") end)
 
 hs.hotkey.bind({ "cmd", "shift" }, "g", function() hs.execute("open -na Ghostty") end)

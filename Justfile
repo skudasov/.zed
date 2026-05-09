@@ -1,12 +1,9 @@
 install:
+    brew install --cask jordanbaird-ice
     mkdir -p ~/.hammerspoon
     cp hammerspoon/init.lua ~/.hammerspoon/init.lua
     nix profile install nixpkgs#nil
     nix profile install nixpkgs#nixd
-
-install-hammerspoon:
-	mkdir -p ~/.hammerspoon
-	cp hammerspoon/init.lua ~/.hammerspoon/init.lua
 
 install-pi:
 	cp -R .pi/. ~/.pi/
