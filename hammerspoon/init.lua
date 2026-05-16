@@ -1,3 +1,5 @@
+require("hs.ipc")
+
 local function focusFull(name)
     for _, win in ipairs(hs.window.filter.defaultCurrentSpace:getWindows()) do
         if win:application():name() == name then
@@ -75,4 +77,26 @@ hs.hotkey.bind({ "cmd" }, "'", function()
 
     local chrome = hs.application.get("Google Chrome")
     if chrome then chrome:activate() end
+end)
+
+
+local function sleep(t) coroutine.applicationYield(t) end
+
+hs.hotkey.bind({ "option", "ctrl" }, "k", function()
+    coroutine.wrap(function()
+        hs.execute("open -na Ghostty")
+        sleep(1)
+        -- auth
+        hs.eventtap.keyStrokes("aws sso login --profile epic")
+        -- run flux9s
+        hs.eventtap.keyStrokes("flux9s")
+        hs.eventtap.keyStroke({}, "return")
+        sleep(1)
+
+        -- split and run k9s
+        hs.eventtap.keyStroke({ "cmd", "shift" }, "d")
+        sleep(1)
+        hs.eventtap.keyStrokes("k9s")
+        hs.eventtap.keyStroke({}, "return")
+    end)()
 end)
