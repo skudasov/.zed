@@ -1,6 +1,4 @@
 local function focusFull(name)
-    hs.window.animationDuration = 0
-
     for _, win in ipairs(hs.window.filter.defaultCurrentSpace:getWindows()) do
         if win:application():name() == name then
             win:focus()
@@ -37,8 +35,21 @@ hs.hotkey.bind({ "cmd" }, "i", function()
     win:focus()
     win:setFrame(win:screen():fullFrame())
 end)
-hs.hotkey.bind({ "cmd" }, "u", function() focusFull("Ghostty") end)
-hs.hotkey.bind({ "cmd" }, "b", function() focusFull("Google Chrome") end)
+hs.hotkey.bind({ "cmd" }, "u", function() 
+    if hs.application.frontmostApplication():name() == "Ghostty" then
+        hs.eventtap.keyStroke({ "ctrl" }, "tab", 10000)
+    else
+        focusFull("Ghostty")
+    end
+end)
+
+hs.hotkey.bind({ "cmd" }, "b", function()
+    if hs.application.frontmostApplication():name() == "Google Chrome" then
+        hs.eventtap.keyStroke({ "ctrl" }, "tab", 10000)
+    else
+        focusFull("Google Chrome")
+    end
+end)
 
 hs.hotkey.bind({ "cmd", "shift" }, "u", function() hs.execute("open -na Ghostty") end)
 hs.hotkey.bind({ "cmd", "shift" }, "i", function() hs.execute("/bin/zsh -l -c 'zed -n'") end)
@@ -65,26 +76,3 @@ hs.hotkey.bind({ "cmd" }, "'", function()
     local chrome = hs.application.get("Google Chrome")
     if chrome then chrome:activate() end
 end)
-
--- Chrome tabs (create modal to isolate key bindings)
-local chromeMod = hs.hotkey.modal.new()
-
-chromeMod:bind({ "cmd" }, "]", function()
-    hs.eventtap.keyStroke({ "ctrl" }, "tab", 0)
-end)
-
-chromeMod:bind({ "cmd" }, "[", function()
-    hs.eventtap.keyStroke({ "ctrl", "shift" }, "tab", 0)
-end)
-
-local appWatcher = hs.application.watcher.new(function(name, event, app)
-    if event == hs.application.watcher.activated then
-        if name == "Google Chrome" then
-            chromeMod:enter()
-        else
-            chromeMod:exit()
-        end
-    end
-end)
-
-appWatcher:start()

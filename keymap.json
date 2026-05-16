@@ -1,8 +1,15 @@
 [
   {
+    "context": "Terminal",
+    "bindings": {
+      "ctrl-[": "vim::NormalBefore",
+    },
+  },
+  {
     "context": "Workspace",
     "bindings": {
       "space t t": "terminal_panel::Toggle",
+      "space t c": "workspace::NewCenterTerminal",
       "ctrl-o": "pane::GoBack",
       "ctrl-i": "pane::GoForward",
       // agents
