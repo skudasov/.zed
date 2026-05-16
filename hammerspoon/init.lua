@@ -53,12 +53,6 @@ hs.hotkey.bind({ "cmd" }, "b", function()
     end
 end)
 
-hs.hotkey.bind({ "cmd", "shift" }, "u", function() hs.execute("open -na Ghostty") end)
-hs.hotkey.bind({ "cmd", "shift" }, "i", function() hs.execute("/bin/zsh -l -c 'zed -n'") end)
-hs.hotkey.bind({ "cmd", "shift" }, "b", function()
-    hs.application.launchOrFocus("Google Chrome")
-    hs.eventtap.keyStroke({ "cmd" }, "n", 100000)
-end)
 hs.hotkey.bind({ "cmd" }, "p", function() focusFull("Slack") end)
 
 --
@@ -81,6 +75,18 @@ end)
 
 
 local function sleep(t) coroutine.applicationYield(t) end
+
+hs.hotkey.bind({ "ctrl", "option" }, "w", function()
+    local origSpace = hs.spaces.activeSpaceOnScreen(hs.screen.mainScreen())
+    hs.execute("open -na Ghostty")
+    hs.execute("/bin/zsh -l -c 'zed -n'")
+    hs.application.launchOrFocus("Google Chrome")
+    hs.eventtap.keyStroke({ "cmd" }, "n", 100000)
+    sleep(0.5)
+    hs.spaces.gotoSpace(origSpace)
+    sleep(0.5)
+    hs.application.launchOrFocus("Zed")
+end)
 
 hs.hotkey.bind({ "option", "ctrl" }, "k", function()
     coroutine.wrap(function()
