@@ -140,6 +140,7 @@
       "space e": "pane::RevealInProjectPanel",
       // Git
       "space g b": "git::Blame",
+      "space g c": "git::ToggleFillCommitEditor",
       "space g h": "git::FileHistory",
       "space g d": "git::Diff",
       "space g D": "git::BranchDiff",
