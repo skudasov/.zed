@@ -4,6 +4,7 @@
   },
   "code_lens": "on",
   "collaboration_panel": {
+    "button": false,
     "dock": "left",
   },
   "icon_theme": {
@@ -26,6 +27,12 @@
   ],
   "disable_ai": false,
   "agent_servers": {
+    "codex-acp": {
+      "default_config_options": {
+        "reasoning_effort": "high"
+      },
+      "type": "registry"
+    },
     "claude-acp": {
       "type": "registry",
     },
@@ -54,9 +61,10 @@
   "gutter": {
     "line_numbers": false,
   },
-  "search": { "button": true },
+  "search": { "button": false },
   "diagnostics": { "button": true },
   "agent": {
+    "button": false,
     "dock": "right",
     "tool_permissions": {
       "tools": {
@@ -75,6 +83,7 @@
   },
   "bottom_dock_layout": "right_aligned",
   "scroll_beyond_last_line": "off",
+  "go_to_definition_scroll_strategy": "preserve",
   "cursor_blink": false,
   "scrollbar": {
     "show": "system",
@@ -98,7 +107,7 @@
     "dock": "bottom",
     "toolbar": { "breadcrumbs": false },
     "line_height": "standard",
-    "button": true,
+    "button": false,
     "max_scroll_history_lines": 30000,
     "blinking": "off",
     "font_features": {
@@ -121,7 +130,7 @@
     "working_directory": "current_project_directory",
   },
   "debugger": {
-    "button": true,
+    "button": false,
   },
   "tab_bar": {
     "show": true,
@@ -136,19 +145,19 @@
     "default_width": 300.0,
     "dock": "left",
     "auto_fold_dirs": false,
-    "button": true,
+    "button": false,
     "auto_reveal_entries": false,
     "entry_spacing": "standard",
   },
   "outline_panel": {
     "dock": "right",
-    "button": true,
+    "button": false,
   },
   "git_panel": {
     "dock": "left",
     "sort_by_path": true,
     "default_width": 300,
-    "button": true,
+    "button": false,
   },
   "buffer_font_family": ".ZedMono",
   "ui_font_family": ".ZedMono",
@@ -159,7 +168,7 @@
   "theme": {
     "mode": "dark",
     "dark": "Ultimate Dark Neo",
-    "light": "Hex Solarized Light Theme",
+    "light": "Ultimate Dark Neo",
   },
   "autosave": {
     "after_delay": {

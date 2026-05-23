@@ -37,6 +37,7 @@ hs.hotkey.bind({ "cmd" }, "i", function()
     win:focus()
     win:setFrame(win:screen():fullFrame())
 end)
+
 hs.hotkey.bind({ "cmd" }, "u", function() 
     if hs.application.frontmostApplication():name() == "Ghostty" then
         hs.eventtap.keyStroke({ "ctrl" }, "tab", 10000)
