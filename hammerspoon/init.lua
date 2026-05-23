@@ -46,7 +46,7 @@ hs.hotkey.bind({ "cmd" }, "u", function()
     end
 end)
 
-hs.hotkey.bind({ "cmd" }, "b", function()
+hs.hotkey.bind({ "cmd" }, "p", function()
     if hs.application.frontmostApplication():name() == "Google Chrome" then
         hs.eventtap.keyStroke({ "ctrl" }, "tab", 10000)
     else
@@ -54,7 +54,7 @@ hs.hotkey.bind({ "cmd" }, "b", function()
     end
 end)
 
-hs.hotkey.bind({ "cmd" }, "p", function() focusFull("Slack") end)
+hs.hotkey.bind({ "cmd" }, "b", function() focusFull("Slack") end)
 
 --
 hs.hotkey.bind({ "cmd" }, "'", function()
