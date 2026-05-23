@@ -57,21 +57,41 @@ end)
 hs.hotkey.bind({ "cmd" }, "b", function() focusFull("Slack") end)
 
 --
+local snapLeft = nil
+local snapRight = nil
+
 hs.hotkey.bind({ "cmd" }, "'", function()
     hs.window.animationDuration = 0
     local f = hs.screen.mainScreen():fullFrame()
+    local focused = hs.window.focusedWindow()
+    if not focused then return end
 
-    for _, win in ipairs(hs.window.filter.defaultCurrentSpace:getWindows()) do
-        local name = win:application():name()
-        if name == "Zed" then
-            win:setFrame({ x = f.x, y = f.y, w = f.w / 2, h = f.h })
-        elseif name == "Google Chrome" then
-            win:setFrame({ x = f.x + f.w / 2, y = f.y, w = f.w / 2, h = f.h })
+    -- Toggle focus if both snap windows still alive and focused is one of them
+    if snapLeft and snapRight
+       and snapLeft:isVisible() and snapRight:isVisible()
+       and (focused:id() == snapLeft:id() or focused:id() == snapRight:id()) then
+        if focused:id() == snapLeft:id() then
+            snapRight:focus()
+        else
+            snapLeft:focus()
         end
+        return
     end
 
+    -- Snap current window → left, Chrome → right
     local chrome = hs.application.get("Google Chrome")
-    if chrome then chrome:activate() end
+    local chromeWin = chrome and chrome:mainWindow()
+    if not chromeWin then
+        hs.application.launchOrFocus("Google Chrome")
+        return
+    end
+    if chromeWin:id() == focused:id() then return end
+
+    focused:setFrame({ x = f.x, y = f.y, w = f.w / 2, h = f.h })
+    chromeWin:setFrame({ x = f.x + f.w / 2, y = f.y, w = f.w / 2, h = f.h })
+    snapLeft = focused
+    snapRight = chromeWin
+    chromeWin:focus()
 end)
 
 
