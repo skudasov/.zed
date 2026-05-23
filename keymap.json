@@ -50,7 +50,9 @@
     "context": "ProjectPanel || EmptyPane || (Editor && VimControl && !VimWaiting && !menu)",
     "bindings": {
       // tasks
-      "space t a": "task::Spawn",
+      "space t r": "task::Spawn",
+      "space t l": "task::Rerun",
+      "space t n": ["editor::SpawnNearestTask", { "reveal": "no_focus" }],
       // navigation
       "space -": "pane::SplitDown",
       "space =": "pane::SplitRight",
@@ -154,9 +156,6 @@
       // markdown
       "space m p": "markdown::OpenPreview",
       "space m P": "markdown::OpenPreviewToTheSide",
-      "space t l": "task::Rerun",
-      "space t n": ["editor::SpawnNearestTask", { "reveal": "no_focus" }],
-      "space t r": "task::Spawn",
       "space u i": "editor::ToggleInlayHints",
       "space u w": "editor::ToggleSoftWrap",
       "space u z": "workspace::ToggleCenteredLayout",
