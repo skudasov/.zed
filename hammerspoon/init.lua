@@ -54,6 +54,22 @@ hs.hotkey.bind({ "cmd" }, "p", function()
     end
 end)
 
+hs.hotkey.bind({ "cmd", "shift" }, "u", function()
+    if hs.application.frontmostApplication():name() == "Ghostty" then
+        hs.eventtap.keyStroke({ "ctrl", "shift" }, "tab", 10000)
+    else
+        focusFull("Ghostty")
+    end
+end)
+
+hs.hotkey.bind({ "cmd", "shift" }, "p", function()
+    if hs.application.frontmostApplication():name() == "Google Chrome" then
+        hs.eventtap.keyStroke({ "ctrl", "shift" }, "tab", 10000)
+    else
+        focusFull("Google Chrome")
+    end
+end)
+
 hs.hotkey.bind({ "cmd" }, "b", function() focusFull("Slack") end)
 
 --
