@@ -79,6 +79,10 @@
       "model": "claude-sonnet-4-6",
       "enable_thinking": false,
     },
+    "inline_assistant_model": {
+      "provider": "anthropic",
+      "model": "claude-haiku-4-5-20251001",
+    },
     "single_file_review": false,
     "model_parameters": [],
   },
@@ -151,7 +155,7 @@
     "entry_spacing": "standard",
   },
   "outline_panel": {
-    "dock": "right",
+    "dock": "left",
     "button": false,
   },
   "git_panel": {
