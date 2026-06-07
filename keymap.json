@@ -14,6 +14,7 @@
       "ctrl-i": "pane::GoForward",
       // agents
       "space a a": "agent::NewThread",
+      "cmd-1": "project_panel::ToggleFocus",
       "cmd-2": "multi_workspace::ToggleWorkspaceSidebar",
       // ai (doesn't work with Claude)
       "space a i": "assistant::InlineAssist",
@@ -216,6 +217,7 @@
       "shift-y": "workspace::CopyRelativePath",
       "g y": "workspace::CopyPath",
       "q": "workspace::ToggleLeftDock",
+      "cmd-1": "workspace::ToggleLeftDock",
       // opening files
       "cmd-l": "project_panel::OpenSplitVertical",
       "cmd-j": "project_panel::OpenSplitHorizontal",
