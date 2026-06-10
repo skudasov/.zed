@@ -52,7 +52,7 @@ name = "gruvbox"
 prefix = "ctrl+b"
 # Session navigator action is the "goto" binding (default prefix+g).
 # Direct binding to ctrl+y: cmd+y triggers goto without entering prefix mode.
-goto = "cmd+y"
+goto = "ctrl+y"
 
 # Prefix-mode actions
 # help = "prefix+?"

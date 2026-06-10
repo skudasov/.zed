@@ -1,4 +1,4 @@
-install: install-sessions-viewer install-herdr
+install: install-sessions-viewer install-herdr install-ghostty
     mkdir -p ~/.hammerspoon
     cp hammerspoon/init.lua ~/.hammerspoon/init.lua
     hs -c "hs.reload()"
@@ -15,6 +15,12 @@ install-herdr:
 	cp herdr/config.toml.example ~/.config/herdr/config.toml
 	@echo "Installed herdr config to ~/.config/herdr/config.toml"
 	@command -v herdr >/dev/null && herdr server reload-config 2>/dev/null || true
+
+install-ghostty:
+	mkdir -p ~/.config/ghostty
+	cp ghostty/config ~/.config/ghostty/config
+	@echo "Installed Ghostty config to ~/.config/ghostty/config"
+	@echo "Restart Ghostty (full quit) for the cmd+y keybind to take effect."
 
 install-pi:
 	cp -R .pi/. ~/.pi/
