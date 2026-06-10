@@ -36,6 +36,4 @@ scrollback-limit = 30000
 # shell-integration = fish   # uncomment if using fish
 
 # ── Keybinds ─────────────────────────────────────────────────────────────────
-# Forward cmd+y to ctrl+y (0x19) so it reaches the herdr TUI as its prefix key.
-# Lets cmd+y act as herdr prefix, matching the cmd+letter chords in hammerspoon.
-keybind = cmd+y=text:\x19
+# (herdr uses its own ctrl+b prefix; no cmd-forwarding needed.)
