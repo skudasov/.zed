@@ -63,9 +63,10 @@ prefix = "ctrl+b"
 # remove_worktree = ""  # optional, unset by default; opens confirmation
 # rename_workspace = "prefix+shift+w"
 # close_workspace = "prefix+shift+d"
-# Workspace navigation — unset by default. Bound here: prefix+, / prefix+. (< >).
-previous_workspace = "prefix+,"
-next_workspace = "prefix+."
+# Workspace navigation — cmd+z cycles (Ghostty forwards it via a text: keybind,
+# see ghostty/config in this repo).
+previous_workspace = "cmd+shift+z"
+next_workspace = "cmd+z"
 # Jump straight to workspace N: prefix+shift+1..9.
 switch_workspace = "prefix+shift+1..9"
 # previous_agent = ""     # optional, unset by default
@@ -73,8 +74,10 @@ switch_workspace = "prefix+shift+1..9"
 # focus_agent = ""        # optional indexed binding, e.g. "prefix+alt+1..9"
 # new_tab = "prefix+c"
 # rename_tab = "prefix+shift+t"
-# previous_tab = "prefix+p"
-next_tab = "prefix+m"
+# Tab navigation — cmd+x cycles (Ghostty forwards it via a text: keybind,
+# see ghostty/config in this repo).
+previous_tab = "cmd+shift+x"
+next_tab = "cmd+x"
 # switch_tab = "prefix+1..9"
 # switch_workspace = ""   # optional indexed binding, e.g. "prefix+shift+1..9"
 # close_tab = "prefix+shift+x"

@@ -36,4 +36,9 @@ scrollback-limit = 30000
 # shell-integration = fish   # uncomment if using fish
 
 # ── Keybinds ─────────────────────────────────────────────────────────────────
-# (herdr uses its own ctrl+b prefix; no cmd-forwarding needed.)
+# Forward cmd+z/x (and shift variants) to terminal apps as kitty-protocol
+# key sequences so herdr can bind them. Overrides Ghostty undo/redo.
+keybind = super+z=text:\x1b[122;9u
+keybind = super+shift+z=text:\x1b[122;10u
+keybind = super+x=text:\x1b[120;9u
+keybind = super+shift+x=text:\x1b[120;10u
