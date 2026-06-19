@@ -26,7 +26,6 @@
       ],
     },
   ],
-  "disable_ai": true,
   "agent_servers": {
     "codex-acp": {
       "default_config_options": {
@@ -174,6 +173,11 @@
     "mode": "dark",
     "dark": "Ultimate Dark Neo",
     "light": "Ultimate Dark Neo",
+  },
+  "theme_overrides": {
+    "Ultimate Dark Neo": {
+      "editor.background": "#303135",
+    },
   },
   "autosave": {
     "after_delay": {

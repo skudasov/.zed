@@ -5,6 +5,7 @@
 # Matches Zed: dark = "GitHub Dark Dimmed", light = "One Light"
 # Custom theme files live in ~/.config/ghostty/themes/ (symlinked from repo)
 theme = Breeze
+background = #303135
 
 # ── Font ─────────────────────────────────────────────────────────────────────
 # Zed uses .ZedMono (bundled). Use any monospace you have installed.
