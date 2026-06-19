@@ -154,12 +154,14 @@
       "space g h u": "git::UnstageAndNext",
       // copy permalink to a line
       "space g Y": "editor::CopyPermalinkToLine",
+      "space g C": "git::CompareWithBranch",
       // markdown
       "space m p": "markdown::OpenPreview",
       "space m P": "markdown::OpenPreviewToTheSide",
       "space u i": "editor::ToggleInlayHints",
       "space u w": "editor::ToggleSoftWrap",
       "space u z": "workspace::ToggleCenteredLayout",
+      "space u b": "editor::ToggleBreadcrumb",
       "j": ["vim::Down", { "display_lines": true }],
       "k": ["vim::Up", { "display_lines": true }],
       "shift-y": ["workspace::SendKeystrokes", "y $"],
