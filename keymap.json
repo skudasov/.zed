@@ -143,7 +143,7 @@
       "space e": "pane::RevealInProjectPanel",
       // Git
       "space g b": "git::Blame",
-      "space g c": "git::ToggleFillCommitEditor",
+      "space g c": "git::CompareWithBranch",
       "space g h": "git::FileHistory",
       "space g d": "git::Diff",
       "space g D": "git::BranchDiff",
@@ -152,9 +152,7 @@
       "space g h r": "git::Restore",
       "space g h s": "git::StageAndNext",
       "space g h u": "git::UnstageAndNext",
-      // copy permalink to a line
       "space g Y": "editor::CopyPermalinkToLine",
-      "space g C": "git::CompareWithBranch",
       // markdown
       "space m p": "markdown::OpenPreview",
       "space m P": "markdown::OpenPreviewToTheSide",
