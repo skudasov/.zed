@@ -11,7 +11,7 @@
   "icon_theme": {
     "mode": "dark",
     "light": "Zed (Default)",
-    "dark": "Zed (Default)",
+    "dark": "JetBrains New UI Icons (Dark)",
   },
   "ssh_connections": [
     {

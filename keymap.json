@@ -8,22 +8,10 @@
   {
     "context": "Workspace",
     "bindings": {
-      "space t t": "terminal_panel::Toggle",
-      "space t c": "workspace::NewCenterTerminal",
       "ctrl-o": "pane::GoBack",
       "ctrl-i": "pane::GoForward",
-      // agents
-      "space a a": "agent::NewThread",
       "cmd-1": "project_panel::ToggleFocus",
       "cmd-2": "multi_workspace::ToggleWorkspaceSidebar",
-      // ai (doesn't work with Claude)
-      "space a i": "assistant::InlineAssist",
-      // goto
-      "g t": "editor::GoToTypeDefinition",
-      "g I": "editor::GoToImplementationSplit",
-      // swaps
-      "space b h": "pane::SwapItemLeft",
-      "space b l": "pane::SwapItemRight",
     },
   },
   {
@@ -41,15 +29,21 @@
     },
   },
   {
-    "context": "Workspace",
-    "bindings": {
-      "space space": "file_finder::Toggle",
-    },
-  },
-  {
     // put key-bindings here if you want them to work in normal & visual mode & project panel
     "context": "ProjectPanel || EmptyPane || (Editor && VimControl && !VimWaiting && !menu)",
     "bindings": {
+      "space space": "file_finder::Toggle",
+      // terminal + agents (moved from Workspace to avoid prefix-stall in terminal)
+      "space t t": "terminal_panel::Toggle",
+      "space t c": "workspace::NewCenterTerminal",
+      "space a a": "agent::NewThread",
+      "space a i": "assistant::InlineAssist",
+      // swaps
+      "space b h": "pane::SwapItemLeft",
+      "space b l": "pane::SwapItemRight",
+      // goto
+      "g t": "editor::GoToTypeDefinition",
+      "g I": "editor::GoToImplementationSplit",
       // tasks
       "space t r": "task::Spawn",
       "space t l": "task::Rerun",
@@ -197,6 +191,7 @@
     "bindings": {
       "s": "vim::PushSneak",
       "S": "vim::PushSneakBackward",
+      "g h": "vim::HelixJumpToWord",
     },
   },
   {
