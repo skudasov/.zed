@@ -2,6 +2,7 @@
   {
     "context": "Terminal",
     "bindings": {
+      "space t t": "terminal_panel::Toggle",
       "ctrl-[": "vim::NormalBefore",
     },
   },
