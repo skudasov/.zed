@@ -59,6 +59,7 @@
       "space j": "workspace::ActivatePaneDown",
       "space k": "workspace::ActivatePaneUp",
       "space l": "workspace::ActivatePaneRight",
+      "space z": "workspace::ToggleZoom",
 
       "cmd-]": "workspace::ActivatePaneRight",
       "cmd-[": "workspace::ActivatePaneLeft",
@@ -112,14 +113,8 @@
       "space m p": "markdown::OpenPreview",
 
       "space g g": ["task::Spawn", { "task_name": "Lazygit", "reveal_target": "center" }],
-      // fuzzy search
-      "space s f": ["task::Spawn", { "task_name": "File Finder", "reveal_target": "center" }],
-      "space s g": ["task::Spawn", { "task_name": "Find in Files", "reveal_target": "center" }],
-      "space s t": [
-        "task::Spawn",
-        // Find in Files Selected Text
-        { "task_name": "Find in Selected", "reveal_target": "center" },
-      ],
+      // fuzzy search (native telescope-style text finder, v1.9+)
+      "space s g": "text_finder::Toggle",
     },
   },
   {
