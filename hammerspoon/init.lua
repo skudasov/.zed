@@ -1,5 +1,21 @@
 require("hs.ipc")
 
+local function maximizeApp(name)
+    local attempts = 0
+    local timer
+    timer = hs.timer.doEvery(0.1, function()
+        attempts = attempts + 1
+        local app = hs.application.get(name)
+        local win = app and app:mainWindow()
+        if win then
+            win:setFrame(win:screen():fullFrame())
+            timer:stop()
+        elseif attempts > 30 then
+            timer:stop()
+        end
+    end)
+end
+
 local function focusFull(name)
     for _, win in ipairs(hs.window.filter.defaultCurrentSpace:getWindows()) do
         if win:application():name() == name then
@@ -9,8 +25,9 @@ local function focusFull(name)
         end
     end
 
-    -- No window on current space: launch or switch to it
+    -- No window on current space: launch, then maximize once window appears
     hs.application.launchOrFocus(name)
+    maximizeApp(name)
 end
 
 hs.hotkey.bind({ "cmd" }, "i", function()
@@ -47,10 +64,10 @@ hs.hotkey.bind({ "cmd" }, "u", function()
 end)
 
 hs.hotkey.bind({ "cmd" }, "p", function()
-    if hs.application.frontmostApplication():name() == "Google Chrome" then
+    if hs.application.frontmostApplication():name() == "Firefox" then
         hs.eventtap.keyStroke({ "ctrl" }, "tab", 10000)
     else
-        focusFull("Google Chrome")
+        focusFull("Firefox")
     end
 end)
 
@@ -63,10 +80,10 @@ hs.hotkey.bind({ "cmd", "shift" }, "u", function()
 end)
 
 hs.hotkey.bind({ "cmd", "shift" }, "p", function()
-    if hs.application.frontmostApplication():name() == "Google Chrome" then
+    if hs.application.frontmostApplication():name() == "Firefox" then
         hs.eventtap.keyStroke({ "ctrl", "shift" }, "tab", 10000)
     else
-        focusFull("Google Chrome")
+        focusFull("Firefox")
     end
 end)
 
@@ -94,20 +111,20 @@ hs.hotkey.bind({ "cmd" }, "'", function()
         return
     end
 
-    -- Snap current window → left, Chrome → right
-    local chrome = hs.application.get("Google Chrome")
-    local chromeWin = chrome and chrome:mainWindow()
-    if not chromeWin then
-        hs.application.launchOrFocus("Google Chrome")
+    -- Snap current window → left, Firefox → right
+    local firefox = hs.application.get("Firefox")
+    local firefoxWin = firefox and firefox:mainWindow()
+    if not firefoxWin then
+        hs.application.launchOrFocus("Firefox")
         return
     end
-    if chromeWin:id() == focused:id() then return end
+    if firefoxWin:id() == focused:id() then return end
 
     focused:setFrame({ x = f.x, y = f.y, w = f.w / 2, h = f.h })
-    chromeWin:setFrame({ x = f.x + f.w / 2, y = f.y, w = f.w / 2, h = f.h })
+    firefoxWin:setFrame({ x = f.x + f.w / 2, y = f.y, w = f.w / 2, h = f.h })
     snapLeft = focused
-    snapRight = chromeWin
-    chromeWin:focus()
+    snapRight = firefoxWin
+    firefoxWin:focus()
 end)
 
 
@@ -117,8 +134,9 @@ hs.hotkey.bind({ "ctrl", "option" }, "w", function()
     local origSpace = hs.spaces.activeSpaceOnScreen(hs.screen.mainScreen())
     hs.execute("open -na Ghostty")
     hs.execute("/bin/zsh -l -c 'zed -n'")
-    hs.application.launchOrFocus("Google Chrome")
+    hs.application.launchOrFocus("Firefox")
     hs.eventtap.keyStroke({ "cmd" }, "n", 100000)
+    maximizeApp("Firefox")
     sleep(0.5)
     hs.spaces.gotoSpace(origSpace)
     sleep(0.5)

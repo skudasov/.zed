@@ -1,0 +1,58 @@
+" Tridactyl config — keyboard-driven browser control
+" Install: `just install-firefox` copies to ~/.tridactylrc
+" Reload in Firefox: :source
+
+" Search
+set searchengine duckduckgo
+
+" New tabs open at the end
+set tabopenpos last
+
+" Vimperator-style hint filtering (type text to narrow hints)
+set hintfiltermode vimperator
+set hintchars 1234567890
+
+" Smooth scrolling
+set smoothscroll true
+
+" Scroll bindings
+bind j scrollline 10
+bind k scrollline -10
+bind h scrollpx -50
+bind l scrollpx 50
+
+" Tab management
+bind d tabclose
+bind D tabclose -1
+bind u undo
+bind gt tabnext_gt
+bind gT tabprev
+bind g0 tabfirst
+bind g$ tablast
+
+" Open / navigate
+bind t tabnew
+bind o open
+bind w winopen
+bind b buffer
+
+" Hints
+bind f hint
+bind F hint -b
+
+" Find
+bind / find
+bind n findnext
+bind N findprevious
+
+" Yank URL
+bind yy yankurl
+bind ys yankshort
+
+" Paste from clipboard
+bind p clipboard pastetab
+bind P winopen
+
+" Reload
+bind r reload
+bind R reloadhard

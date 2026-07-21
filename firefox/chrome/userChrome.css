@@ -1,0 +1,283 @@
+/* Firefox userChrome.css — matches Zed "Ultimate Dark Neo" + Ghostty Breeze
+ * Install: `just install-firefox` from ~/.config/zed
+ * Requires toolkit.legacyUserProfileCustomizations.stylesheets = true (in user.js)
+ *
+ * Palette (from Ghostty Breeze + Zed editor.background override):
+ *   bg       #303135   editor / terminal background
+ *   bg-alt   #383c42   panels, urlbar, menus
+ *   bg-hover #3d4047   hover states
+ *   fg       #eff0f1   primary text
+ *   fg-dim   #bdc3c7   secondary text
+ *   accent   #3daee9   Breeze bright blue (focus, active tab, links)
+ *
+ * UI is driven by Tridactyl (keyboard), so nav-bar + tab bar + bookmarks
+ * are hidden. Re-enable by commenting out the rules in "Minimal UI" below.
+ */
+
+:root {
+  --bg: #303135;
+  --bg-alt: #383c42;
+  --bg-hover: #3d4047;
+  --fg: #eff0f1;
+  --fg-dim: #bdc3c7;
+  --accent: #3daee9;
+  --border: rgba(255, 255, 255, 0.08);
+}
+
+/* ── Minimal UI (Tridactyl-driven) ──────────────────────────────────────── */
+/* Hide nav-bar — use Tridactyl :open / :tabopen instead */
+#nav-bar { display: none !important; }
+
+/* Hide tab bar — use Tridactyl :buffer / gt / gT instead */
+#tabbrowser-tabs { visibility: collapse !important; }
+
+/* Hide bookmarks bar */
+#PersonalToolbar { display: none !important; }
+
+/* Hide "Firefox View" button */
+#firefox-view-button { display: none !important; }
+
+/* ── Main window / toolbox ─────────────────────────────────────────────── */
+#main-window,
+#navigator-toolbox,
+#browser {
+  background: var(--bg) !important;
+  color: var(--fg) !important;
+}
+
+/* ── Tab bar (styled for when re-enabled) ───────────────────────────────── */
+#tabbrowser-tabs,
+#tabbrowser-arrowscrollbox,
+#tabbrowser-tabbox {
+  background: var(--bg) !important;
+}
+
+.tabbrowser-tab .tab-stack {
+  background: transparent !important;
+  border-radius: 8px !important;
+  margin: 4px 2px !important;
+}
+
+.tabbrowser-tab[selected="true"] .tab-stack {
+  background: var(--bg-alt) !important;
+  box-shadow: inset 0 2px 0 var(--accent) !important;
+}
+
+.tabbrowser-tab:hover:not([selected="true"]):not([pinned]) .tab-stack {
+  background: var(--bg-hover) !important;
+}
+
+.tab-label,
+.tab-icon-image {
+  color: var(--fg-dim) !important;
+}
+
+.tabbrowser-tab[selected="true"] .tab-label {
+  color: var(--fg) !important;
+}
+
+/* Hide tab close button (use Cmd+W / Tridactyl :d instead) */
+.tab-close-button { display: none !important; }
+
+/* Remove tab separators */
+.tabbrowser-tab::after,
+.tabbrowser-tab::before {
+  display: none !important;
+}
+
+/* New tab button */
+#tabs-newtab-button .toolbarbutton-icon {
+  color: var(--fg-dim) !important;
+}
+#tabs-newtab-button:hover .toolbarbutton-icon {
+  color: var(--accent) !important;
+}
+
+/* ── Toolbars (styled for when re-enabled) ──────────────────────────────── */
+toolbar.chromeclass-toolbar {
+  background: var(--bg) !important;
+  color: var(--fg) !important;
+  border-color: var(--border) !important;
+}
+
+toolbarbutton {
+  color: var(--fg-dim) !important;
+}
+
+toolbarbutton:hover:not([disabled]),
+.toolbarbutton-1:hover:not([disabled]) {
+  background: var(--bg-hover) !important;
+  color: var(--fg) !important;
+}
+
+toolbarbutton[open],
+toolbarbutton[checked] {
+  background: var(--bg-alt) !important;
+  color: var(--accent) !important;
+}
+
+/* ── URL bar (styled for when re-enabled) ───────────────────────────────── */
+#urlbar,
+#searchbar {
+  background: var(--bg-alt) !important;
+  color: var(--fg) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: 4px !important;
+}
+
+#urlbar[focused="true"],
+#searchbar[focused="true"] {
+  border-color: var(--accent) !important;
+  outline: none !important;
+}
+
+#urlbar-input,
+#urlbar-scheme,
+#searchbar-textbox {
+  color: var(--fg) !important;
+  background: transparent !important;
+}
+
+#urlbar-input::selection,
+#searchbar-textbox::selection {
+  background: var(--accent) !important;
+  color: #fff !important;
+}
+
+#urlbar-results,
+#urlbarView {
+  background: var(--bg-alt) !important;
+  color: var(--fg) !important;
+  border: 1px solid var(--border) !important;
+}
+
+.urlbarView-row[selected] {
+  background: var(--accent) !important;
+  color: #fff !important;
+}
+
+.urlbarView-row:hover {
+  background: var(--bg-hover) !important;
+}
+
+/* ── Sidebar (Sidebery vertical tabs) ──────────────────────────────────── */
+#sidebar-box,
+#sidebar,
+#sidebar-header,
+#sidebar-footer {
+  background: var(--bg) !important;
+  color: var(--fg) !important;
+}
+
+/* Hide the sidebar header (drop-down + close button) for a cleaner look */
+#sidebar-header {
+  display: none !important;
+}
+
+/* Thin border between sidebar and content */
+#sidebar-splitter {
+  background: var(--border) !important;
+  border: none !important;
+  min-width: 1px !important;
+  max-width: 1px !important;
+}
+
+/* ── Menus / context menus ─────────────────────────────────────────────── */
+menupopup,
+menu,
+menuitem,
+menuseparator {
+  background: var(--bg-alt) !important;
+  color: var(--fg) !important;
+  border-color: var(--border) !important;
+}
+
+menu:hover:not([disabled]),
+menuitem:hover:not([disabled]),
+menu[_moz-menuactive="true"]:not([disabled]),
+menuitem[_moz-menuactive="true"]:not([disabled]) {
+  background: var(--accent) !important;
+  color: #fff !important;
+}
+
+menuseparator {
+  border-top: 1px solid var(--border) !important;
+}
+
+/* ── Scrollbars (thin) ──────────────────────────────────────────────────── */
+scrollbar {
+  background: var(--bg) !important;
+  width: 6px !important;
+}
+scrollbar[orient="horizontal"] {
+  height: 6px !important;
+}
+
+scrollbar thumb {
+  background: var(--bg-hover) !important;
+  border-radius: 4px !important;
+  min-width: 6px !important;
+  min-height: 6px !important;
+}
+
+scrollbar thumb:hover {
+  background: var(--accent) !important;
+}
+
+scrollbar scrollbarbutton {
+  display: none !important;
+}
+
+/* ── Find bar ──────────────────────────────────────────────────────────── */
+#FindToolbar,
+.findbar-container {
+  background: var(--bg) !important;
+  color: var(--fg) !important;
+  border-top: 1px solid var(--border) !important;
+}
+
+.findbar-textbox {
+  background: var(--bg-alt) !important;
+  color: var(--fg) !important;
+  border: 1px solid var(--border) !important;
+}
+
+.findbar-textbox[focused="true"] {
+  border-color: var(--accent) !important;
+}
+
+/* ── Status panel (link hover preview) ─────────────────────────────────── */
+#statuspanel #statuspanel-label {
+  background: var(--bg-alt) !important;
+  color: var(--fg-dim) !important;
+  border: 1px solid var(--border) !important;
+}
+
+/* ── Library / downloads panel ─────────────────────────────────────────── */
+#downloadsPanel,
+#downloadsListBox,
+#downloadsFooter {
+  background: var(--bg-alt) !important;
+  color: var(--fg) !important;
+}
+
+richlistitem:hover,
+richlistitem[selected] {
+  background: var(--bg-hover) !important;
+  color: var(--fg) !important;
+}
+
+/* ── New tab page sponsored content ────────────────────────────────────── */
+.upcoming-section,
+.pocket-section {
+  display: none !important;
+}
+
+/* ── DevTools — optional, matches the dark editor theme ────────────────── */
+:root[devtoolstheme="dark"] {
+  --theme-body-background: var(--bg) !important;
+  --theme-sidebar-background: var(--bg-alt) !important;
+  --theme-toolbar-background: var(--bg) !important;
+  --theme-selection-background: var(--accent) !important;
+  --theme-text-color-strong: var(--fg) !important;
+}
