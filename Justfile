@@ -1,4 +1,4 @@
-install: install-sessions-viewer install-herdr install-ghostty
+install: install-sessions-viewer install-herdr
     mkdir -p ~/.hammerspoon
     cp hammerspoon/init.lua ~/.hammerspoon/init.lua
     hs -c "hs.reload()"

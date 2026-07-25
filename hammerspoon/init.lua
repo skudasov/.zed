@@ -1,10 +1,9 @@
 require("hs.ipc")
 
-local function focusFull(name)
+local function focusApp(name)
     for _, win in ipairs(hs.window.filter.defaultCurrentSpace:getWindows()) do
         if win:application():name() == name then
             win:focus()
-            win:setFrame(win:screen():fullFrame())
             return
         end
     end
@@ -35,14 +34,13 @@ hs.hotkey.bind({ "cmd" }, "i", function()
     end
     local win = zedWins[idx]
     win:focus()
-    win:setFrame(win:screen():fullFrame())
 end)
 
 hs.hotkey.bind({ "cmd" }, "u", function() 
     if hs.application.frontmostApplication():name() == "Ghostty" then
         hs.eventtap.keyStroke({ "ctrl" }, "tab", 10000)
     else
-        focusFull("Ghostty")
+        focusApp("Ghostty")
     end
 end)
 
@@ -50,7 +48,7 @@ hs.hotkey.bind({ "cmd" }, "p", function()
     if hs.application.frontmostApplication():name() == "Google Chrome" then
         hs.eventtap.keyStroke({ "ctrl" }, "tab", 10000)
     else
-        focusFull("Google Chrome")
+        focusApp("Google Chrome")
     end
 end)
 
@@ -58,7 +56,7 @@ hs.hotkey.bind({ "cmd", "shift" }, "u", function()
     if hs.application.frontmostApplication():name() == "Ghostty" then
         hs.eventtap.keyStroke({ "ctrl", "shift" }, "tab", 10000)
     else
-        focusFull("Ghostty")
+        focusApp("Ghostty")
     end
 end)
 
@@ -66,48 +64,47 @@ hs.hotkey.bind({ "cmd", "shift" }, "p", function()
     if hs.application.frontmostApplication():name() == "Google Chrome" then
         hs.eventtap.keyStroke({ "ctrl", "shift" }, "tab", 10000)
     else
-        focusFull("Google Chrome")
+        focusApp("Google Chrome")
     end
 end)
 
-hs.hotkey.bind({ "cmd" }, "b", function() focusFull("Slack") end)
+hs.hotkey.bind({ "cmd" }, "b", function() focusApp("Slack") end)
 
---
-local snapLeft = nil
-local snapRight = nil
-
+-- cmd+' : split focused app (left) + Chrome (right) on the current screen.
+-- Switch between windows with cmd+i/u/p.
 hs.hotkey.bind({ "cmd" }, "'", function()
     hs.window.animationDuration = 0
-    local f = hs.screen.mainScreen():fullFrame()
     local focused = hs.window.focusedWindow()
     if not focused then return end
 
-    -- Toggle focus if both snap windows still alive and focused is one of them
-    if snapLeft and snapRight
-       and snapLeft:isVisible() and snapRight:isVisible()
-       and (focused:id() == snapLeft:id() or focused:id() == snapRight:id()) then
-        if focused:id() == snapLeft:id() then
-            snapRight:focus()
-        else
-            snapLeft:focus()
-        end
-        return
-    end
-
-    -- Snap current window → left, Chrome → right
     local chrome = hs.application.get("Google Chrome")
     local chromeWin = chrome and chrome:mainWindow()
     if not chromeWin then
         hs.application.launchOrFocus("Google Chrome")
         return
     end
-    if chromeWin:id() == focused:id() then return end
+    if focused:id() == chromeWin:id() then return end
 
+    local f = focused:screen():frame()
+    local mid = f.x + f.w / 2
     focused:setFrame({ x = f.x, y = f.y, w = f.w / 2, h = f.h })
-    chromeWin:setFrame({ x = f.x + f.w / 2, y = f.y, w = f.w / 2, h = f.h })
-    snapLeft = focused
-    snapRight = chromeWin
-    chromeWin:focus()
+    chromeWin:setFrame({ x = mid, y = f.y, w = f.w / 2, h = f.h })
+    focused:focus()
+end)
+
+-- cmd+; : maximize Chrome / Zed / Ghostty to full size on the current screen.
+hs.hotkey.bind({ "cmd" }, ";", function()
+    hs.window.animationDuration = 0
+    local focused = hs.window.focusedWindow()
+    local screen = (focused and focused:screen()) or hs.screen.mainScreen()
+    local f = screen:frame()
+    local apps = { ["Google Chrome"] = true, ["Zed"] = true, ["Ghostty"] = true }
+    for _, win in ipairs(hs.window.filter.defaultCurrentSpace:getWindows()) do
+        if apps[win:application():name()] then
+            win:setFrame(f)
+        end
+    end
+    if focused then focused:focus() end
 end)
 
 
