@@ -113,6 +113,9 @@
       "space m p": "markdown::OpenPreview",
 
       "space g g": ["task::Spawn", { "task_name": "Lazygit", "reveal_target": "center" }],
+      // code review (tuicr)
+      "space c r": ["task::Spawn", { "task_name": "Tuicr", "reveal_target": "center" }],
+      "space c R": ["task::Spawn", { "task_name": "Tuicr (pick commit)", "reveal_target": "center" }],
       // fuzzy search (native telescope-style text finder, v1.9+)
       "space s g": "text_finder::Toggle",
     },
@@ -129,7 +132,8 @@
       // code actions and refactoring
       "space c a": "editor::ToggleCodeActions",
       "space c f": "editor::Format",
-      "space c r ": "editor::Rename",
+      // rename moved off "space c r" (now tuicr code review)
+      "space c n": "editor::Rename",
       "space e": "pane::RevealInProjectPanel",
       // Git
       "space g b": "git::Blame",
