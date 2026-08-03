@@ -1,4 +1,4 @@
-install: install-sessions-viewer install-herdr
+install: install-sessions-viewer install-herdr install-tuicr
     mkdir -p ~/.hammerspoon
     cp hammerspoon/init.lua ~/.hammerspoon/init.lua
     hs -c "hs.reload()"
@@ -6,6 +6,9 @@ install: install-sessions-viewer install-herdr
 install-sessions-viewer:
     rsync -a --delete --exclude=node_modules --exclude=.svelte-kit viewer/ ~/.claude/projects/viewer/
     cd ~/.claude/projects/viewer && pnpm install
+
+install-tuicr:
+    brew install tuicr
 
 sessions:
     cd viewer && pnpm run dev
