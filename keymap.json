@@ -130,8 +130,7 @@
       // code actions and refactoring
       "space c a": "editor::ToggleCodeActions",
       "space c f": "editor::Format",
-      // rename moved off "space c r" (now tuicr code review)
-      "space c n": "editor::Rename",
+      "space c r": "editor::Rename",
       "space e": "pane::RevealInProjectPanel",
       // Git
       "space g b": "git::Blame",
