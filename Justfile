@@ -1,7 +1,10 @@
-install: install-sessions-viewer install-herdr install-tuicr
+install: install-sessions-viewer install-herdr install-lazydocker
     mkdir -p ~/.hammerspoon
     cp hammerspoon/init.lua ~/.hammerspoon/init.lua
     hs -c "hs.reload()"
+
+install-lazydocker:
+    brew install jesseduffield/lazydocker/lazydocker
 
 install-sessions-viewer:
     rsync -a --delete --exclude=node_modules --exclude=.svelte-kit viewer/ ~/.claude/projects/viewer/
