@@ -1,5 +1,6 @@
-# Ghostty config — sourced from ~/.config/zed/ghostty/config
-# Install: `just install-ghostty` from ~/.config/zed
+# Ghostty config — source of truth lives here in ~/.config/zed/ghostty/config
+# Install: `just install-configs` from ~/.config/zed (copies, does not symlink)
+# Edits made directly in ~/.config/ghostty/config are overwritten on install.
 
 # ── Theme ────────────────────────────────────────────────────────────────────
 # Matches Zed: dark = "GitHub Dark Dimmed", light = "One Light"
@@ -37,8 +38,14 @@ scrollback-limit = 30000
 # shell-integration = fish   # uncomment if using fish
 
 # ── Keybinds ─────────────────────────────────────────────────────────────────
-# Forward cmd+z/x/c (and shift variants) to terminal apps as kitty-protocol
+# Forward cmd+z/x/c/j/k/l (and shift variants) to terminal apps as kitty-protocol
 # key sequences so herdr can bind them. Overrides Ghostty undo/redo/copy.
+# Each one needs a matching binding in herdr/config.toml [keys], else the bytes
+# fall through into the focused pane. Current mapping:
+#   cmd+z / cmd+shift+z -> next/previous workspace
+#   cmd+x / cmd+shift+x -> next/previous tab
+#   cmd+j -> new workspace   cmd+k -> new tab   cmd+l -> horizontal split
+#   cmd+c -> unbound in herdr
 keybind = super+z=text:\x1b[122;9u
 keybind = super+shift+z=text:\x1b[122;10u
 keybind = super+x=text:\x1b[120;9u

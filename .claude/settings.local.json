@@ -7,7 +7,7 @@
       "Bash(rtk read:*)",
       "Bash(rtk gain:*)",
       "Bash(rtk ls:*)",
-      "Bash(just install-ghostty:*)",
+      "Bash(just install-configs:*)",
       "WebFetch(domain:zed.dev)",
       "WebSearch",
       "WebFetch(domain:raw.githubusercontent.com)",
