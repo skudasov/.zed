@@ -1,4 +1,4 @@
-install: install-configs install-lazydocker install-herdr-plus
+install: install-flux9s install-configs install-lazydocker install-k9s install-herdr-plus
     mkdir -p ~/.hammerspoon
     cp hammerspoon/init.lua ~/.hammerspoon/init.lua
     hs -c "hs.reload()"
@@ -8,6 +8,12 @@ install-lazydocker:
 
 install-tuicr:
     brew install tuicr
+
+install-k9s:
+    brew install k9s
+
+install-flux9s:
+    brew install dgunzy/tap/flux9s
 
 # Copy (never symlink) the herdr + Ghostty configs into place.
 # rm -f first: cp through an existing symlink would write back into this repo

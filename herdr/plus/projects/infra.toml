@@ -1,0 +1,16 @@
+# Workspace preset: container + cluster TUIs, one tab each.
+name = "infra"
+description = "lazydocker + k9s"
+working_dir = "~"
+
+[[tabs]]
+name = "docker"
+command = "lazydocker"
+
+[[tabs]]
+name = "k8s"
+command = "k9s"
+
+[[tabs]]
+name = "flux9s"
+command = "flux9s"
