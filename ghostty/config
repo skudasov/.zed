@@ -45,7 +45,11 @@ scrollback-limit = 30000
 #   cmd+z / cmd+shift+z -> next/previous workspace
 #   cmd+x / cmd+shift+x -> next/previous tab
 #   cmd+j -> new workspace   cmd+k -> new tab   cmd+l -> horizontal split
+#   cmd+1 -> toggle sidebar (spaces + agents)
 #   cmd+c -> unbound in herdr
+# Note: cmd+1 overrides Ghostty's default "jump to tab 1".
+keybind = super+digit_1=text:\x1b[49;9u
+keybind = super+1=text:\x1b[49;9u
 keybind = super+z=text:\x1b[122;9u
 keybind = super+shift+z=text:\x1b[122;10u
 keybind = super+x=text:\x1b[120;9u

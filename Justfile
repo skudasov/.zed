@@ -1,4 +1,4 @@
-install: install-sessions-viewer install-configs install-lazydocker
+install: install-configs install-lazydocker install-herdr-plus
     mkdir -p ~/.hammerspoon
     cp hammerspoon/init.lua ~/.hammerspoon/init.lua
     hs -c "hs.reload()"
@@ -6,15 +6,8 @@ install: install-sessions-viewer install-configs install-lazydocker
 install-lazydocker:
     brew install jesseduffield/lazydocker/lazydocker
 
-install-sessions-viewer:
-    rsync -a --delete --exclude=node_modules --exclude=.svelte-kit viewer/ ~/.claude/projects/viewer/
-    cd ~/.claude/projects/viewer && pnpm install
-
 install-tuicr:
     brew install tuicr
-
-sessions:
-    cd viewer && pnpm run dev
 
 # Copy (never symlink) the herdr + Ghostty configs into place.
 # rm -f first: cp through an existing symlink would write back into this repo
@@ -28,6 +21,23 @@ install-configs:
 	@echo "Installed Ghostty config to ~/.config/ghostty/config"
 	@command -v herdr >/dev/null && herdr server reload-config 2>/dev/null || true
 	@echo "Reload Ghostty config (cmd+shift+,) for keybind changes to take effect."
+
+# Install the herdr-plus plugin and push this repo's plugin config into the
+# plugin's managed config dir. Repo is the source of truth: rsync --delete
+# means anything added directly under the managed dir is removed on install.
+install-herdr-plus:
+	#!/usr/bin/env bash
+	set -euo pipefail
+	command -v herdr >/dev/null || { echo "herdr not on PATH"; exit 1; }
+	if ! herdr plugin list --json 2>/dev/null | grep -q 'cloudmanic.herdr-plus'; then
+		herdr plugin install cloudmanic/herdr-plus --yes
+	fi
+	dir="$(herdr plugin config-dir cloudmanic.herdr-plus 2>/dev/null || true)"
+	dir="${dir:-$HOME/.config/herdr/plugins/config/cloudmanic.herdr-plus}"
+	mkdir -p "$dir"
+	rsync -a --delete --exclude=.gitkeep herdr/plus/ "$dir/"
+	echo "Installed herdr-plus config to $dir"
+	herdr server reload-config 2>/dev/null || true
 
 install-pi:
 	cp -R .pi/. ~/.pi/

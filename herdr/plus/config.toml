@@ -1,0 +1,10 @@
+# herdr-plus global settings — source of truth lives here in
+# ~/.config/zed/herdr/plus/config.toml
+# Install: `just install-herdr-plus` from ~/.config/zed
+# (copies this whole directory into the plugin's managed config dir,
+#  `herdr plugin config-dir cloudmanic.herdr-plus`).
+# Edits made directly in the managed dir are overwritten on install.
+
+[worktree]
+# Prefix applied to branches created from the projects browser (ctrl+g).
+branch_prefix = "skudasov/"

@@ -1,0 +1,3 @@
+# Quick action: reinstall dotfiles configs and reload the herdr server.
+name = "Reload dotfiles configs"
+command = "cd ~/.config/zed && just install-configs"
