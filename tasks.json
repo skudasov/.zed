@@ -56,5 +56,15 @@
     "reveal_target": "dock",
     "hide": "always",
     "shell": "system"
+  },
+  {
+    "label": "GitHub PR",
+    "command": "echo \"Branch: $(git branch --show-current)\" && (gh pr view --web 2>/dev/null || gh pr create --web)",
+    "cwd": "$ZED_WORKTREE_ROOT",
+    "use_new_terminal": false,
+    "allow_concurrent_runs": false,
+    "hide": "always",
+    "reveal": "never",
+    "shell": "system"
   }
 ]

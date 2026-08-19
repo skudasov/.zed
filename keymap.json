@@ -113,6 +113,7 @@
       "space m p": "markdown::OpenPreview",
 
       "space g g": ["task::Spawn", { "task_name": "Lazygit", "reveal_target": "center" }],
+      "space g p": ["task::Spawn", { "task_name": "GitHub PR" }],
       "space t u i": ["task::Spawn", { "task_name": "Tuicr (pick commit)", "reveal_target": "center" }],
       // fuzzy search (native telescope-style text finder, v1.9+)
       "space s g": "text_finder::Toggle",
