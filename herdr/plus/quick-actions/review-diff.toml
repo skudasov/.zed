@@ -1,0 +1,14 @@
+# Review this branch: merge-base(default branch)..HEAD, in a fresh agent with an
+# empty context. Opens a "diff" tab in the repo's review: workspace.
+name = "Review: this branch's diff"
+description = "Fresh agent reviews merge-base..HEAD"
+type = "select"
+command = "~/.config/herdr/bin/ai-review.sh diff {{.Value}} '{{.WorkDir}}'"
+
+[[options]]
+label = "claude"
+value = "claude"
+
+[[options]]
+label = "opencode"
+value = "opencode"

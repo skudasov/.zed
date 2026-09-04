@@ -1,0 +1,14 @@
+# Pick one of the repo's open PRs (repo resolved from the git remote via gh) and
+# review it in a fresh agent. The PR picker opens inside the new review tab.
+name = "Review: pick a PR"
+description = "Fuzzy-pick an open PR and review it"
+type = "select"
+command = "~/.config/herdr/bin/ai-review.sh pr {{.Value}} '{{.WorkDir}}'"
+
+[[options]]
+label = "claude"
+value = "claude"
+
+[[options]]
+label = "opencode"
+value = "opencode"
