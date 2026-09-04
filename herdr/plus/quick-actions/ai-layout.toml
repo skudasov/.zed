@@ -1,7 +1,7 @@
-# Quick action: agent workspace for the repo you launched from — a plan tab and
-# an impl tab, both running the agent you pick. Re-running focuses it.
+# Agent workspace for the repo you launched from: a plan tab and an impl tab,
+# both running the agent you pick. Re-running focuses it instead of duplicating.
 # Also bound directly: prefix+c (claude), prefix+o (opencode).
-name = "Agent layout (plan + impl)"
+name = "Agent: plan + impl workspace"
 description = "New workspace for this repo with plan and impl tabs"
 type = "select"
 command = "~/.config/herdr/bin/ai-layout.sh {{.Value}} '{{.WorkDir}}'"
