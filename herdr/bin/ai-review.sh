@@ -16,9 +16,9 @@ command -v herdr >/dev/null || { echo "ai-review: herdr not on PATH" >&2; exit 1
 command -v jq >/dev/null || { echo "ai-review: jq not on PATH" >&2; exit 1; }
 
 # --- internal: runs inside the review pane, where there is a tty -------------
-# ai-review.sh __pick <agent> <pane_id> <root>
+# ai-review.sh __pick <agent> <pane_id> <tab_id> <root>
 if [ "${1:-}" = "__pick" ]; then
-	agent="$2"; pane="$3"; root="$4"
+	agent="$2"; pane="$3"; tab="$4"; root="$5"
 	command -v gh >/dev/null || { echo "ai-review: gh not on PATH" >&2; exec "$SHELL"; }
 	command -v fzf >/dev/null || { echo "ai-review: fzf not on PATH" >&2; exec "$SHELL"; }
 
@@ -28,18 +28,17 @@ if [ "${1:-}" = "__pick" ]; then
 		--template '{{range .}}{{printf "%v\t%s\t%s\t%s\n" .number .title .author.login .headRefName}}{{end}}' |
 		fzf --delimiter='\t' --with-nth=1,2,3 --prompt='review PR > ' --height=100% --border || true)"
 	num="$(cut -f1 <<<"$line")"
+	title="$(cut -f2 <<<"$line")"
 	[ -n "$num" ] || { echo "ai-review: no PR selected"; exec "$SHELL"; }
 
-	if [ "$(basename "$agent")" = "claude" ]; then
-		prompt="/code-review $num"
-	else
-		prompt="Review pull request #$num of this repo. Start by running: gh pr diff $num. Report correctness bugs first, then simplifications. Do not edit any files."
-	fi
+	# Tab carries the PR number and title, so the sidebar says what is under review.
+	herdr tab rename "$tab" "#$num ${title:0:40}" >/dev/null 2>&1 || true
+
+	prompt="Review pull request #$num of this repo. Start by running: gh pr diff $num. Report correctness bugs first, then simplifications. Do not edit any files."
 
 	# Send the prompt once the agent has booted; exec the agent into this pane.
 	(
 		herdr agent wait "$pane" --status idle --timeout 60000 >/dev/null 2>&1 || sleep 5
-		herdr pane rename "$pane" "pr-$num" >/dev/null 2>&1 || true
 		herdr pane run "$pane" "$prompt" >/dev/null
 	) &
 	exec "$agent"
@@ -75,6 +74,7 @@ new_tab() { # new_tab <name>
 		out="$(herdr tab create --workspace "$ws" --cwd "$root" --label "$name" --no-focus)"
 	fi
 	pane="$(jq -r '.result.root_pane.pane_id' <<<"$out")"
+	tab="$(jq -r '.result.tab.tab_id' <<<"$out")"
 }
 
 case "$mode" in
@@ -98,11 +98,7 @@ diff)
 	fi
 	short="$(git -C "$root" rev-parse --short "$base")"
 
-	if [ "$(basename "$agent")" = "claude" ]; then
-		prompt="/code-review $short"
-	else
-		prompt="Review the changes on this branch. Start by running: git diff $short...HEAD. Report correctness bugs first, then simplifications. Do not edit any files."
-	fi
+	prompt="Review the changes on this branch. Start by running: git diff $short...HEAD. Report correctness bugs first, then simplifications. Do not edit any files."
 
 	new_tab diff
 	herdr pane run "$pane" "$agent" >/dev/null
@@ -117,7 +113,7 @@ pr)
 	self="$(cd "$(dirname "$0")" && pwd)/$(basename "$0")"
 	new_tab pr
 	herdr workspace focus "$ws" >/dev/null
-	herdr pane run "$pane" "$self __pick $agent $pane $root" >/dev/null
+	herdr pane run "$pane" "$self __pick $agent $pane $tab $root" >/dev/null
 	echo "ai-review: pick a PR in $label ($pane)"
 	;;
 *)
