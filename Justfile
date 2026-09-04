@@ -21,9 +21,15 @@ install-flux9s:
 install-configs:
 	mkdir -p ~/.config/herdr ~/.config/ghostty
 	rm -f ~/.config/herdr/config.toml ~/.config/ghostty/config
-	cp herdr/config.toml ~/.config/herdr/config.toml
+	# Expand ~ in script paths: herdr may hand [[keys.command]] straight to
+	# execve, which would not expand it. The repo keeps ~ so it stays portable.
+	sed "s|~/.config/herdr/bin/|$HOME/.config/herdr/bin/|g" herdr/config.toml > ~/.config/herdr/config.toml
 	cp ghostty/config ~/.config/ghostty/config
+	mkdir -p ~/.config/herdr/bin
+	cp herdr/bin/*.sh ~/.config/herdr/bin/
+	chmod +x ~/.config/herdr/bin/*.sh
 	@echo "Installed herdr config to ~/.config/herdr/config.toml"
+	@echo "Installed herdr scripts to ~/.config/herdr/bin/"
 	@echo "Installed Ghostty config to ~/.config/ghostty/config"
 	@command -v herdr >/dev/null && herdr server reload-config 2>/dev/null || true
 	@echo "Reload Ghostty config (cmd+shift+,) for keybind changes to take effect."

@@ -55,7 +55,9 @@ prefix = "ctrl+b"
 # settings = "prefix+s"
 # detach = "prefix+q"
 # reload_config = "prefix+shift+r"
-# open_notification_target = "prefix+o"
+# prefix+o now opens the opencode layout (see [[keys.command]] below), so the
+# notification jump moves to prefix+n (free: new_workspace is bound to cmd+j).
+open_notification_target = "prefix+n"
 # workspace_picker = "prefix+w"
 # goto = "prefix+g"
 # New workspace — cmd+j (Ghostty forwards it via a text: keybind, see ghostty/config).
@@ -136,6 +138,23 @@ key = "prefix+a"
 type = "plugin_action"
 command = "cloudmanic.herdr-plus.quick-actions"
 description = "herdr-plus: quick actions"
+
+# Agent layout — new workspace for the current repo with a plan tab and an impl
+# tab, both running the same agent. Re-running focuses the existing one, so each
+# agent gets exactly one workspace per repo.
+# Script lives in this repo at herdr/bin/ai-layout.sh; `just install-configs`
+# copies it to ~/.config/herdr/bin/.
+[[keys.command]]
+key = "prefix+c"
+type = "shell"
+command = "~/.config/herdr/bin/ai-layout.sh claude"
+description = "claude: plan + impl workspace"
+
+[[keys.command]]
+key = "prefix+o"
+type = "shell"
+command = "~/.config/herdr/bin/ai-layout.sh opencode"
+description = "opencode: plan + impl workspace"
 
 # Legacy indexed shortcut config is still parsed for compatibility.
 # Prefer switch_tab, switch_workspace, and focus_agent for new configs.
