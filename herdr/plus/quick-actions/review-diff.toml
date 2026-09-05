@@ -3,7 +3,7 @@
 name = "Review: this branch's diff"
 description = "Fresh agent reviews merge-base..HEAD"
 type = "select"
-command = "~/.config/herdr/bin/ai-review.sh diff {{.Value}} '{{.WorkDir}}'"
+command = "~/.config/herdr/bin/ai-review.ts diff {{.Value}} '{{.WorkDir}}'"
 
 [[options]]
 label = "claude"

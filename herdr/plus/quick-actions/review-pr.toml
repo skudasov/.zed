@@ -3,7 +3,7 @@
 name = "Review: pick a PR"
 description = "Fuzzy-pick an open PR and review it"
 type = "select"
-command = "~/.config/herdr/bin/ai-review.sh pr {{.Value}} '{{.WorkDir}}'"
+command = "~/.config/herdr/bin/ai-review.ts pr {{.Value}} '{{.WorkDir}}'"
 
 [[options]]
 label = "claude"

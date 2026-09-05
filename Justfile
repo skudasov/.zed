@@ -25,9 +25,14 @@ install-configs:
 	# execve, which would not expand it. The repo keeps ~ so it stays portable.
 	sed "s|~/.config/herdr/bin/|$HOME/.config/herdr/bin/|g" herdr/config.toml > ~/.config/herdr/config.toml
 	cp ghostty/config ~/.config/ghostty/config
+	# The scripts run under bun. The repo keeps `#!/usr/bin/env bun` so it stays
+	# portable; the installed copies get an absolute shebang, because herdr runs
+	# [[keys.command]] detached and its PATH may not include ~/.bun/bin.
 	mkdir -p ~/.config/herdr/bin
-	cp herdr/bin/*.sh ~/.config/herdr/bin/
-	chmod +x ~/.config/herdr/bin/*.sh
+	rm -f ~/.config/herdr/bin/*.ts
+	cp herdr/bin/*.ts ~/.config/herdr/bin/
+	sed -i '' "1s|#!/usr/bin/env bun|#!$(command -v bun)|" ~/.config/herdr/bin/*.ts
+	chmod +x ~/.config/herdr/bin/*.ts
 	@echo "Installed herdr config to ~/.config/herdr/config.toml"
 	@echo "Installed herdr scripts to ~/.config/herdr/bin/"
 	@echo "Installed Ghostty config to ~/.config/ghostty/config"
