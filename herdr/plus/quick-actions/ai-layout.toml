@@ -4,7 +4,7 @@
 name = "Agent: plan + impl workspace"
 description = "New workspace for this repo with plan and impl tabs"
 type = "select"
-command = "~/.config/herdr/bin/ai-layout.sh {{.Value}} '{{.WorkDir}}'"
+command = "~/.config/herdr/bin/ai-layout.ts {{.Value}} '{{.WorkDir}}'"
 
 [[options]]
 label = "claude"

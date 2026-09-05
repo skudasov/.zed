@@ -133,8 +133,11 @@ type = "plugin_action"
 command = "cloudmanic.herdr-plus.projects"
 description = "herdr-plus: projects"
 
+# Quick actions — cmd+e (Ghostty forwards it via a text: keybind, see
+# ghostty/config). This is the fuzzy launcher for the scripts in herdr/bin,
+# so new commands need no new keymaps.
 [[keys.command]]
-key = "prefix+a"
+key = "cmd+e"
 type = "plugin_action"
 command = "cloudmanic.herdr-plus.quick-actions"
 description = "herdr-plus: quick actions"
@@ -142,18 +145,18 @@ description = "herdr-plus: quick actions"
 # Agent layout — new workspace for the current repo with a plan tab and an impl
 # tab, both running the same agent. Re-running focuses the existing one, so each
 # agent gets exactly one workspace per repo.
-# Script lives in this repo at herdr/bin/ai-layout.sh; `just install-configs`
+# Script lives in this repo at herdr/bin/ai-layout.ts; `just install-configs`
 # copies it to ~/.config/herdr/bin/.
 [[keys.command]]
 key = "prefix+c"
 type = "shell"
-command = "~/.config/herdr/bin/ai-layout.sh claude"
+command = "~/.config/herdr/bin/ai-layout.ts claude"
 description = "claude: plan + impl workspace"
 
 [[keys.command]]
 key = "prefix+o"
 type = "shell"
-command = "~/.config/herdr/bin/ai-layout.sh opencode"
+command = "~/.config/herdr/bin/ai-layout.ts opencode"
 description = "opencode: plan + impl workspace"
 
 # Legacy indexed shortcut config is still parsed for compatibility.
