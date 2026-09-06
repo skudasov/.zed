@@ -31,7 +31,7 @@ interface PullRequest {
   headRefName: string
 }
 
-function die(message: string): never {
+function exit(message: string): never {
   console.error(`ai-review: ${message}`)
   process.exit(1)
 }
@@ -57,8 +57,8 @@ async function promptWhenReady(paneId: string, prompt: string): Promise<void> {
 // --- modes -------------------------------------------------------------------
 
 async function reviewDiff(agent: string, dir: string): Promise<void> {
-  const root = (await repoRoot(dir)) ?? die(`not a git repo: ${dir}`)
-  const base = (await reviewBase(root)) ?? die('nothing to review')
+  const root = (await repoRoot(dir)) ?? exit(`not a git repo: ${dir}`)
+  const base = (await reviewBase(root)) ?? exit('nothing to review')
 
   const { workspaceId, paneId } = await reviewTab(root, 'diff')
   await focusWorkspace(workspaceId)
@@ -71,7 +71,7 @@ async function reviewDiff(agent: string, dir: string): Promise<void> {
 }
 
 async function reviewPullRequest(agent: string, dir: string): Promise<void> {
-  const root = (await repoRoot(dir)) ?? die(`not a git repo: ${dir}`)
+  const root = (await repoRoot(dir)) ?? exit(`not a git repo: ${dir}`)
 
   const { workspaceId, tabId, paneId } = await reviewTab(root, 'pr')
   await focusWorkspace(workspaceId)
@@ -92,7 +92,7 @@ async function pickAndReview(
     .cwd(root)
     .quiet()
     .json()
-  if (pulls.length === 0) die('no open PRs')
+  if (pulls.length === 0) exit('no open PRs')
 
   const tab = '\t'
   const rows = pulls.map((pr) => [pr.number, pr.title, pr.author.login, pr.headRefName].join(tab))
@@ -103,7 +103,7 @@ async function pickAndReview(
       .text()
 
   const pr = pulls.find((candidate) => candidate.number === Number(choice.split('\t')[0]))
-  if (!pr) die('no PR selected')
+  if (!pr) exit('no PR selected')
 
   // The tab carries the PR number and title, so the sidebar says what is under
   // review — the same name whichever agent is running it.
@@ -134,6 +134,6 @@ if (mode === '__pick') {
   } else if (mode === 'pr') {
     await reviewPullRequest(agent, dir)
   } else {
-    die(`unknown mode: ${mode} (want diff or pr)`)
+    exit(`unknown mode: ${mode} (want diff or pr)`)
   }
 }
