@@ -33,8 +33,12 @@ install-configs:
 	cp herdr/bin/*.ts ~/.config/herdr/bin/
 	sed -i '' "1s|#!/usr/bin/env bun|#!$(command -v bun)|" ~/.config/herdr/bin/*.ts
 	chmod +x ~/.config/herdr/bin/*.ts
+	mkdir -p ~/.config/herdr/skill-snippets
+	rm -f ~/.config/herdr/skill-snippets/*
+	cp herdr/skill-snippets/*.md ~/.config/herdr/skill-snippets/
 	@echo "Installed herdr config to ~/.config/herdr/config.toml"
 	@echo "Installed herdr scripts to ~/.config/herdr/bin/"
+	@echo "Installed skill snippets to ~/.config/herdr/skill-snippets/"
 	@echo "Installed Ghostty config to ~/.config/ghostty/config"
 	@command -v herdr >/dev/null && herdr server reload-config 2>/dev/null || true
 	@echo "Reload Ghostty config (cmd+shift+,) for keybind changes to take effect."
