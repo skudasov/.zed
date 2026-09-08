@@ -22,7 +22,7 @@ import {
 import type { NewTab } from './herdr.ts'
 import { repoRoot, reviewBase } from './git.ts'
 
-const INSTRUCTIONS = 'Report correctness bugs first, then simplifications. Do not edit any files.'
+const INSTRUCTIONS = 'Review for correctness only. Do not read, grep, or review test files (*_test.go) or documentation (*.md). Report correctness bugs first, then simplifications. Do not edit any files. For any issues or bugs found also write down permalinks to GitHub.'
 
 interface PullRequest {
   number: number
