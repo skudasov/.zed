@@ -1,0 +1,5 @@
+# Pick a PR from the same inbox as "Review: AI" and review it yourself in
+# tuicr (`tuicr pr <url>`), in a tab of the repo's review: workspace.
+name = "Review: manual"
+description = "Pick a PR and review it yourself in tuicr"
+command = "~/.config/herdr/bin/ai-review.ts manual '{{.WorkDir}}'"

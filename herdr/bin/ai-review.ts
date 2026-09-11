@@ -3,12 +3,13 @@
  * ai-review — open a fresh review agent in a "review:<repo>" workspace.
  *
  *   ai-review.ts diff  [agent] [dir]   review this branch: merge-base(default)..HEAD
- *   ai-review.ts inbox [agent] [dir]   pick a PR from the repos in review.toml, review it
+ *   ai-review.ts inbox  [agent] [dir]  pick a PR from the repos in review.toml, an agent reviews it
+ *   ai-review.ts manual [dir]          pick a PR the same way, review it yourself in tuicr
  *
  * PRs are grouped — review asked of me, of my team, mine, involving me, the
- * rest — and show draft, CI and conflict status. After the PR comes a prompt
- * template from ~/.config/herdr/review-prompts/. Both pickers are fzf, so run
- * this where there is a tty, like the quick-actions overlay.
+ * rest — and show draft, CI and conflict status. For inbox, after the PR comes
+ * a prompt template from ~/.config/herdr/review-prompts/. The pickers are fzf,
+ * so run this where there is a tty, like the quick-actions overlay.
  *
  * agent defaults to claude; dir defaults to the focused pane's cwd, then cwd.
  */
@@ -29,7 +30,7 @@ import {
 import type { NewTab } from './herdr.ts'
 import { originRepo, repoRoot, reviewBase } from './git.ts'
 import { DEFAULT_CONFIG, fetchInbox, loadReviewConfig } from './github.ts'
-import type { Group, PullRequest, ReviewConfig } from './github.ts'
+import type { Group, PullRequest } from './github.ts'
 
 const INSTRUCTIONS = 'Review for correctness only. Do not read, grep, or review test files (*_test.go) or documentation (*.md). Report correctness bugs first, then simplifications. Do not edit any files. For any issues or bugs found also write down permalinks to GitHub.'
 
@@ -190,13 +191,14 @@ async function reviewDir(repo: string, launchDir: string, cloneRoots: string[]):
   return scratch
 }
 
-async function pickAndReview(
-  agent: string,
-  dir: string,
-  scope: string[],
-  config: ReviewConfig,
-  notes: string[] = [],
-): Promise<void> {
+/** Fetch the PRs of review.toml's repos, pick one, and find where to review it. */
+async function pickFromInbox(dir: string): Promise<{ pr: PullRequest; cwd: string }> {
+  const loaded = await loadReviewConfig()
+  const config = loaded ?? DEFAULT_CONFIG
+  const scope = [...config.repos.map((repo) => `repo:${repo}`), ...config.orgs.map((org) => `org:${org}`)]
+  const notes = loaded ? [] : ['No ~/.config/herdr/review.toml: showing all of GitHub']
+  if (loaded && scope.length === 0) notes.push('review.toml lists no repos or orgs: showing all of GitHub')
+
   const inbox = await fetchInbox(scope, config).catch((error: Error) => exit(error.message))
   if (inbox.samlBlocked) {
     notes.push('Some PRs hidden by SAML SSO: authorize the gh token for that org at github.com/settings/tokens')
@@ -204,16 +206,17 @@ async function pickAndReview(
   if (inbox.pulls.length === 0) exit(['no open PRs', ...notes].join('\n  '))
 
   const pr = (await pickPullRequest(inbox.pulls, notes)) ?? exit('no PR selected')
-  const template = (await pickPrompt()) ?? exit('no prompt selected')
-  const cwd = await reviewDir(pr.repo, dir, config.cloneRoots)
+  return { pr, cwd: await reviewDir(pr.repo, dir, config.cloneRoots) }
+}
 
+/** A focused tab for the PR in its repo's review workspace, running `command`. */
+async function openReviewTab(pr: PullRequest, cwd: string, command: string): Promise<string> {
   // The tab carries the PR number and title, so the sidebar says what is under
-  // review — the same name whichever agent is running it.
+  // review — the same name whoever is reviewing it.
   const { workspaceId, paneId } = await reviewTab(cwd, `#${pr.number} ${pr.title}`.slice(0, 48))
   await focusWorkspace(workspaceId)
-  await runInPane(paneId, agent)
-  await promptWhenReady(paneId, renderPrompt(template, pr))
-  console.log(`ai-review: reviewing ${pr.repo}#${pr.number} in review:${basename(cwd)} (${paneId})`)
+  await runInPane(paneId, command)
+  return paneId
 }
 
 // --- modes -------------------------------------------------------------------
@@ -233,21 +236,31 @@ async function reviewDiff(agent: string, dir: string): Promise<void> {
 }
 
 async function reviewInbox(agent: string, dir: string): Promise<void> {
-  const loaded = await loadReviewConfig()
-  const config = loaded ?? DEFAULT_CONFIG
-  const scope = [...config.repos.map((repo) => `repo:${repo}`), ...config.orgs.map((org) => `org:${org}`)]
-  const notes = loaded ? [] : ['No ~/.config/herdr/review.toml: showing all of GitHub']
-  if (loaded && scope.length === 0) notes.push('review.toml lists no repos or orgs: showing all of GitHub')
-  await pickAndReview(agent, dir, scope, config, notes)
+  const { pr, cwd } = await pickFromInbox(dir)
+  const template = (await pickPrompt()) ?? exit('no prompt selected')
+  const paneId = await openReviewTab(pr, cwd, agent)
+  await promptWhenReady(paneId, renderPrompt(template, pr))
+  console.log(`ai-review: reviewing ${pr.repo}#${pr.number} in review:${basename(cwd)} (${paneId})`)
 }
 
-const [mode = 'diff', agent = 'claude', dirArg] = process.argv.slice(2)
+/** Same picker, but I do the reviewing, in tuicr. */
+async function reviewManual(dir: string): Promise<void> {
+  const { pr, cwd } = await pickFromInbox(dir)
+  const paneId = await openReviewTab(pr, cwd, `tuicr pr ${pr.url}`)
+  console.log(`ai-review: tuicr on ${pr.repo}#${pr.number} in review:${basename(cwd)} (${paneId})`)
+}
+
+const [mode = 'diff', ...rest] = process.argv.slice(2)
+// manual takes no agent: its only argument is the dir.
+const [agent = 'claude', dirArg] = mode === 'manual' ? [undefined, rest[0]] : rest
 const dir = dirArg ?? (await focusedDir()) ?? process.cwd()
 
 if (mode === 'diff') {
   await reviewDiff(agent, dir)
 } else if (mode === 'inbox') {
   await reviewInbox(agent, dir)
+} else if (mode === 'manual') {
+  await reviewManual(dir)
 } else {
-  exit(`unknown mode: ${mode} (want diff or inbox)`)
+  exit(`unknown mode: ${mode} (want diff, inbox or manual)`)
 }

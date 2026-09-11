@@ -1,8 +1,8 @@
 # Pick a PR from the repos in ~/.config/herdr/review.toml — review requests
 # first, with draft/checks/conflict status — then a prompt template, and review
 # it in a fresh agent. Both pickers run in the quick-actions overlay.
-name = "Review: PR inbox"
-description = "Watched repos' PRs, needs-my-review first"
+name = "Review: AI"
+description = "Pick a PR, then a prompt; a fresh agent reviews it"
 type = "select"
 command = "~/.config/herdr/bin/ai-review.ts inbox {{.Value}} '{{.WorkDir}}'"
 
