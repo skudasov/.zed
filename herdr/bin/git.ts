@@ -10,6 +10,12 @@ const git = async (dir: string, ...args: string[]): Promise<string | undefined> 
 /** The repo containing `dir`, or undefined when `dir` is not in a git repo. */
 export const repoRoot = (dir: string) => git(dir, "rev-parse", "--show-toplevel");
 
+/** `owner/repo` of the origin remote, when it lives on GitHub. */
+export async function originRepo(dir: string): Promise<string | undefined> {
+  const url = await git(dir, "remote", "get-url", "origin");
+  return url?.match(/github\.com[:/](.+?)(?:\.git)?\/?$/)?.[1];
+}
+
 /**
  * Where this branch left the default branch — the base of everything you wrote.
  * On the default branch itself there is no such point, so review the last commit.
