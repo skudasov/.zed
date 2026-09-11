@@ -1,0 +1,22 @@
+# PR review inbox (herdr/bin/ai-review.ts inbox) — source of truth lives here in
+# ~/.config/zed/herdr/review.toml
+# Install: `just install-configs` from ~/.config/zed (copies to ~/.config/herdr/review.toml)
+
+# Repos whose PRs appear in the inbox, as owner/name.
+# With both repos and orgs empty, the inbox searches all of GitHub.
+repos = [
+  # "blockscout/blockscout",
+]
+
+# Every repo of these orgs.
+orgs = []
+
+# Also list open PRs in the watched repos that don't involve me (the OTHER group).
+show_others = true
+
+# Max PRs per group.
+limit = 30
+
+# Where local clones live. A clone whose origin matches the PR's repo becomes the
+# agent's cwd; otherwise it runs in ~/.herdr/reviews/<owner>/<repo>.
+clone_roots = ["~/Projects"]
