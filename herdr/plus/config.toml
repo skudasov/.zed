@@ -8,3 +8,10 @@
 [worktree]
 # Prefix applied to branches created from the projects browser (ctrl+g).
 branch_prefix = "skudasov/"
+
+# Placement for herdr-plus pickers: overlay, popup, split, tab, or zoomed.
+[projects]
+placement = "popup"
+
+[quick_actions]
+placement = "popup"

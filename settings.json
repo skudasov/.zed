@@ -79,8 +79,8 @@
       "enable_thinking": false,
     },
     "inline_assistant_model": {
-      "provider": "anthropic",
-      "model": "claude-haiku-4-5-20251001",
+      "provider": "opencode",
+      "model": "deepseek-v4-flash",
     },
     "single_file_review": false,
     "model_parameters": [],
@@ -142,10 +142,10 @@
     "show_tab_bar_buttons": false,
   },
   "project_panel": {
+    "folder_indicator": "icon",
     "git_status": true,
     "hide_gitignore": false,
     "file_icons": true,
-    "folder_icons": true,
     "default_width": 300.0,
     "dock": "left",
     "auto_fold_dirs": false,
