@@ -84,6 +84,7 @@
     },
     "single_file_review": false,
     "model_parameters": [],
+    "terminal_init_command": "herdr --session ide",
   },
   "bottom_dock_layout": "right_aligned",
   "scroll_beyond_last_line": "off",

@@ -4,6 +4,9 @@
     "bindings": {
       "space t t": "terminal_panel::Toggle",
       "ctrl-[": "vim::NormalBefore",
+      // switch between vertical splits even while the terminal has focus
+      "cmd-[": "workspace::ActivatePaneLeft",
+      "cmd-]": "workspace::ActivatePaneRight",
     },
   },
   {
@@ -39,6 +42,7 @@
       "space t c": "workspace::NewCenterTerminal",
       "space a a": "agent::NewThread",
       "space a i": "assistant::InlineAssist",
+      "space a t": "agent::NewTerminalThread",
       // swaps
       "space b h": "pane::SwapItemLeft",
       "space b l": "pane::SwapItemRight",
