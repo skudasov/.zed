@@ -13,6 +13,7 @@ background = #303135
 # Uncomment and change to your preferred font:
 # font-family = "ZedMono Nerd Font"
 # font-family = "JetBrains Mono"
+font-family = "JetBrains Mono"
 font-size = 15
 
 # Ligatures — mirrors Zed terminal font_features

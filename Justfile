@@ -1,7 +1,11 @@
-install: install-flux9s install-configs install-lazydocker install-k9s install-herdr-plus
+install: install-fonts install-flux9s install-configs install-lazydocker install-k9s install-herdr-plus
     mkdir -p ~/.hammerspoon
     cp hammerspoon/init.lua ~/.hammerspoon/init.lua
     hs -c "hs.reload()"
+
+# JetBrains Mono is the font for Zed (buffer + UI) and Ghostty (and so herdr).
+install-fonts:
+    brew install --cask font-jetbrains-mono
 
 install-lazydocker:
     brew install jesseduffield/lazydocker/lazydocker
