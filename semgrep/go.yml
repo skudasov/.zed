@@ -1,0 +1,164 @@
+# Go rules for `Review: semgrep` — the mechanical half of ~/.config/herdr/skill-snippets/go-*.md.
+# Source of truth lives in ~/.config/zed/herdr/semgrep/go.yml; `just install-configs` copies it.
+# Self-test: `just test-semgrep` (fixtures in tests/go.go carry ruleid:/ok: annotations).
+rules:
+  - id: go-context-background
+    languages: [go]
+    severity: WARNING
+    message: >-
+      context.Background() outside main and tests: take the caller's ctx so the work can be cancelled.
+    paths:
+      exclude: ["*_test.go", "main.go", "cmd/**"]
+    pattern-either:
+      - pattern: context.Background()
+      - pattern: context.TODO()
+
+  - id: go-context-in-struct
+    languages: [go]
+    severity: WARNING
+    message: >-
+      context stored in a struct field: pass ctx explicitly through the call instead.
+    pattern: |
+      type $T struct {
+        ...
+        $F context.Context
+        ...
+      }
+
+  - id: go-context-not-first-param
+    languages: [go]
+    severity: WARNING
+    message: >-
+      ctx is not the first parameter: func $F(ctx context.Context, ...).
+    patterns:
+      - pattern: func $F($A $T, ...) { ... }
+      - pattern-not: func $F(ctx context.Context, ...) { ... }
+      - pattern-inside: |
+          func $F(..., $C context.Context, ...) { ... }
+
+  - id: go-errorf-without-wrap
+    languages: [go]
+    severity: WARNING
+    message: >-
+      fmt.Errorf carrying an err without %w: callers lose errors.Is / errors.As.
+    patterns:
+      - pattern: fmt.Errorf($MSG, ..., $ERR)
+      - metavariable-regex:
+          metavariable: $ERR
+          regex: ^(err|.*Err)$
+      # re2 has no negative lookahead, so "contains no %w" is spelled out:
+      # any run of non-% chars, or a % followed by anything but w.
+      - metavariable-regex:
+          metavariable: $MSG
+          regex: ^"(?:[^%]|%[^w])*"$
+
+  - id: go-error-string-match
+    languages: [go]
+    severity: ERROR
+    message: >-
+      matching on an error string: use a sentinel error with errors.Is, or a type with errors.As.
+    pattern-either:
+      - pattern: $ERR.Error() == "..."
+      - pattern: '"..." == $ERR.Error()'
+      - pattern: strings.Contains($ERR.Error(), "...")
+      - pattern: strings.HasPrefix($ERR.Error(), "...")
+
+  - id: go-defer-in-loop
+    languages: [go]
+    severity: WARNING
+    message: >-
+      defer inside a loop: it runs when the function returns, not per iteration. Move the body into a function.
+    patterns:
+      - pattern-inside: |
+          for ... {
+            ...
+          }
+      # A defer inside a closure runs when the closure returns, which is the fix.
+      - pattern-not-inside: |
+          func(...) {
+            ...
+          }
+      - pattern-either:
+          - pattern: defer $F(...)
+          - pattern: defer $X.$M(...)
+
+  - id: go-mutex-by-value
+    languages: [go]
+    severity: ERROR
+    message: >-
+      sync mutex passed or received by value: the copy guards nothing. Use a pointer receiver or *sync.Mutex.
+    pattern-either:
+      - pattern: func $F(..., $M sync.Mutex, ...) { ... }
+      - pattern: func $F(..., $M sync.RWMutex, ...) { ... }
+      - pattern: func $F(..., $M sync.WaitGroup, ...) { ... }
+
+  - id: go-time-after-in-select-loop
+    languages: [go]
+    severity: WARNING
+    message: >-
+      time.After in a select inside a loop leaks a timer per iteration: use a time.Timer and Reset it.
+    patterns:
+      - pattern-inside: |
+          for ... {
+            ...
+          }
+      - pattern-inside: |
+          select {
+          case <-$C:
+            ...
+          }
+      - pattern: time.After(...)
+
+  - id: go-http-client-without-timeout
+    languages: [go]
+    severity: ERROR
+    message: >-
+      http.Client without a Timeout waits forever. Set one, or use the shared resty client.
+    patterns:
+      # The bare literal also matches the &-taken one, so this stays a single
+      # pattern: two of them would report the same line twice.
+      - pattern: 'http.Client{...}'
+      - pattern-not: 'http.Client{..., Timeout: ...}'
+
+  - id: go-http-default-client
+    languages: [go]
+    severity: WARNING
+    message: >-
+      package-level http helper: no ctx, no timeout. Use the shared resty client with SetContext(ctx).
+    pattern-either:
+      - pattern: http.Get(...)
+      - pattern: http.Post(...)
+      - pattern: http.PostForm(...)
+      - pattern: http.Head(...)
+      - pattern: http.DefaultClient.Do(...)
+
+  - id: go-stdlib-print-logging
+    languages: [go]
+    severity: WARNING
+    message: >-
+      app logging goes through zerolog: log.Info().Str(...).Err(err).Msg("..."), not fmt/stdlib log.
+    paths:
+      exclude: ["*_test.go"]
+    pattern-either:
+      - pattern: fmt.Print(...)
+      - pattern: fmt.Printf(...)
+      - pattern: fmt.Println(...)
+      - pattern: println(...)
+
+  - id: go-init-func
+    languages: [go]
+    severity: WARNING
+    message: >-
+      init(): hidden global state run before main. Do the work in a constructor the caller can see.
+    paths:
+      exclude: ["*_test.go"]
+    pattern: func init() { ... }
+
+  - id: go-sleep-in-test
+    languages: [go]
+    severity: WARNING
+    message: >-
+      time.Sleep in a test is a flake waiting to happen: synchronise on a channel, or poll with require.Eventually.
+    paths:
+      include: ["*_test.go"]
+    pattern: time.Sleep(...)

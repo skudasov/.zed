@@ -4,6 +4,7 @@
  *
  *   ai-review.ts diff  [agent] [dir]   review this branch: merge-base(default)..HEAD
  *   ai-review.ts ocr   [agent] [dir]   same range, scoped and ruled by OpenCodeReview's delegate mode
+ *   ai-review.ts semgrep [agent] [dir] same range, with semgrep's Go findings as the starting point
  *   ai-review.ts inbox  [agent] [dir]  pick a PR from the repos in review.toml, an agent reviews it
  *   ai-review.ts manual [dir]          pick a PR the same way, review it yourself in tuicr
  *
@@ -29,7 +30,7 @@ import {
   waitForIdleAgent,
 } from './herdr.ts'
 import type { NewTab } from './herdr.ts'
-import { originRepo, repoRoot, reviewBase } from './git.ts'
+import { changedFiles, originRepo, repoRoot, reviewBase } from './git.ts'
 import { DEFAULT_CONFIG, fetchInbox, loadReviewConfig } from './github.ts'
 import type { Group, PullRequest } from './github.ts'
 
@@ -39,6 +40,16 @@ const INSTRUCTIONS = 'Review for correctness only. Do not read, grep, or review 
 // it only fixes the shape of the report.
 const OCR_INSTRUCTIONS =
   'Report findings as file:line, correctness bugs first, then simplifications, and name the rule each one breaks. Do not edit any files.'
+
+// Installed by `just install-semgrep-rules` from ~/.config/zed/semgrep/. A directory,
+// not a file: semgrep applies each rule only to the languages it declares, so
+// pointing at all of them and letting the changed files decide is the same scan
+// as picking go.yml by hand — and it keeps working as more languages land here.
+const SEMGREP_RULES = join(homedir(), '.config/semgrep')
+// semgrep matches patterns, not meaning: it cannot see the bug two functions
+// away, and it does report things that are fine in context.
+const SEMGREP_INSTRUCTIONS =
+  'Treat every semgrep finding as a lead, not a verdict: confirm it in the code, and say which ones you are discarding and why. Report findings as file:line. Do not edit any files.'
 
 const PROMPTS_DIR = process.env.REVIEW_PROMPTS_DIR ?? join(homedir(), '.config/herdr/review-prompts')
 // Used when the prompts dir is empty or missing.
@@ -276,6 +287,43 @@ function reviewOcr(agent: string, dir: string): Promise<void> {
   })
 }
 
+/**
+ * Same range again, but semgrep goes first: the mechanical rules in
+ * ~/.config/semgrep/ are matched deterministically and for free, so
+ * the agent spends its context on the bugs a matcher cannot reach.
+ *
+ * The scan is left to the agent's shell — `git diff --name-only` there keeps the
+ * file list out of the prompt, which herdr types into the pane a character at a
+ * time.
+ */
+async function reviewSemgrep(agent: string, dir: string): Promise<void> {
+  if (!Bun.which('semgrep')) exit('semgrep not on PATH: brew install semgrep (or `just install-semgrep`)')
+  if (!(await Bun.file(SEMGREP_RULES).exists())) {
+    exit(`no rules at ${SEMGREP_RULES}: run \`just install-semgrep-rules\` in ~/.config/zed`)
+  }
+
+  const root = (await repoRoot(dir)) ?? exit(`not a git repo: ${dir}`)
+  const base = (await reviewBase(root)) ?? exit('nothing to review')
+  // Semgrep with no paths scans the whole repo, which is a different and much
+  // slower review than the one asked for, so an empty range stops here instead.
+  const files = await changedFiles(root, base)
+  if (files.length === 0) exit(`no files added or changed in ${base}...HEAD`)
+
+  // --diff-filter=ACMR for the same reason changedFiles uses it: a path that the
+  // branch deleted is not there to be scanned.
+  const scan = `semgrep --config ${SEMGREP_RULES} --quiet $(git diff --name-only --diff-filter=ACMR ${base}...HEAD)`
+  await branchReview(agent, dir, 'semgrep', () =>
+    [
+      `Review the changes on this branch, starting from what semgrep already found.`,
+      `First run: ${scan}.`,
+      `That is every rule broken by the ${files.length === 1 ? 'one file' : `${files.length} files`} this branch touches; rules for other languages simply do not match.`,
+      `${SEMGREP_INSTRUCTIONS}`,
+      `Then read git diff ${base}...HEAD and add what semgrep cannot see: wrong logic, nil paths, races, cancellation that never happens, and anything the tests would miss.`,
+      `Correctness bugs first, then simplifications.`,
+    ].join(' '),
+  )
+}
+
 async function reviewInbox(agent: string, dir: string): Promise<void> {
   const { pr, cwd } = await pickFromInbox(dir)
   const template = (await pickPrompt()) ?? exit('no prompt selected')
@@ -300,10 +348,12 @@ if (mode === 'diff') {
   await reviewDiff(agent, dir)
 } else if (mode === 'ocr') {
   await reviewOcr(agent, dir)
+} else if (mode === 'semgrep') {
+  await reviewSemgrep(agent, dir)
 } else if (mode === 'inbox') {
   await reviewInbox(agent, dir)
 } else if (mode === 'manual') {
   await reviewManual(dir)
 } else {
-  exit(`unknown mode: ${mode} (want diff, ocr, inbox or manual)`)
+  exit(`unknown mode: ${mode} (want diff, ocr, semgrep, inbox or manual)`)
 }

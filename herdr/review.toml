@@ -5,7 +5,7 @@
 # Repos whose PRs appear in the inbox, as owner/name.
 # With both repos and orgs empty, the inbox searches all of GitHub.
 repos = [
-  # "blockscout/blockscout",
+  # "smartcontractkit/chainlink",
 ]
 
 # Every repo of these orgs.

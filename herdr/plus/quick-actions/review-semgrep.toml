@@ -1,0 +1,19 @@
+# Same range as "Review: this branch's diff", but semgrep goes first: the agent
+# runs the rules in ~/.config/semgrep/ over the files this branch touched, then
+# confirms or discards each finding and carries on with the bugs a pattern
+# matcher cannot reach. Every language's rules are passed every time — semgrep
+# only applies a rule to the languages it declares. Rules are mechanical and
+# free; the agent's context goes on the rest.
+# Install semgrep with `just install-semgrep`.
+name = "Review: semgrep"
+description = "semgrep's findings first, then a fresh agent reviews merge-base..HEAD"
+type = "select"
+command = "~/.config/herdr/bin/ai-review.ts semgrep {{.Value}} '{{.WorkDir}}'"
+
+[[options]]
+label = "claude"
+value = "claude"
+
+[[options]]
+label = "opencode"
+value = "opencode"

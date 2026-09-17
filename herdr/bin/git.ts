@@ -17,6 +17,15 @@ export async function originRepo(dir: string): Promise<string | undefined> {
 }
 
 /**
+ * The files this branch added or changed, relative to the repo root.
+ * Deletions are filtered out: a scanner handed a path that is gone just errors.
+ */
+export async function changedFiles(root: string, base: string): Promise<string[]> {
+  const out = await git(root, "diff", "--name-only", "--diff-filter=ACMR", `${base}...HEAD`);
+  return out ? out.split("\n") : [];
+}
+
+/**
  * Where this branch left the default branch — the base of everything you wrote.
  * On the default branch itself there is no such point, so review the last commit.
  */

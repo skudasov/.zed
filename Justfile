@@ -1,4 +1,4 @@
-install: install-fonts install-flux9s install-configs install-lazydocker install-k9s install-sofka install-ocr install-herdr-plus install-chrome-theme
+install: install-fonts install-flux9s install-configs install-lazydocker install-k9s install-sofka install-ocr install-semgrep install-semgrep-rules install-herdr-plus install-chrome-theme
     mkdir -p ~/.hammerspoon
     cp hammerspoon/init.lua ~/.hammerspoon/init.lua
     hs -c "hs.reload()"
@@ -17,6 +17,32 @@ install-tuicr:
 # OpenCodeReview (`ocr`), used by the "Review: OCR" quick action.
 install-ocr:
     npm install -g @alibaba-group/open-code-review
+
+# Pattern matcher behind the "Review: semgrep" quick action; rules in semgrep/.
+install-semgrep:
+    brew install semgrep
+
+# They belong to no one tool — anything can point --config at the installed
+# directory — so they do not live under ~/.config/herdr with the review wiring.
+# Install the rules; the tests/ fixtures next to them stay in the repo.
+install-semgrep-rules:
+    mkdir -p ~/.config/semgrep
+    rm -f ~/.config/semgrep/*.yml
+    cp semgrep/*.yml ~/.config/semgrep/
+    @echo "Installed semgrep rules to ~/.config/semgrep/"
+
+# The test-only rule sits outside semgrep's file pairing, so it gets its own scan.
+# Run each language's rules against their ruleid:/ok: fixtures in semgrep/tests/.
+test-semgrep:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    cd semgrep
+    semgrep --config . --validate
+    semgrep --test --config . tests
+    # A rule with paths.include: "*_test.*" never matches the fixture semgrep
+    # pairs with its rule file, so those fixtures get a plain scan instead.
+    semgrep --config . --quiet --error tests/*_test.* >/dev/null \
+      && { echo "test-only rules did not fire"; exit 1; } || echo "test-only rules ✓"
 
 install-k9s:
     brew install k9s
