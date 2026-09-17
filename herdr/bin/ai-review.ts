@@ -3,6 +3,7 @@
  * ai-review — open a fresh review agent in a "review:<repo>" workspace.
  *
  *   ai-review.ts diff  [agent] [dir]   review this branch: merge-base(default)..HEAD
+ *   ai-review.ts ocr   [agent] [dir]   same range, scoped and ruled by OpenCodeReview's delegate mode
  *   ai-review.ts inbox  [agent] [dir]  pick a PR from the repos in review.toml, an agent reviews it
  *   ai-review.ts manual [dir]          pick a PR the same way, review it yourself in tuicr
  *
@@ -33,6 +34,11 @@ import { DEFAULT_CONFIG, fetchInbox, loadReviewConfig } from './github.ts'
 import type { Group, PullRequest } from './github.ts'
 
 const INSTRUCTIONS = 'Review for correctness only. Do not read, grep, or review test files (*_test.go) or documentation (*.md). Report correctness bugs first, then simplifications. Do not edit any files. For any issues or bugs found also write down permalinks to GitHub.'
+
+// OCR picks the scope and the rules, so this says nothing about what to read;
+// it only fixes the shape of the report.
+const OCR_INSTRUCTIONS =
+  'Report findings as file:line, correctness bugs first, then simplifications, and name the rule each one breaks. Do not edit any files.'
 
 const PROMPTS_DIR = process.env.REVIEW_PROMPTS_DIR ?? join(homedir(), '.config/herdr/review-prompts')
 // Used when the prompts dir is empty or missing.
@@ -221,18 +227,53 @@ async function openReviewTab(pr: PullRequest, cwd: string, command: string): Pro
 
 // --- modes -------------------------------------------------------------------
 
-async function reviewDiff(agent: string, dir: string): Promise<void> {
+/**
+ * A fresh agent on this branch's range, in a tab of the repo's review workspace.
+ * `prompt` gets the repo root and the base the range starts from.
+ */
+async function branchReview(
+  agent: string,
+  dir: string,
+  tabName: string,
+  prompt: (root: string, base: string) => string,
+): Promise<void> {
   const root = (await repoRoot(dir)) ?? exit(`not a git repo: ${dir}`)
   const base = (await reviewBase(root)) ?? exit('nothing to review')
 
-  const { workspaceId, paneId } = await reviewTab(root, 'diff')
+  const { workspaceId, paneId } = await reviewTab(root, tabName)
   await focusWorkspace(workspaceId)
   await runInPane(paneId, agent)
-  await promptWhenReady(
-    paneId,
+  await promptWhenReady(paneId, prompt(root, base))
+  console.log(`ai-review: reviewing ${base}...HEAD in review:${basename(root)} (${paneId})`)
+}
+
+const reviewDiff = (agent: string, dir: string) =>
+  branchReview(agent, dir, 'diff', (_root, base) =>
     `Review the changes on this branch. Start by running: git diff ${base}...HEAD. ${INSTRUCTIONS}`,
   )
-  console.log(`ai-review: reviewing ${base}...HEAD in review:${basename(root)} (${paneId})`)
+
+/**
+ * Same range, delegated: `ocr` decides what is in scope and which rules apply,
+ * the agent does the reading and the judging. Delegate mode runs no LLM of its
+ * own, so ocr needs no provider configured — `ocr config` is for its own
+ * review/scan modes, not this one.
+ */
+function reviewOcr(agent: string, dir: string): Promise<void> {
+  if (!Bun.which('ocr')) {
+    exit('ocr not on PATH: npm install -g @alibaba-group/open-code-review (or `just install-ocr`)')
+  }
+  return branchReview(agent, dir, 'ocr', (root, base) => {
+    const scope = `--repo '${root}' --from ${base} --to HEAD`
+    return [
+      `Review the changes on this branch, with OpenCodeReview picking the scope and the rules.`,
+      `First run: ocr delegate preview ${scope}.`,
+      `It lists the reviewable files; the struck-through ones are excluded, so skip those.`,
+      `Then run: ocr delegate rule ${scope} <every reviewable path>.`,
+      `It prints the review rules grouped by the files they apply to.`,
+      `Then read the changes with git diff ${base}...HEAD and judge each file against the rules of its group.`,
+      OCR_INSTRUCTIONS,
+    ].join(' ')
+  })
 }
 
 async function reviewInbox(agent: string, dir: string): Promise<void> {
@@ -257,10 +298,12 @@ const dir = dirArg ?? (await focusedDir()) ?? process.cwd()
 
 if (mode === 'diff') {
   await reviewDiff(agent, dir)
+} else if (mode === 'ocr') {
+  await reviewOcr(agent, dir)
 } else if (mode === 'inbox') {
   await reviewInbox(agent, dir)
 } else if (mode === 'manual') {
   await reviewManual(dir)
 } else {
-  exit(`unknown mode: ${mode} (want diff, inbox or manual)`)
+  exit(`unknown mode: ${mode} (want diff, ocr, inbox or manual)`)
 }

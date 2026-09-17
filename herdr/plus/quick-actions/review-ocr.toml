@@ -1,0 +1,17 @@
+# Same range as "Review: this branch's diff", but OpenCodeReview (ocr) picks the
+# scope and the rules: the agent runs `ocr delegate preview` / `ocr delegate
+# rule` and reviews against what they print. Delegate mode runs no LLM of its
+# own, so ocr needs no API key — the agent you pick here does the thinking.
+# Install ocr with `just install-ocr`.
+name = "Review: OCR"
+description = "Fresh agent reviews merge-base..HEAD, scoped and ruled by OpenCodeReview"
+type = "select"
+command = "~/.config/herdr/bin/ai-review.ts ocr {{.Value}} '{{.WorkDir}}'"
+
+[[options]]
+label = "claude"
+value = "claude"
+
+[[options]]
+label = "opencode"
+value = "opencode"

@@ -1,4 +1,4 @@
-install: install-fonts install-flux9s install-configs install-lazydocker install-k9s install-sofka install-herdr-plus install-chrome-theme
+install: install-fonts install-flux9s install-configs install-lazydocker install-k9s install-sofka install-ocr install-herdr-plus install-chrome-theme
     mkdir -p ~/.hammerspoon
     cp hammerspoon/init.lua ~/.hammerspoon/init.lua
     hs -c "hs.reload()"
@@ -12,6 +12,11 @@ install-lazydocker:
 
 install-tuicr:
     brew install tuicr
+
+# Delegate mode runs no LLM itself, so no provider or API key needs configuring.
+# OpenCodeReview (`ocr`), used by the "Review: OCR" quick action.
+install-ocr:
+    npm install -g @alibaba-group/open-code-review
 
 install-k9s:
     brew install k9s
