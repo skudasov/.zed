@@ -2,7 +2,29 @@
 
 Copy files to `~/.config/zed`
 
-Use "Material Simple Dark Grey" for Chrome.
+## Chrome theme
+
+`chrome-theme/` is a theme extension whose colors match Zed's "Ultimate Dark Neo"
+and Ghostty: background `#303135`, active tab / toolbar `#3c464d`, text `#fff9ec`.
+It repaints the tab strip, toolbar, bookmarks bar and New Tab Page only — web
+pages and `chrome://` pages are untouched.
+
+```bash
+just install-chrome-theme
+```
+
+Then, once:
+
+1. `chrome://extensions` -> Developer mode on
+2. **Load unpacked**, `cmd+shift+g` in the picker, paste `~/.config/zed/chrome-theme`
+   (`cmd+shift+.` also toggles hidden dirs in any macOS file dialog)
+
+Chrome re-loads it on every start, so this is a one-time step. After editing
+`chrome-theme/manifest.json`, hit the reload arrow on the extension card.
+
+Chrome will not sideload a packed `.crx` on macOS and the `ExtensionSettings`
+policy requires a Web Store `update_url`, so "Load unpacked" is the only way to
+install this without publishing it.
 
 ## Setting up project tasks and debug
 

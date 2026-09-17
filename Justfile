@@ -1,4 +1,4 @@
-install: install-fonts install-flux9s install-configs install-lazydocker install-k9s install-herdr-plus
+install: install-fonts install-flux9s install-configs install-lazydocker install-k9s install-sofka install-herdr-plus install-chrome-theme
     mkdir -p ~/.hammerspoon
     cp hammerspoon/init.lua ~/.hammerspoon/init.lua
     hs -c "hs.reload()"
@@ -18,6 +18,10 @@ install-k9s:
 
 install-flux9s:
     brew install dgunzy/tap/flux9s
+
+# Kubernetes TUI (kube-rs + ratatui), with Flux CD and Argo CD support.
+install-sofka:
+    brew install nklmilojevic/sofka/sofka
 
 # Copy (never symlink) the herdr + Ghostty configs into place.
 # rm -f first: cp through an existing symlink would write back into this repo
@@ -73,3 +77,22 @@ install-pi:
 	cp -R .pi/. ~/.pi/
 	cd ~/.pi/extensions && pnpm i && cd -
 	@echo "Installed Pi config to ~/.pi"
+
+# Chrome cannot sideload a local .crx on macOS (an ExtensionSettings policy
+# update_url must point at the Web Store), so this stays a "Load unpacked"
+# extension. Loading it once is permanent: Chrome re-loads it on every start.
+# The copy is a no-op when the repo already sits at ~/.config/zed.
+# Chrome theme matching Zed "Ultimate Dark Neo" + Ghostty (background #303135).
+install-chrome-theme:
+	#!/usr/bin/env bash
+	set -euo pipefail
+	dest="$HOME/.config/zed/chrome-theme"
+	if [ "$(pwd)/chrome-theme" != "$dest" ]; then
+		mkdir -p "$dest"
+		cp chrome-theme/manifest.json "$dest/manifest.json"
+	fi
+	echo "Chrome theme ready at $dest"
+	echo "  1. open chrome://extensions and turn Developer mode on"
+	echo "  2. Load unpacked -> cmd+shift+g in the picker, paste: $dest"
+	echo "  (cmd+shift+. also toggles hidden dirs in any macOS file dialog)"
+	echo "  Already loaded? Just hit the reload arrow on the card."

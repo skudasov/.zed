@@ -1,0 +1,38 @@
+{
+  "manifest_version": 3,
+  "name": "Ultimate Dark Neo (Zed/Ghostty match)",
+  "version": "1.0",
+  "description": "Chrome UI colors matched to Zed 'Ultimate Dark Neo' + Ghostty (#303135 base).",
+  "theme": {
+    "colors": {
+      "frame": [48, 49, 53],
+      "frame_inactive": [42, 43, 46],
+      "frame_incognito": [41, 44, 46],
+      "frame_incognito_inactive": [41, 44, 46],
+
+      "toolbar": [60, 70, 77],
+      "button_background": [67, 71, 72],
+      "toolbar_button_icon": [255, 249, 236],
+
+      "tab_text": [255, 249, 236],
+      "background_tab": [48, 49, 53],
+      "background_tab_inactive": [48, 49, 53],
+      "background_tab_incognito": [41, 44, 46],
+      "background_tab_incognito_inactive": [41, 44, 46],
+      "tab_background_text": [176, 172, 165],
+      "tab_background_text_inactive": [176, 172, 165],
+      "tab_background_text_incognito": [176, 172, 165],
+      "tab_background_text_incognito_inactive": [176, 172, 165],
+
+      "bookmark_text": [255, 249, 236],
+
+      "ntp_background": [48, 49, 53],
+      "ntp_text": [255, 249, 236],
+      "ntp_link": [130, 169, 202],
+      "ntp_header": [63, 80, 98]
+    },
+    "properties": {
+      "ntp_logo_alternate": 1
+    }
+  }
+}
