@@ -1,5 +1,5 @@
 # Go rules for `Review: semgrep` — the mechanical half of ~/.config/herdr/skill-snippets/go-*.md.
-# Source of truth lives in ~/.config/zed/herdr/semgrep/go.yml; `just install-configs` copies it.
+# Source of truth lives in ~/.config/zed/semgrep/go.yml; `just install-semgrep-rules` copies it.
 # Self-test: `just test-semgrep` (fixtures in tests/go.go carry ruleid:/ok: annotations).
 rules:
   - id: go-context-background

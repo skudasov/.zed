@@ -121,22 +121,3 @@ hs.hotkey.bind({ "ctrl", "option" }, "w", function()
     sleep(0.5)
     hs.application.launchOrFocus("Zed")
 end)
-
-hs.hotkey.bind({ "option", "ctrl" }, "k", function()
-    coroutine.wrap(function()
-        hs.execute("open -na Ghostty")
-        sleep(1)
-        -- auth
-        hs.eventtap.keyStrokes("aws sso login --profile epic")
-        -- run flux9s
-        hs.eventtap.keyStrokes("flux9s")
-        hs.eventtap.keyStroke({}, "return")
-        sleep(1)
-
-        -- split and run k9s
-        hs.eventtap.keyStroke({ "cmd", "shift" }, "d")
-        sleep(1)
-        hs.eventtap.keyStrokes("k9s")
-        hs.eventtap.keyStroke({}, "return")
-    end)()
-end)

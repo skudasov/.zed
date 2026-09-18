@@ -104,11 +104,6 @@ install-herdr-plus:
 	echo "Installed herdr-plus config to $dir"
 	herdr server reload-config 2>/dev/null || true
 
-install-pi:
-	cp -R .pi/. ~/.pi/
-	cd ~/.pi/extensions && pnpm i && cd -
-	@echo "Installed Pi config to ~/.pi"
-
 # Chrome cannot sideload a local .crx on macOS (an ExtensionSettings policy
 # update_url must point at the Web Store), so this stays a "Load unpacked"
 # extension. Loading it once is permanent: Chrome re-loads it on every start.
