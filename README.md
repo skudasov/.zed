@@ -2,15 +2,15 @@
 
 Copy files to `~/.config/zed`
 
-## Linking Hammerspoon Keys
-
-Enable `Hammerspoon` to access window API.
-**System Settings → Privacy & Security → Accessibility → Hammerspoon**
+## Hammerspoon (OS X automation)
 
 ```bash
 brew install --cask hammerspoon
 just install
 ```
+
+Enable `Hammerspoon` to access window API.
+**System Settings → Privacy & Security → Accessibility → Hammerspoon**
 
 ## Semgrep rules
 
@@ -32,10 +32,6 @@ The review scans the files the branch touched, not the repo: a whole-repo scan
 reports everything that was already there, which buries the branch's own bugs.
 Use `semgrep --config ~/.config/semgrep --baseline-commit <ref> .` for a
 whole-repo scan that still only reports what the branch introduced.
-
-## Setting up project tasks and debug
-
-Create a directory `.zed/` with `tasks.json` and `debug.json` and copy examples for `Go` and `Python`
 
 ## Chrome theme
 
