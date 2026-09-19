@@ -1,0 +1,16 @@
+# Hand the agent in the pane you launched from a humanizer request: pick a
+# tracked prose file in the repo, or take whatever is on the clipboard.
+# The humanizer skill is plain markdown installed into every harness by
+# `just install-skills`, so the same prompt works in claude and opencode.
+name = "Humanize"
+description = "Rewrite prose with the humanizer skill, in the pane you launched from"
+type = "select"
+command = "~/.config/herdr/bin/humanize.ts {{.Value}} '{{.WorkDir}}'"
+
+[[options]]
+label = "file"
+value = "file"
+
+[[options]]
+label = "clipboard"
+value = "clipboard"

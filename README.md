@@ -33,6 +33,58 @@ reports everything that was already there, which buries the branch's own bugs.
 Use `semgrep --config ~/.config/semgrep --baseline-commit <ref> .` for a
 whole-repo scan that still only reports what the branch introduced.
 
+## Session transcripts
+
+[herdr-transcripts](https://github.com/hxreborn/herdr-transcripts) is an `fzf`
+picker over every Claude Code and Codex session on the machine, searchable by
+title, prompt, reply or tool call. `Enter` resumes a session in its own
+directory, or focuses its pane when it is already running.
+
+```bash
+just install-herdr-transcripts
+```
+
+`prefix+f` opens the picker (bound in `herdr/config.toml`). The keybind uses
+`$HERDR_BIN_PATH`, which `just install-configs` rewrites to the absolute herdr
+path for the same reason the `herdr/bin` shebangs are rewritten: herdr runs
+`[[keys.command]]` detached and expands nothing itself.
+
+The plugin keeps its index in `~/.cache/herdr-transcripts` and its picker state
+(scope, sort, filters, resume flags) in
+`~/.config/herdr/plugins/config/transcripts/`, so this repo installs the plugin
+and nothing else. `Ctrl+D` in the picker shows diagnostics, including Claude
+Code's transcript retention — worth checking, since `cleanupPeriodDays`
+defaults low enough to delete the sessions you would search for.
+
+## Agent skills
+
+`skills/manifest.txt` pins external agent skills by repo and git ref.
+`just install-skills` clones each one and copies it into every harness that
+reads a skills directory:
+
+- `~/.claude/skills/<name>`
+- `~/.config/opencode/skills/<name>`
+
+A skill is portable markdown, so one source serves both. Installing replaces
+the whole directory, so a file dropped upstream does not linger. Adding a skill
+is one manifest line:
+
+```text
+# name        repo                ref        subdir
+humanizer     blader/humanizer    v3.0.0     .
+```
+
+The ref is pinned on purpose: a skill is a prompt, and an unpinned prompt
+changes under you.
+
+[Humanizer](https://github.com/blader/humanizer) rewrites AI-sounding prose
+against 25 patterns without changing the facts. Because it triggers off its
+description rather than a slash command, plain language reaches it in any
+harness — "humanize the prose in docs/launch-post.md" works in claude and
+opencode alike. The **Humanize** quick action (`cmd+e`) sends that request to
+the agent in the pane you launched from, for either a tracked prose file picked
+with `fzf` or whatever is on the clipboard.
+
 ## Chrome theme
 
 `chrome-theme/` is a theme extension whose colors match Zed's "Ultimate Dark Neo"

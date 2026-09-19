@@ -1,4 +1,4 @@
-install: install-fonts install-flux9s install-configs install-lazydocker install-k9s install-sofka install-ocr install-semgrep install-semgrep-rules install-herdr-plus install-chrome-theme
+install: install-fonts install-flux9s install-configs install-lazydocker install-k9s install-sofka install-ocr install-semgrep install-semgrep-rules install-herdr-plus install-herdr-transcripts install-skills install-chrome-theme
     mkdir -p ~/.hammerspoon
     cp hammerspoon/init.lua ~/.hammerspoon/init.lua
     hs -c "hs.reload()"
@@ -62,7 +62,12 @@ install-configs:
 	rm -f ~/.config/herdr/config.toml ~/.config/ghostty/config
 	# Expand ~ in script paths: herdr may hand [[keys.command]] straight to
 	# execve, which would not expand it. The repo keeps ~ so it stays portable.
-	sed "s|~/.config/herdr/bin/|$HOME/.config/herdr/bin/|g" herdr/config.toml > ~/.config/herdr/config.toml
+	# $HERDR_BIN_PATH is the path herdr-transcripts documents for its keybind;
+	# resolve it here for the same reason, falling back to a bare `herdr` when
+	# the binary is not installed yet.
+	sed -e "s|~/.config/herdr/bin/|$HOME/.config/herdr/bin/|g" \
+	    -e "s|\$HERDR_BIN_PATH|$(command -v herdr || echo herdr)|g" \
+	    herdr/config.toml > ~/.config/herdr/config.toml
 	cp ghostty/config ~/.config/ghostty/config
 	# The scripts run under bun. The repo keeps `#!/usr/bin/env bun` so it stays
 	# portable; the installed copies get an absolute shebang, because herdr runs
@@ -103,6 +108,48 @@ install-herdr-plus:
 	rsync -a --delete --exclude=.gitkeep herdr/plus/ "$dir/"
 	echo "Installed herdr-plus config to $dir"
 	herdr server reload-config 2>/dev/null || true
+
+# herdr-transcripts (github.com/hxreborn/herdr-transcripts) — fzf over every
+# Claude Code and Codex session, bound to prefix+f in herdr/config.toml. The
+# plugin keeps its own index in ~/.cache/herdr-transcripts and its own picker
+# state in the plugin config dir, so there is nothing for this repo to install
+# besides the plugin itself.
+install-herdr-transcripts:
+	#!/usr/bin/env bash
+	set -euo pipefail
+	command -v herdr >/dev/null || { echo "herdr not on PATH"; exit 1; }
+	command -v fzf >/dev/null || brew install fzf
+	if ! herdr plugin list --json 2>/dev/null | grep -q 'herdr-transcripts\|\.transcripts'; then
+		herdr plugin install hxreborn/herdr-transcripts --yes
+	fi
+	herdr server reload-config 2>/dev/null || true
+	echo "Installed herdr-transcripts; prefix+f opens the picker"
+
+# External agent skills, from skills/manifest.txt into every harness that reads
+# a skills directory. A skill is portable markdown, so the same file serves
+# claude and opencode — installing it twice is cheaper than teaching one harness
+# to read the other's directory. The manifest pins a ref per skill; installing
+# replaces the whole directory, so upstream removals do not linger.
+install-skills:
+	#!/usr/bin/env bash
+	set -euo pipefail
+	targets=("$HOME/.claude/skills" "$HOME/.config/opencode/skills")
+	tmp="$(mktemp -d)"
+	trap 'rm -rf "$tmp"' EXIT
+	while read -r name repo ref subdir _rest; do
+		case "${name:-}" in ''|'#'*) continue;; esac
+		git -c advice.detachedHead=false clone --quiet --depth 1 --branch "$ref" "https://github.com/$repo" "$tmp/$name"
+		src="$tmp/$name/${subdir:-.}"
+		[ -f "$src/SKILL.md" ] || { echo "skills: no SKILL.md in $repo@$ref/${subdir:-.}"; exit 1; }
+		for dir in "${targets[@]}"; do
+			mkdir -p "$dir"
+			rm -rf "${dir:?}/$name"
+			# Everything the skill itself needs, none of the repo's packaging.
+			rsync -a --exclude=.git --exclude=.github --exclude=.claude-plugin \
+			      --exclude=assets --exclude=tests "$src/" "$dir/$name/"
+			echo "Installed skill $name ($repo@$ref) to $dir/$name"
+		done
+	done < skills/manifest.txt
 
 # Chrome cannot sideload a local .crx on macOS (an ExtensionSettings policy
 # update_url must point at the Web Store), so this stays a "Load unpacked"

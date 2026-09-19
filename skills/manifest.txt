@@ -1,0 +1,12 @@
+# External agent skills, installed into every harness by `just install-skills`.
+#
+# One skill per line, whitespace separated:
+#
+#   <name>  <github owner/repo>  <git ref>  <path to the skill dir in the repo>
+#
+# <name> is the directory the skill lands in, so it is also the name agents see.
+# <git ref> is pinned on purpose: a skill is a prompt, and an unpinned prompt
+# changes under you. Bump it deliberately.
+#
+# name        repo                ref        subdir
+humanizer     blader/humanizer    v3.0.0     .

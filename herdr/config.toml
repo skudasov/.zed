@@ -161,6 +161,19 @@ type = "shell"
 command = "~/.config/herdr/bin/ai-layout.ts opencode"
 description = "opencode: plan + impl workspace"
 
+# Session transcripts — fzf over every Claude Code and Codex session, searchable
+# by title, prompt, reply or tool call; enter resumes the session in a new tab.
+# herdr-transcripts (github.com/hxreborn/herdr-transcripts), installed with
+# `just install-herdr-transcripts`. Inert until the plugin is installed.
+# $HERDR_BIN_PATH is rewritten to the absolute herdr path by `just
+# install-configs`, for the same reason the bin/ scripts are: herdr runs
+# [[keys.command]] detached and may not expand anything itself.
+[[keys.command]]
+key = "prefix+f"
+type = "shell"
+command = "$HERDR_BIN_PATH plugin pane open --plugin transcripts --entrypoint picker"
+description = "transcripts: search session transcripts"
+
 # Legacy indexed shortcut config is still parsed for compatibility.
 # Prefer switch_tab, switch_workspace, and focus_agent for new configs.
 # [keys.indexed]
