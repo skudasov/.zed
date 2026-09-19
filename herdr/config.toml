@@ -161,6 +161,31 @@ type = "shell"
 command = "~/.config/herdr/bin/ai-layout.ts opencode"
 description = "opencode: plan + impl workspace"
 
+# Session flow graph — zoetrope (`zoe`) follows the live Claude Code or Codex
+# session of the repo you launched from and draws it as a graph of agents,
+# subagents and tool calls. Opens (or focuses) one "zoe" tab per workspace.
+# Script lives in this repo at herdr/bin/zoe.ts; install the binary with
+# `just install-zoetrope`.
+[[keys.command]]
+key = "prefix+a"
+type = "shell"
+command = "~/.config/herdr/bin/zoe.ts"
+description = "zoetrope: session flow graph"
+
+# Diagrams — d2 compiles a .d2 source, timg draws it with the kitty graphics
+# protocol Ghostty speaks, so the split beside you shows a real image rather
+# than block-character art. With no argument it renders the newest diagram in
+# the repo, which is what an agent that just wrote one wants. The agent cannot
+# draw it itself: its stdout is captured by the harness, so it asks herdr to run
+# timg — that is what the `diagram` skill tells it to do.
+# Script lives in this repo at herdr/bin/diagram.ts; install the binaries with
+# `just install-diagrams`.
+[[keys.command]]
+key = "prefix+d"
+type = "shell"
+command = "~/.config/herdr/bin/diagram.ts"
+description = "diagram: render newest diagram in a split"
+
 # Session transcripts — fzf over every Claude Code and Codex session, searchable
 # by title, prompt, reply or tool call; enter resumes the session in a new tab.
 # herdr-transcripts (github.com/hxreborn/herdr-transcripts), installed with

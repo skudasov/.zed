@@ -1,4 +1,6 @@
 # External agent skills, installed into every harness by `just install-skills`.
+# Skills written in this repo need no entry: any skills/<name>/SKILL.md is
+# installed alongside these.
 #
 # One skill per line, whitespace separated:
 #

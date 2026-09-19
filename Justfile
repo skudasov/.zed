@@ -1,4 +1,4 @@
-install: install-fonts install-flux9s install-configs install-lazydocker install-k9s install-sofka install-ocr install-semgrep install-semgrep-rules install-herdr-plus install-herdr-transcripts install-skills install-chrome-theme
+install: install-fonts install-flux9s install-configs install-lazydocker install-k9s install-sofka install-ocr install-semgrep install-semgrep-rules install-herdr-plus install-herdr-transcripts install-zoetrope install-diagrams install-skills install-chrome-theme
     mkdir -p ~/.hammerspoon
     cp hammerspoon/init.lua ~/.hammerspoon/init.lua
     hs -c "hs.reload()"
@@ -46,6 +46,19 @@ test-semgrep:
 
 install-k9s:
     brew install k9s
+
+# zoetrope (github.com/furkankly/zoetrope) — draws a Claude Code or Codex
+# session as a live flow graph of agents, subagents and tool calls. Binary is
+# `zoe`; herdr/bin/zoe.ts opens it in a "zoe" tab (prefix+a, or quick actions).
+install-zoetrope:
+    brew install furkankly/tap/zoetrope
+
+# d2 (d2lang.com) compiles a text diagram source to PNG/SVG, and timg draws that
+# image in the terminal with the kitty graphics protocol Ghostty speaks — so a
+# diagram shows up as a real image, not block-character art. Wired together by
+# herdr/bin/diagram.ts, bound to prefix+d and driven by the `diagram` skill.
+install-diagrams:
+    brew install d2 timg
 
 install-flux9s:
     brew install dgunzy/tap/flux9s
@@ -150,6 +163,19 @@ install-skills:
 			echo "Installed skill $name ($repo@$ref) to $dir/$name"
 		done
 	done < skills/manifest.txt
+	# Skills written here rather than vendored: a directory under skills/ with a
+	# SKILL.md, installed the same way and into the same places, so an agent
+	# cannot tell which of its skills came from where.
+	for src in skills/*/; do
+		name="$(basename "$src")"
+		[ -f "$src/SKILL.md" ] || continue
+		for dir in "${targets[@]}"; do
+			mkdir -p "$dir"
+			rm -rf "${dir:?}/$name"
+			rsync -a "$src" "$dir/$name/"
+			echo "Installed skill $name (local) to $dir/$name"
+		done
+	done
 
 # Chrome cannot sideload a local .crx on macOS (an ExtensionSettings policy
 # update_url must point at the Web Store), so this stays a "Load unpacked"

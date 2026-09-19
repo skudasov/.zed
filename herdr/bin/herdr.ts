@@ -45,12 +45,29 @@ export async function createWorkspace(label: string, cwd: string): Promise<NewTa
   return { workspaceId: made.workspace.workspace_id, tabId: made.tab.tab_id, paneId: made.root_pane.pane_id };
 }
 
-export async function createTab(workspaceId: string, label: string, cwd: string): Promise<NewTab> {
-  const made = await result($`herdr tab create --workspace ${workspaceId} --cwd ${cwd} --label ${label} --no-focus`);
+export async function createTab(workspaceId: string, label: string, cwd: string, focus = false): Promise<NewTab> {
+  const flag = focus ? "--focus" : "--no-focus";
+  const made = await result($`herdr tab create --workspace ${workspaceId} --cwd ${cwd} --label ${label} ${flag}`);
   return { workspaceId, tabId: made.tab.tab_id, paneId: made.root_pane.pane_id };
 }
 
 export const renameTab = (tabId: string, label: string) => $`herdr tab rename ${tabId} ${label}`.quiet();
+
+export const renamePane = (paneId: string, label: string) => $`herdr pane rename ${paneId} ${label}`.quiet();
+
+/**
+ * Splits a pane and hands back the new one. `--no-focus` keeps you where you
+ * are: a split made for something to look at should not steal the cursor from
+ * whatever you were typing into.
+ */
+export async function splitPane(paneId: string, direction: "right" | "down", cwd: string, ratio = 0.5): Promise<string> {
+  const made = await result(
+    $`herdr pane split --pane ${paneId} --direction ${direction} --ratio ${ratio} --cwd ${cwd} --no-focus`,
+  );
+  return made.pane.pane_id;
+}
+
+export const closePane = (paneId: string) => $`herdr pane close ${paneId}`.quiet().nothrow();
 
 export const focusWorkspace = (workspaceId: string) => $`herdr workspace focus ${workspaceId}`.quiet();
 
@@ -66,3 +83,15 @@ export async function waitForIdleAgent(paneId: string, timeoutMs = 60_000): Prom
   const wait = await $`herdr agent wait ${paneId} --status idle --timeout ${timeoutMs}`.quiet().nothrow();
   return wait.exitCode === 0;
 }
+
+export interface Tab {
+  tab_id: string;
+  workspace_id: string;
+  label: string;
+  focused: boolean;
+}
+
+export const listTabs = async (workspaceId?: string): Promise<Tab[]> =>
+  (await result(workspaceId ? $`herdr tab list --workspace ${workspaceId}` : $`herdr tab list`)).tabs;
+
+export const focusTab = (tabId: string) => $`herdr tab focus ${tabId}`.quiet();

@@ -1,0 +1,7 @@
+# zoetrope (`zoe`) as a flow graph of the live Claude Code or Codex session in
+# the repo you launched from: agents, subagents and every tool call, replayable.
+# Opens (or focuses) a "zoe" tab in the current workspace.
+# Also bound directly: prefix+a. Install the binary with `just install-zoetrope`.
+name = "Zoetrope: session flow graph"
+description = "Watch this repo's live agent session as a graph"
+command = "~/.config/herdr/bin/zoe.ts '{{.WorkDir}}'"
