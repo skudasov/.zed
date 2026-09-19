@@ -7,3 +7,5 @@ secrets/
 zig-examples
 .pi/extensions/node_modules/
 node_modules/
+diagram.d2
+diagram.svg

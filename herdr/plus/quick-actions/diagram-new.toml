@@ -1,0 +1,14 @@
+# A live diagram workbench in its own tab: the rendered diagram on top (three
+# quarters of it), LazyVim on the source underneath. A .d2 buffer saves itself
+# as you type, so the picture redraws without a :w.
+#
+# diagram.d2 and diagram.svg are made in the directory you launched from, and
+# every launch starts from scratch: last time's source and render are both
+# deleted. Rename a diagram you want to keep before opening the next one.
+#
+# Pass --browser for d2's watch server in terminal-browser instead — panning and
+# tooltips, at the price of a whole Chromium.
+# Install the binaries with `just install-diagrams`.
+name = "Diagram: new"
+description = "Live d2 preview over LazyVim, in a new tab"
+command = "~/.config/herdr/bin/diagram-new.ts '{{.WorkDir}}'"

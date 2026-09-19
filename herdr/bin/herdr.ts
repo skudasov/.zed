@@ -56,18 +56,48 @@ export const renameTab = (tabId: string, label: string) => $`herdr tab rename ${
 export const renamePane = (paneId: string, label: string) => $`herdr pane rename ${paneId} ${label}`.quiet();
 
 /**
- * Splits a pane and hands back the new one. `--no-focus` keeps you where you
- * are: a split made for something to look at should not steal the cursor from
- * whatever you were typing into.
+ * Splits a pane and hands back the new one. It does not take focus by default:
+ * a split made for something to look at should not steal the cursor from
+ * whatever you were typing into. Pass `focus` when the split is to be typed in.
  */
-export async function splitPane(paneId: string, direction: "right" | "down", cwd: string, ratio = 0.5): Promise<string> {
+export async function splitPane(
+  paneId: string,
+  direction: "right" | "down",
+  cwd: string,
+  ratio = 0.5,
+  focus = false,
+): Promise<string> {
+  const flag = focus ? "--focus" : "--no-focus";
   const made = await result(
-    $`herdr pane split --pane ${paneId} --direction ${direction} --ratio ${ratio} --cwd ${cwd} --no-focus`,
+    $`herdr pane split --pane ${paneId} --direction ${direction} --ratio ${ratio} --cwd ${cwd} ${flag}`,
   );
   return made.pane.pane_id;
 }
 
 export const closePane = (paneId: string) => $`herdr pane close ${paneId}`.quiet().nothrow();
+
+/** One pane's place in its tab, in character cells. */
+export interface PaneRect {
+  pane_id: string;
+  rect: { x: number; y: number; width: number; height: number };
+}
+
+/** The tab a pane lives in: its total size, and every pane's rectangle in it. */
+export interface Layout {
+  tab_id: string;
+  area: { width: number; height: number };
+  panes: PaneRect[];
+}
+
+export const paneLayout = async (paneId: string): Promise<Layout> =>
+  (await result($`herdr pane layout --pane ${paneId}`)).layout;
+
+/**
+ * Moves the split edge. `amount` is a fraction of the whole tab, and the
+ * direction is the way the edge travels: "up" grows the lower pane.
+ */
+export const resizePane = (paneId: string, direction: "up" | "down" | "left" | "right", amount: number) =>
+  $`herdr pane resize --pane ${paneId} --direction ${direction} --amount ${amount}`.quiet().nothrow();
 
 export const focusWorkspace = (workspaceId: string) => $`herdr workspace focus ${workspaceId}`.quiet();
 
