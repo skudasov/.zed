@@ -26,8 +26,12 @@ render cache under `~/.cache/herdr-diagrams`.
 ```
 
 That splits the current pane vertically — the diagram stacked under the work,
-at full width — and draws the PNG with the kitty graphics protocol. Focus stays
-where it was, so the user keeps typing uninterrupted.
+at full width — and draws the PNG with the kitty graphics protocol, scaled up to
+fill the pane. Focus stays where it was, so the user keeps typing uninterrupted.
+
+The split is sized to the diagram, up to three quarters of the screen, and the
+script renders under all three of d2's layout engines and keeps whichever fills
+the pane best. You do not choose the engine; you choose the shape (below).
 
 Call it again after every edit. The split is reused, one per tab, and
 re-rendered in place, so iterating never piles up panes. Other useful forms:
@@ -79,6 +83,25 @@ machines, draw plain nodes and edges and let the layout sort it out.
 Check the source compiles with `d2 validate arch.d2` if a render fails; the
 script reports d2's own error either way.
 
+## Shape it to the screen
+
+This is the difference between a diagram the user can read and a strip of text
+four rows tall. The pane is about two and a half times wider than it is tall, so
+**aim for a diagram roughly twice as wide as it is tall**. An image wider than
+that can only grow until it hits the edges of the screen, and then it stops —
+the extra height goes blank and nothing the script does can recover it.
+
+A straight chain of six nodes in `direction: right` comes out five times wider
+than tall, and renders half the size it could. Fix it by giving the graph some
+height:
+
+- Group related nodes into containers; a container stacks its contents.
+- Break one long chain into two shorter rows and join them.
+- Draw the branches. Most systems are not chains — if yours looks like one,
+  the fan-out (caches, queues, stores, failure paths) is usually missing.
+- Switch `direction` to `down` when the thing really is a hierarchy or a
+  layer stack.
+
 ## Judgment
 
 A diagram earns its place by showing a mechanism — what talks to what, what
@@ -89,6 +112,17 @@ nothing more.
 
 Prefer `direction: right` for pipelines and request paths, `down` for
 hierarchies and layer stacks.
+
+If the user wants a closer look, they can focus the split and zoom it to the
+whole tab with `prefix+z`. Mention that once, not every time.
+
+## A diagram.d2 already open
+
+The user has a workbench of their own — a live d2 preview over vim, in its own
+tab — and it works on a file called `diagram.d2` in the directory it was
+launched from. If you find one, it is probably on screen in front of them: edit
+it and they see the change on save, without you rendering anything. Say what you
+changed rather than opening a second view of it.
 
 ## When this is not available
 

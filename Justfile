@@ -1,4 +1,4 @@
-install: install-fonts install-flux9s install-configs install-lazydocker install-k9s install-sofka install-ocr install-semgrep install-semgrep-rules install-herdr-plus install-herdr-transcripts install-zoetrope install-diagrams install-skills install-chrome-theme
+install: install-fonts install-flux9s install-configs install-lazydocker install-k9s install-sofka install-ocr install-semgrep install-semgrep-rules install-herdr-plus install-herdr-transcripts install-zoetrope install-diagrams install-lazyvim install-skills install-chrome-theme
     mkdir -p ~/.hammerspoon
     cp hammerspoon/init.lua ~/.hammerspoon/init.lua
     hs -c "hs.reload()"
@@ -58,7 +58,39 @@ install-zoetrope:
 # diagram shows up as a real image, not block-character art. Wired together by
 # herdr/bin/diagram.ts, bound to prefix+d and driven by the `diagram` skill.
 install-diagrams:
-    brew install d2 timg
+	#!/usr/bin/env bash
+	set -euo pipefail
+	brew install d2 timg neovim
+	# terminal-browser (github.com/zenbu-labs/terminal-browser) is a real browser
+	# in a terminal pane — the live preview half of the "Diagram: new" workbench.
+	# Its own installer puts it under ~/.local, so an existing copy is left alone
+	# rather than ending up with two of them on PATH.
+	if command -v terminal-browser >/dev/null; then
+		echo "$(terminal-browser --version) already installed"
+	else
+		brew install terminal-browser
+	fi
+
+# LazyVim (github.com/LazyVim/LazyVim) — the editor half of the diagram
+# workbench, and a usable Neovim everywhere else. Installed from the upstream
+# starter, which is a template and not a dependency: its .git is dropped so
+# ~/.config/nvim is yours to edit. An existing config is left alone.
+install-lazyvim:
+	#!/usr/bin/env bash
+	set -euo pipefail
+	command -v nvim >/dev/null || brew install neovim
+	if [ -d ~/.config/nvim ]; then
+		echo "~/.config/nvim already exists, leaving it alone"
+	else
+		git clone --depth 1 https://github.com/LazyVim/starter ~/.config/nvim
+		rm -rf ~/.config/nvim/.git
+		echo "Installed LazyVim starter to ~/.config/nvim"
+	fi
+	just install-configs >/dev/null
+	# Plugins are fetched on first start otherwise, which means the diagram
+	# workbench's first launch is spent watching a package manager.
+	nvim --headless "+Lazy! sync" +qa 2>&1 | tail -3 || true
+	echo "LazyVim ready"
 
 install-flux9s:
     brew install dgunzy/tap/flux9s
@@ -90,6 +122,16 @@ install-configs:
 	cp herdr/bin/*.ts ~/.config/herdr/bin/
 	sed -i '' "1s|#!/usr/bin/env bun|#!$(command -v bun)|" ~/.config/herdr/bin/*.ts
 	chmod +x ~/.config/herdr/bin/*.ts
+	# The repo's slice of the Neovim config: LazyVim reads lua/config/*.lua after
+	# its own defaults, so these files only add to it. They are copied rather
+	# than merged, so anything hand-edited there is replaced — put your own
+	# settings in lua/plugins/ instead, which this never touches.
+	if [ -d ~/.config/nvim/lua/config ]; then \
+		cp herdr/nvim/lua/config/*.lua ~/.config/nvim/lua/config/; \
+		echo "Installed nvim config to ~/.config/nvim/lua/config/"; \
+	else \
+		echo "No ~/.config/nvim yet — run \`just install-lazyvim\`"; \
+	fi
 	mkdir -p ~/.config/herdr/skill-snippets
 	rm -f ~/.config/herdr/skill-snippets/*
 	cp herdr/skill-snippets/*.md ~/.config/herdr/skill-snippets/
