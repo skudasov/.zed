@@ -173,7 +173,7 @@ install-herdr-transcripts:
 	#!/usr/bin/env bash
 	set -euo pipefail
 	command -v herdr >/dev/null || { echo "herdr not on PATH"; exit 1; }
-	command -v fzf >/dev/null || brew install fzf
+	command -v fzf >/dev/null || brew install fzf && brew upgrade fzf
 	if ! herdr plugin list --json 2>/dev/null | grep -q 'herdr-transcripts\|\.transcripts'; then
 		herdr plugin install hxreborn/herdr-transcripts --yes
 	fi
