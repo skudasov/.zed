@@ -43,7 +43,14 @@ const THEME = 200;
 /** What the preview keeps when the editor is split off below it. */
 const EDITOR_SHARE = 0.75;
 
+/**
+ * What a fresh workbench starts with. Architecture, state machines and the
+ * rest are all plain nodes and edges, so there is nothing to choose between
+ * them — only a sequence diagram needs a line at the top, and it is here
+ * commented out for the times you want one.
+ */
 const STARTER = `direction: right
+# shape: sequence_diagram
 
 # Type. The buffer saves itself, and the pane above redraws.
 user: User { shape: person }

@@ -30,8 +30,10 @@ at full width — and draws the PNG with the kitty graphics protocol, scaled up 
 fill the pane. Focus stays where it was, so the user keeps typing uninterrupted.
 
 The split is sized to the diagram, up to three quarters of the screen, and the
-script renders under all three of d2's layout engines and keeps whichever fills
-the pane best. You do not choose the engine; you choose the shape (below).
+image is drawn at the pane's full width. The layout engine is tala unless the
+source pins its own with `layout-engine` (dagre and elk are the alternatives);
+the same goes for `theme-id` and `pad` — a key set in `vars.d2-config` is left
+off d2's command line, where it would otherwise be overruled.
 
 Call it again after every edit. The split is reused, one per tab, and
 re-rendered in place, so iterating never piles up panes. Other useful forms:

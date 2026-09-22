@@ -44,6 +44,8 @@ const CACHE = join(process.env.HOME!, ".cache", "herdr-diagrams");
 const STATE = join(CACHE, "panes.json");
 /** Dark Mauve, the base the gruvbox overrides below are applied on top of. */
 const THEME = 200;
+/** Breathing room around the diagram, in pixels. */
+const PAD = 20;
 /** The canvas colour, for timg to composite any transparency against. */
 const BACKGROUND = "#282828";
 /**
@@ -77,9 +79,30 @@ vars: {
 }
 `;
 
-/** The source with the palette appended, ready to hand d2 on stdin. */
-async function themed(): Promise<Blob> {
-  return new Blob([await Bun.file(source).text(), GRUVBOX]);
+/** Does the source set this key for itself in `vars.d2-config`? */
+const sets = (text: string, key: string) => new RegExp(`^\\s*${key}\\s*:`, "m").test(text);
+
+/**
+ * A source and the flags it did not already decide for itself. d2's command
+ * line beats `vars.d2-config`, so a key the diagram pins has to be left off
+ * the command line — `layout-engine: elk` in a source is a decision about that
+ * diagram, not a default to improve on.
+ *
+ * A text match, not a parse: d2-config is the only place these keys mean
+ * anything, and a shape called `pad` costs a flag rather than a wrong render.
+ */
+function compile(text: string): { input: Blob; flags: string[] } {
+  const colours = sets(text, "theme-id") || sets(text, "theme-overrides");
+  return {
+    // The palette is appended rather than written in, so the file you edit
+    // stays a plain diagram and d2's errors still point at the right line.
+    input: new Blob([text, colours ? "" : GRUVBOX]),
+    flags: [
+      ...(sets(text, "layout-engine") ? [] : ["--layout", ENGINE]),
+      ...(sets(text, "theme-id") ? [] : ["--theme", String(THEME)]),
+      ...(sets(text, "pad") ? [] : ["--pad", String(PAD)]),
+    ],
+  };
 }
 
 /** d2 calls the diagram `-` when it reads stdin; the file has a name, so use it. */
@@ -88,6 +111,10 @@ const nameErrors = (stderr: string) => stderr.replaceAll("-:", `${basename(sourc
 const MAX_SHARE = 0.75;
 /** Never so short that a diagram is pointless, even if it would fit. */
 const MIN_ROWS = 10;
+/** Rows left to whatever else shares the tab when --watch sizes its own pane. */
+const MIN_NEIGHBOUR_ROWS = 8;
+/** Resize only when the pane is wrong by more than this; a row either way is not worth a redraw. */
+const RESIZE_SLACK = 2;
 /** A terminal cell is about twice as tall as it is wide — JetBrains Mono, here. */
 const CELL_ASPECT = 2;
 /** One row of the split goes to timg's filename title. */
@@ -95,12 +122,15 @@ const TITLE_ROWS = 1;
 /** How often --watch looks at the source. Cheap: one stat, no subprocess. */
 const POLL_MS = 250;
 /**
- * d2's layout engines, tried in order. Which one packs a given graph closest to
- * the shape of the pane is not predictable from the source — a chain comes out
- * five times wider than tall under dagre and half as wide as tall under tala —
- * so the render picks per diagram rather than per taste.
+ * The layout engine, unless the source pins its own. tala is d2's native one
+ * and routes edges best on the graphs that get drawn here; dagre and elk are
+ * the alternatives, set with `layout-engine` in the diagram itself.
+ *
+ * This used to be a contest between all three, judged on which filled the pane
+ * — worth it back when the pane was a fixed box. The pane is now sized to the
+ * diagram, so the shape of the render no longer costs anything.
  */
-const LAYOUTS = ["dagre", "elk", "tala"];
+const ENGINE = "tala";
 /** What timg can decode on its own: GraphicsMagick, librsvg and poppler. */
 const IMAGES = new Set([".svg", ".png", ".jpg", ".jpeg", ".gif", ".webp", ".pdf", ".bmp", ".tiff"]);
 
@@ -236,61 +266,77 @@ function coverage(aspect: number, cols: number, rows: number) {
 
 /**
  * Compile to PNG under the cache; images pass straight through to timg.
- * Every layout engine gets a go and the widest-covering render wins.
  */
-async function render(cols: number, maxRows: number): Promise<{ image: string; engine: string }> {
-  if (IMAGES.has(kind)) return { image: source, engine: "none" };
+async function render(): Promise<string> {
+  if (IMAGES.has(kind)) return source;
   if (kind !== ".d2") fail(`don't know how to render ${kind || "a file with no extension"}`);
   await mkdir(CACHE, { recursive: true });
   // Named after the source path, so re-rendering overwrites rather than piles
   // up, and two same-named files in different repos keep separate renders.
-  const stem = join(CACHE, Bun.hash(source).toString(16));
-  const input = await themed();
-  const tried = await Promise.all(
-    LAYOUTS.map(async (engine) => {
-      const out = `${stem}-${engine}.png`;
-      const built = await $`d2 --layout ${engine} --theme ${THEME} --pad 20 - ${out} < ${input}`.quiet().nothrow();
-      const size = built.exitCode === 0 ? await pngSize(out) : undefined;
-      return { engine, out, size, error: nameErrors(built.stderr.toString()) };
-    }),
-  );
-  const usable = tried.filter((attempt) => attempt.size);
-  if (usable.length === 0) throw new Error(tried[0]!.error || "d2 failed");
-  const best = usable
-    .map((attempt) => ({ ...attempt, ...coverage(attempt.size!.width / attempt.size!.height, cols, maxRows) }))
-    .sort((a, b) => b.cells - a.cells)[0]!;
-  return { image: best.out, engine: best.engine };
+  const out = `${join(CACHE, Bun.hash(source).toString(16))}.png`;
+  const { input, flags } = compile(await Bun.file(source).text());
+  const built = await $`d2 ${flags} - ${out} < ${input}`.quiet().nothrow();
+  if (built.exitCode !== 0) throw new Error(nameErrors(built.stderr.toString()) || "d2 failed");
+  return out;
 }
 
-const timg = (image: string, extra: string[] = []) =>
-  `clear; timg -p kitty -C -U -b '${BACKGROUND}' ${extra.join(" ")} --title ${JSON.stringify(image)}`;
+/**
+ * -W scales to the pane's full width and lets the height do what it likes,
+ * which is what makes a diagram fill the terminal instead of sitting in the
+ * middle of it: without it timg fits inside width *and* height, so a diagram
+ * even slightly taller than its pane is scaled down until both fit and the
+ * sides go blank. It is only safe once the pane is as tall as the image at
+ * full width — both callers below size the pane first, and both fall back to
+ * fitting inside the box when the pane could not be made tall enough.
+ */
+const timg = (image: string, fitWidth: boolean, extra: string[] = []) =>
+  `clear; timg -p kitty -C -U ${fitWidth ? "-W " : ""}-b '${BACKGROUND}' ${extra.join(" ")} --title ${JSON.stringify(image)}`;
+
+/** The rows a diagram of this aspect wants when drawn at full width, title included. */
+const wantedRows = (aspect: number, cols: number, ceiling: number) =>
+  Math.min(ceiling, Math.max(MIN_ROWS, coverage(aspect, cols, ceiling - TITLE_ROWS).rows + TITLE_ROWS));
 
 /**
- * The same layout contest as render(), but fought on stdout and settled into a
- * single .svg beside the source. Nothing else is written: the workbench is two
- * files, the diagram and its picture, and a cache of rejected candidates next
- * to them would only be confusing.
+ * Give a pane exactly the rows its diagram needs at full width. The picture is
+ * the thing being looked at, but it is not the only thing in the tab, so
+ * whatever shares it keeps MIN_NEIGHBOUR_ROWS and the diagram takes at most
+ * MAX_SHARE. Answers whether the pane ended up tall enough for -W.
  */
-async function renderBeside(cols: number, maxRows: number): Promise<string> {
+async function fitPane(paneId: string, aspect: number, cols: number): Promise<boolean> {
+  const layout = await paneLayout(paneId).catch(() => undefined);
+  const rect = layout?.panes.find((pane) => pane.pane_id === paneId)?.rect;
+  if (!layout || !rect) return false;
+  const tabRows = layout.area.height;
+  const shared = tabRows - rect.height;
+  const ceiling = shared === 0 ? tabRows : Math.min(Math.floor(tabRows * MAX_SHARE), tabRows - MIN_NEIGHBOUR_ROWS);
+  const wanted = wantedRows(aspect, cols, ceiling);
+  // Which way the split edge travels to make *this* pane bigger: down when the
+  // pane is the top one, up when something sits above it.
+  const grow = rect.y === 0 ? "down" : "up";
+  const shrink = grow === "down" ? "up" : "down";
+  const delta = wanted - rect.height;
+  if (Math.abs(delta) >= RESIZE_SLACK) {
+    await resizePane(paneId, delta > 0 ? grow : shrink, Math.abs(delta) / tabRows);
+  }
+  // Clamped short of what the diagram wanted — fit it inside the box instead,
+  // or -W would push the bottom of it off the pane.
+  return wanted >= wantedRows(aspect, cols, Number.MAX_SAFE_INTEGER);
+}
+
+/**
+ * The same render as render(), but to an .svg beside the source. Nothing else
+ * is written: the workbench is two files, the diagram and its picture. The
+ * aspect comes back with it, because the pane is then sized to match.
+ */
+async function renderBeside(): Promise<{ out: string; aspect: number }> {
   const out = source.replace(/\.d2$/, ".svg");
-  const input = await themed();
-  const tried = await Promise.all(
-    LAYOUTS.map(async (engine) => {
-      const built = await $`d2 --layout ${engine} --theme ${THEME} --pad 20 --stdout-format svg - - < ${input}`
-        .quiet()
-        .nothrow();
-      // d2 sizes the root <svg> with a viewBox rather than width and height.
-      const box = built.stdout.toString().match(/viewBox="0 0 ([\d.]+) ([\d.]+)"/);
-      return { svg: built.stdout, aspect: box ? Number(box[1]) / Number(box[2]) : undefined, error: nameErrors(built.stderr.toString()) };
-    }),
-  );
-  const usable = tried.filter((attempt) => attempt.aspect);
-  if (usable.length === 0) throw new Error(tried[0]!.error || "d2 failed");
-  const best = usable
-    .map((attempt) => ({ ...attempt, ...coverage(attempt.aspect!, cols, maxRows) }))
-    .sort((a, b) => b.cells - a.cells)[0]!;
-  await Bun.write(out, best.svg);
-  return out;
+  const { input, flags } = compile(await Bun.file(source).text());
+  const built = await $`d2 ${flags} --stdout-format svg - - < ${input}`.quiet().nothrow();
+  // d2 sizes the root <svg> with a viewBox rather than width and height.
+  const box = built.stdout.toString().match(/viewBox="0 0 ([\d.]+) ([\d.]+)"/);
+  if (!box) throw new Error(nameErrors(built.stderr.toString()) || "d2 failed");
+  await Bun.write(out, built.stdout);
+  return { out, aspect: Number(box[1]) / Number(box[2]) };
 }
 
 /**
@@ -303,6 +349,9 @@ async function renderBeside(cols: number, maxRows: number): Promise<string> {
 if (flag("watch")) {
   if (kind !== ".d2") fail(`--watch needs a .d2 source, got ${kind || "no extension"}`);
   const mtime = async () => (await Bun.file(source).stat().catch(() => null))?.mtimeMs ?? 0;
+  // herdr sets this in every pane it runs. Without it the pane cannot resize
+  // itself, and the diagram just fits inside whatever box it was given.
+  const selfPane = process.env.HERDR_PANE_ID;
   let last = -1;
   let redraw = true;
   // A resized pane needs the layout picked again, not just the image rescaled.
@@ -314,7 +363,6 @@ if (flag("watch")) {
       last = now;
       redraw = false;
       const cols = process.stdout.columns ?? 80;
-      const rows = (process.stdout.rows ?? 24) - TITLE_ROWS;
       console.clear();
       // Deleted rather than changed: say so and stop drawing. Leaving the last
       // picture up would be a drawing of a file that is not there any more.
@@ -322,7 +370,9 @@ if (flag("watch")) {
         console.error(`waiting for ${basename(source)} — it is not there`);
       } else {
         try {
-          await $`sh -c ${timg(await renderBeside(cols, rows))}`.nothrow();
+          const { out, aspect } = await renderBeside();
+          const fitWidth = selfPane ? await fitPane(selfPane, aspect, cols) : false;
+          await $`sh -c ${timg(out, fitWidth)}`.nothrow();
         } catch (error) {
           console.error(`${basename(source)} does not compile:\n\n${error instanceof Error ? error.message : error}`);
         }
@@ -337,10 +387,7 @@ const layout = await paneLayout(focused.pane_id);
 const { width: cols, height: tabRows } = layout.area;
 const maxRows = Math.max(MIN_ROWS, Math.floor(tabRows * MAX_SHARE) - TITLE_ROWS);
 
-const { image } = await render(cols, maxRows).catch((error) => fail(`d2 failed:\n${error.message}`));
-// -U upscales: d2 renders a small diagram small, and a pane given most of the
-// screen should be filled by it rather than show it postage-stamp sized.
-const show = timg(image);
+const image = await render().catch((error) => fail(`d2 failed:\n${error.message}`));
 
 /**
  * The split is exactly as tall as the image drawn at full width, capped at
@@ -348,9 +395,14 @@ const show = timg(image);
  * the image is already as wide as the tab, so nothing makes it grow further.
  */
 const size = await pngSize(image);
-const wanted = size
-  ? Math.min(maxRows, Math.max(MIN_ROWS, coverage(size.width / size.height, cols, maxRows).rows)) + TITLE_ROWS
-  : maxRows + TITLE_ROWS;
+const aspect = size ? size.width / size.height : undefined;
+const wanted = aspect ? wantedRows(aspect, cols, maxRows + TITLE_ROWS) : maxRows + TITLE_ROWS;
+// The cap bit: a diagram too tall for three quarters of the tab is drawn to
+// fit inside the split instead, since -W would run it off the bottom.
+const fitWidth = aspect !== undefined && wanted >= wantedRows(aspect, cols, Number.MAX_SAFE_INTEGER);
+// -U upscales: d2 renders a small diagram small, and a pane given most of the
+// screen should be filled by it rather than show it postage-stamp sized.
+const show = timg(image, fitWidth);
 
 const reused = await existingPane();
 // A vertical split, stacking the picture under the work. Diagrams come out
