@@ -1,4 +1,4 @@
-install: install-harlequin install-fonts install-flux9s install-configs install-lazydocker install-k9s install-sofka install-ocr install-semgrep install-semgrep-rules install-herdr-plus install-herdr-transcripts install-zoetrope install-diagrams install-lazyvim install-skills install-gopls install-chrome-theme
+install: install-harlequin install-fonts install-flux9s install-configs install-lazydocker install-k9s install-sofka install-ocr install-semgrep install-semgrep-rules install-herdr-plus install-herdr-transcripts install-zoetrope install-diagrams install-lazyvim install-skills install-gopls install-ponytail install-chrome-theme
     mkdir -p ~/.hammerspoon
     cp hammerspoon/init.lua ~/.hammerspoon/init.lua
     hs -c "hs.reload()"
@@ -72,6 +72,22 @@ install-gopls:
     claude mcp add --scope user gopls -- "$gopls" mcp
     just install-harness-configs
 
+# ponytail (github.com/DietrichGebert/ponytail) — "lazy senior dev" ruleset:
+# YAGNI, stdlib first, no unrequested abstractions. Claude gets it as a plugin
+# from a marketplace pinned to the tag; opencode as the npm package of the same
+# version, via install-harness-configs. One version for both, bumped here.
+ponytail_version := "4.10.0"
+
+install-ponytail:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    # The marketplace is pinned to a tag, so a bump means re-adding it; removing
+    # it uninstalls the plugin, which the install below puts back.
+    claude plugin marketplace remove ponytail >/dev/null 2>&1 || true
+    claude plugin marketplace add "https://github.com/DietrichGebert/ponytail.git#v{{ponytail_version}}"
+    claude plugin install ponytail@ponytail
+    just install-harness-configs
+
 # Agent harness configs that are not skills. opencode/opencode.jsonc carries
 # __PLACEHOLDER__ tokens for machine-specific values, filled in here.
 install-harness-configs:
@@ -79,6 +95,7 @@ install-harness-configs:
     set -euo pipefail
     mkdir -p ~/.config/opencode
     sed -e "s|__GOPLS__|$(go env GOPATH)/bin/gopls|g" \
+        -e "s|__PONYTAIL_VERSION__|{{ponytail_version}}|g" \
         opencode/opencode.jsonc > ~/.config/opencode/opencode.jsonc
     echo "Installed opencode config to ~/.config/opencode/opencode.jsonc"
 

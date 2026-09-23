@@ -3,7 +3,8 @@
   // Source of truth lives in ~/.config/zed/opencode/opencode.jsonc.
   // `just install-harness-configs` fills in the __PLACEHOLDER__ tokens for this
   // machine and copies the result to ~/.config/opencode/opencode.jsonc.
-  "plugin": ["@dietrichgebert/ponytail"],
+  // ponytail is pinned by `ponytail_version` in the Justfile, shared with claude.
+  "plugin": ["@dietrichgebert/ponytail@__PONYTAIL_VERSION__"],
   "mcp": {
     // Go workspace tools (symbol search, references, diagnostics, package API)
     // from gopls' built-in MCP server. It starts in opencode's cwd, so it serves

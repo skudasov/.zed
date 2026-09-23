@@ -106,6 +106,24 @@ Zed runs its own copy of gopls and is not affected.
 
 Check with `claude mcp list` and `opencode mcp list`.
 
+## ponytail
+
+[ponytail](https://github.com/DietrichGebert/ponytail) makes the agent write the
+least code that works: check whether it needs to exist, then the codebase, the
+stdlib, the platform, installed dependencies, and only then write something.
+It adds `/ponytail` commands (`-audit`, `-review`, `-debt`, `-gain`) and injects
+its rules each turn.
+
+```bash
+just install-ponytail
+```
+
+`ponytail_version` in the Justfile pins both harnesses to the same release:
+Claude Code gets the plugin from a marketplace added at that git tag, opencode
+gets the npm package of that version through `opencode/opencode.jsonc`. To
+upgrade, bump the variable and rerun. Check with `claude plugin list` and
+`opencode debug config`.
+
 ## Chrome theme
 
 `chrome-theme/` is a theme extension whose colors match Zed's "Ultimate Dark Neo"
