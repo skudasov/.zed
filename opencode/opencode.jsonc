@@ -1,0 +1,17 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  // Source of truth lives in ~/.config/zed/opencode/opencode.jsonc.
+  // `just install-harness-configs` fills in the __PLACEHOLDER__ tokens for this
+  // machine and copies the result to ~/.config/opencode/opencode.jsonc.
+  "plugin": ["@dietrichgebert/ponytail"],
+  "mcp": {
+    // Go workspace tools (symbol search, references, diagnostics, package API)
+    // from gopls' built-in MCP server. It starts in opencode's cwd, so it serves
+    // whichever Go module the session was opened in. Installed by `just install-gopls`.
+    "gopls": {
+      "type": "local",
+      "command": ["__GOPLS__", "mcp"],
+      "enabled": true,
+    },
+  },
+}

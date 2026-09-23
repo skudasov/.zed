@@ -85,6 +85,27 @@ opencode alike. The **Humanize** quick action (`cmd+e`) sends that request to
 the agent in the pane you launched from, for either a tracked prose file picked
 with `fzf` or whatever is on the clipboard.
 
+## gopls for agents
+
+gopls has an MCP server built in (`gopls mcp`), which gives an agent the Go
+tools an editor has: `go_search`, `go_symbol_references`, `go_diagnostics`,
+`go_package_api`, `go_file_context`, `go_rename_symbol`, `go_vulncheck`,
+`go_workspace`. The agent then uses symbol lookups instead of grepping.
+
+```bash
+just install-gopls
+```
+
+This pins gopls (`gopls_version` in the Justfile), registers it with Claude Code
+at user scope (`~/.claude.json`), and runs `just install-harness-configs`, which
+renders `opencode/opencode.jsonc` into `~/.config/opencode/`. Both harnesses get
+the absolute path to `~/go/bin/gopls`, because an MCP server is started by the
+harness, not by your shell, and `~/go/bin` is not on PATH. The server starts in
+the session's cwd, so it serves whichever Go module you opened the agent in.
+Zed runs its own copy of gopls and is not affected.
+
+Check with `claude mcp list` and `opencode mcp list`.
+
 ## Chrome theme
 
 `chrome-theme/` is a theme extension whose colors match Zed's "Ultimate Dark Neo"

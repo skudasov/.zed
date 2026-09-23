@@ -1,5 +1,19 @@
 [
   {
+    "label": "Harlequin",
+    "command": "harlequin",
+    "use_new_terminal": false,
+    "allow_concurrent_runs": false,
+    "hide": "always",
+    "reveal": "always",
+    "shell": {
+      "with_arguments": {
+        "program": "sh",
+        "args": ["--noediting", "--norc", "--noprofile"],
+      },
+    },
+  },
+  {
     "label": "Lazygit",
     "command": "lazygit",
     "use_new_terminal": false,
@@ -9,9 +23,9 @@
     "shell": {
       "with_arguments": {
         "program": "sh",
-        "args": ["--noediting", "--norc", "--noprofile"]
-      }
-    }
+        "args": ["--noediting", "--norc", "--noprofile"],
+      },
+    },
   },
   {
     "label": "Tuicr",
@@ -26,9 +40,9 @@
     "shell": {
       "with_arguments": {
         "program": "sh",
-        "args": ["--noediting", "--norc", "--noprofile"]
-      }
-    }
+        "args": ["--noediting", "--norc", "--noprofile"],
+      },
+    },
   },
   {
     "label": "Tuicr (pick commit)",
@@ -42,9 +56,9 @@
     "shell": {
       "with_arguments": {
         "program": "sh",
-        "args": ["--noediting", "--norc", "--noprofile"]
-      }
-    }
+        "args": ["--noediting", "--norc", "--noprofile"],
+      },
+    },
   },
   {
     "label": "GitHub Browse",
@@ -55,7 +69,7 @@
     "reveal": "never",
     "reveal_target": "dock",
     "hide": "always",
-    "shell": "system"
+    "shell": "system",
   },
   {
     "label": "GitHub PR",
@@ -65,6 +79,6 @@
     "allow_concurrent_runs": false,
     "hide": "always",
     "reveal": "never",
-    "shell": "system"
-  }
+    "shell": "system",
+  },
 ]
