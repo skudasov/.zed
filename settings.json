@@ -1,4 +1,6 @@
 {
+  // AI lives in herdr; turns off agent panel, threads, inline assist, edit predictions
+  "disable_ai": true,
   "cli_default_open_behavior": "existing_window",
   "focus_follows_mouse": {
     "enabled": true,
@@ -64,6 +66,9 @@
   "search": { "button": false },
   "diagnostics": { "button": true },
   "agent": {
+    "threads_sidebar": {
+      "auto_open": false
+    },
     "button": false,
     "dock": "right",
     "tool_permissions": {

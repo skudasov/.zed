@@ -14,6 +14,23 @@
     },
   },
   {
+    // permanent AI scratch session (learning / cheat-sheet); detaching keeps it alive
+    "label": "Herdr IDE",
+    "command": "herdr",
+    "args": ["--session", "ide"],
+    "use_new_terminal": false,
+    "allow_concurrent_runs": false,
+    "hide": "always",
+    "reveal": "always",
+    "reveal_target": "center",
+    "shell": {
+      "with_arguments": {
+        "program": "sh",
+        "args": ["--noediting", "--norc", "--noprofile"],
+      },
+    },
+  },
+  {
     "label": "Lazygit",
     "command": "lazygit",
     "use_new_terminal": false,

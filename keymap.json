@@ -37,12 +37,15 @@
     "context": "ProjectPanel || EmptyPane || (Editor && VimControl && !VimWaiting && !menu)",
     "bindings": {
       "space space": "file_finder::Toggle",
-      // terminal + agents (moved from Workspace to avoid prefix-stall in terminal)
+      // terminal (moved from Workspace to avoid prefix-stall in terminal)
       "space t t": "terminal_panel::Toggle",
       "space t c": "workspace::NewCenterTerminal",
-      "space a a": "agent::NewThread",
-      "space a i": "assistant::InlineAssist",
-      "space a t": "agent::NewTerminalThread",
+      // empty vertical split + terminal in it; cmd-w closes terminal and split
+      "space t v": ["workspace::SendKeystrokes", "ctrl-alt-cmd-l space t c"],
+      "ctrl-alt-cmd-l": ["pane::SplitRight", { "mode": "EmptyPane" }],
+      // herdr "ide" session (AI) in an empty vertical split; cmd-w closes it, session lives on
+      "space a t": ["workspace::SendKeystrokes", "ctrl-alt-cmd-l ctrl-alt-cmd-h"],
+      "ctrl-alt-cmd-h": ["task::Spawn", { "task_name": "Herdr IDE", "reveal_target": "center" }],
       // swaps
       "space b h": "pane::SwapItemLeft",
       "space b l": "pane::SwapItemRight",
