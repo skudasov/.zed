@@ -2,7 +2,6 @@
   {
     "context": "Terminal",
     "bindings": {
-      "space t t": "terminal_panel::Toggle",
       "ctrl-[": "vim::NormalBefore",
       // switch between vertical splits even while the terminal has focus
       "cmd-[": "workspace::ActivatePaneLeft",
@@ -30,6 +29,7 @@
     "context": "Workspace",
     "bindings": {
       "ctrl-z": "workspace::ToggleZoom",
+      "cmd-z": "terminal_panel::Toggle",
     },
   },
   {
@@ -37,8 +37,8 @@
     "context": "ProjectPanel || EmptyPane || (Editor && VimControl && !VimWaiting && !menu)",
     "bindings": {
       "space space": "file_finder::Toggle",
-      // terminal (moved from Workspace to avoid prefix-stall in terminal)
-      "space t t": "terminal_panel::Toggle",
+      // terminal (cmd-z in Workspace; repeated here to beat editor undo in normal/visual)
+      "cmd-z": "terminal_panel::Toggle",
       "space t c": "workspace::NewCenterTerminal",
       // empty vertical split + terminal in it; cmd-w closes terminal and split
       "space t v": ["workspace::SendKeystrokes", "ctrl-alt-cmd-l space t c"],
@@ -120,7 +120,6 @@
       "space m p": "markdown::OpenPreview",
 
       "space g g": ["task::Spawn", { "task_name": "Lazygit", "reveal_target": "center" }],
-      "space l s": ["task::Spawn", { "task_name": "Harlequin", "reveal_target": "center" }],
       "space g p": ["task::Spawn", { "task_name": "GitHub PR" }],
       "space t u i": ["task::Spawn", { "task_name": "Tuicr (pick commit)", "reveal_target": "center" }],
       // fuzzy search (native telescope-style text finder, v1.9+)
@@ -167,7 +166,6 @@
       "backspace": "editor::SelectSmallerSyntaxNode",
       "g y": ["workspace::SendKeystrokes", "\" + y"],
       "g p": "editor::Paste",
-      "g r": "editor::FindAllReferences",
       "g f": "editor::OpenExcerpts",
       "] e": ["editor::GoToDiagnostic", { "severity": "error" }],
       "[ e": ["editor::GoToPreviousDiagnostic", { "severity": "error" }],

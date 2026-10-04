@@ -1,4 +1,4 @@
-install: install-harlequin install-fonts install-flux9s install-configs install-lazydocker install-k9s install-sofka install-ocr install-semgrep install-semgrep-rules install-herdr-plus install-herdr-transcripts install-zoetrope install-diagrams install-lazyvim install-skills install-gopls install-ponytail install-chrome-theme
+install: install-harlequin install-fonts install-flux9s install-configs install-lazydocker install-k9s install-sofka install-ocr install-semgrep install-semgrep-rules install-herdr-plus install-herdr-transcripts install-zoetrope install-diagrams install-lazyvim install-skills install-ponytail install-chrome-theme
     mkdir -p ~/.hammerspoon
     cp hammerspoon/init.lua ~/.hammerspoon/init.lua
     hs -c "hs.reload()"
@@ -55,23 +55,6 @@ test-semgrep:
 install-k9s:
     brew install k9s
 
-# gopls, pinned, with its built-in MCP server registered in claude and opencode.
-# Both get the absolute path: ~/go/bin is not on PATH, and an MCP server is
-# spawned by the harness, not your shell. Zed keeps its own gopls under
-# ~/Library/Application Support/Zed and does not use this one.
-gopls_version := "v0.23.0"
-
-install-gopls:
-    #!/usr/bin/env bash
-    set -euo pipefail
-    go install golang.org/x/tools/gopls@{{gopls_version}}
-    gopls="$(go env GOPATH)/bin/gopls"
-    "$gopls" version
-    # Remove first so a re-run replaces the entry instead of failing on a duplicate.
-    claude mcp remove --scope user gopls >/dev/null 2>&1 || true
-    claude mcp add --scope user gopls -- "$gopls" mcp
-    just install-harness-configs
-
 # ponytail (github.com/DietrichGebert/ponytail) — "lazy senior dev" ruleset:
 # YAGNI, stdlib first, no unrequested abstractions. Claude gets it as a plugin
 # from a marketplace pinned to the tag; opencode as the npm package of the same
@@ -94,8 +77,7 @@ install-harness-configs:
     #!/usr/bin/env bash
     set -euo pipefail
     mkdir -p ~/.config/opencode
-    sed -e "s|__GOPLS__|$(go env GOPATH)/bin/gopls|g" \
-        -e "s|__PONYTAIL_VERSION__|{{ponytail_version}}|g" \
+    sed -e "s|__PONYTAIL_VERSION__|{{ponytail_version}}|g" \
         opencode/opencode.jsonc > ~/.config/opencode/opencode.jsonc
     echo "Installed opencode config to ~/.config/opencode/opencode.jsonc"
 
