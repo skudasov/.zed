@@ -71,7 +71,8 @@ install-ponytail:
     claude plugin install ponytail@ponytail
     just install-harness-configs
 
-# Agent harness configs that are not skills. opencode/opencode.jsonc carries
+# Agent harness configs that are not skills. opencode/cli.json is copied as is;
+# opencode/opencode.jsonc carries
 # __PLACEHOLDER__ tokens for machine-specific values, filled in here.
 install-harness-configs:
     #!/usr/bin/env bash
@@ -80,6 +81,10 @@ install-harness-configs:
     sed -e "s|__PONYTAIL_VERSION__|{{ponytail_version}}|g" \
         opencode/opencode.jsonc > ~/.config/opencode/opencode.jsonc
     echo "Installed opencode config to ~/.config/opencode/opencode.jsonc"
+    # TUI settings (what /settings edits). Copied whole, so a /settings change
+    # made on one machine is lost on the next install unless it lands here too.
+    cp opencode/cli.json ~/.config/opencode/cli.json
+    echo "Installed opencode TUI settings to ~/.config/opencode/cli.json"
 
 # zoetrope (github.com/furkankly/zoetrope) — draws a Claude Code or Codex
 # session as a live flow graph of agents, subagents and tool calls. Binary is
