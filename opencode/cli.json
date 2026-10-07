@@ -13,5 +13,6 @@
   },
   "tabs": {
     "mode": "off"
-  }
+  },
+  "plugins": ["./plugins/minimal-footer"]
 }

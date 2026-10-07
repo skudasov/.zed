@@ -85,6 +85,25 @@ install-harness-configs:
     # made on one machine is lost on the next install unless it lands here too.
     cp opencode/cli.json ~/.config/opencode/cli.json
     echo "Installed opencode TUI settings to ~/.config/opencode/cli.json"
+    # cli.json's "plugins" loads them by path from ~/.config/opencode/plugins/,
+    # so the plugin files install with the config that references them.
+    just install-opencode-plugins
+
+# OpenCode TUI plugins, one directory per plugin under opencode/plugins/,
+# laid out like a published package (package.json + tui.tsx) and referenced
+# by name from cli.json's "plugins". Copied (never symlinked) whole-directory
+# into ~/.config/opencode/plugins/, which herdr also manages files in: only
+# directories named here are touched, herdr's loose files are left alone.
+install-opencode-plugins:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    mkdir -p ~/.config/opencode/plugins
+    for src in opencode/plugins/*/; do
+        name="$(basename "$src")"
+        rm -rf ~/.config/opencode/plugins/"$name"
+        cp -R "${src%/}" ~/.config/opencode/plugins/"$name"
+        echo "Installed OpenCode plugin $name to ~/.config/opencode/plugins/$name"
+    done
 
 # zoetrope (github.com/furkankly/zoetrope) — draws a Claude Code or Codex
 # session as a live flow graph of agents, subagents and tool calls. Binary is
