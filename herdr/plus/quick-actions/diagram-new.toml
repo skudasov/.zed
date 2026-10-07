@@ -8,7 +8,7 @@
 #
 # Pass --browser for d2's watch server in terminal-browser instead — panning and
 # tooltips, at the price of a whole Chromium.
-# Install the binaries with `just install-diagrams`.
+# Install the binaries with `just diagrams`.
 name = "Diagram: new"
 description = "Live d2 preview over LazyVim, in a new tab"
 command = "~/.config/herdr/bin/diagram-new.ts '{{.WorkDir}}'"

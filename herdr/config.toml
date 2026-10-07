@@ -1,5 +1,5 @@
 # herdr configuration — source of truth lives here in ~/.config/zed/herdr/config.toml
-# Install: `just install-configs` from ~/.config/zed (copies to ~/.config/herdr/config.toml)
+# Install: `just configs` from ~/.config/zed (copies to ~/.config/herdr/config.toml)
 # Edits made directly in ~/.config/herdr/config.toml are overwritten on install.
 
 # Show first-run notification setup on startup.
@@ -127,7 +127,7 @@ toggle_sidebar = "cmd+1"
 # command = "lazygit"
 
 # herdr-plus (github.com/cloudmanic/herdr-plus) — install with
-# `just install-herdr-plus` from ~/.config/zed. These bindings are inert
+# `just herdr-plus` from ~/.config/zed. These bindings are inert
 # until the plugin is installed.
 [[keys.command]]
 key = "prefix+p"
@@ -147,7 +147,7 @@ description = "herdr-plus: quick actions"
 # Agent layout — new workspace for the current repo with a plan tab and an impl
 # tab, both running the same agent. Re-running focuses the existing one, so each
 # agent gets exactly one workspace per repo.
-# Script lives in this repo at herdr/bin/ai-layout.ts; `just install-configs`
+# Script lives in this repo at herdr/bin/ai-layout.ts; `just configs`
 # copies it to ~/.config/herdr/bin/.
 [[keys.command]]
 key = "prefix+c"
@@ -165,7 +165,7 @@ description = "opencode: plan + impl workspace"
 # session of the repo you launched from and draws it as a graph of agents,
 # subagents and tool calls. Opens (or focuses) one "zoe" tab per workspace.
 # Script lives in this repo at herdr/bin/zoe.ts; install the binary with
-# `just install-zoetrope`.
+# `just zoetrope`.
 [[keys.command]]
 key = "prefix+a"
 type = "shell"
@@ -179,7 +179,7 @@ description = "zoetrope: session flow graph"
 # draw it itself: its stdout is captured by the harness, so it asks herdr to run
 # timg — that is what the `diagram` skill tells it to do.
 # Script lives in this repo at herdr/bin/diagram.ts; install the binaries with
-# `just install-diagrams`.
+# `just diagrams`.
 [[keys.command]]
 key = "prefix+d"
 type = "shell"
@@ -189,9 +189,9 @@ description = "diagram: render newest diagram in a split"
 # Session transcripts — fzf over every Claude Code and Codex session, searchable
 # by title, prompt, reply or tool call; enter resumes the session in a new tab.
 # herdr-transcripts (github.com/hxreborn/herdr-transcripts), installed with
-# `just install-herdr-transcripts`. Inert until the plugin is installed.
+# `just herdr-transcripts`. Inert until the plugin is installed.
 # $HERDR_BIN_PATH is rewritten to the absolute herdr path by `just
-# install-configs`, for the same reason the bin/ scripts are: herdr runs
+# configs`, for the same reason the bin/ scripts are: herdr runs
 # [[keys.command]] detached and may not expand anything itself.
 [[keys.command]]
 key = "prefix+f"

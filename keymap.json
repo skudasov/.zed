@@ -139,6 +139,8 @@
       "space c a": "editor::ToggleCodeActions",
       "space c f": "editor::Format",
       "space c r": "editor::Rename",
+      "space c i": "call_hierarchy::ShowIncomingCalls",
+      "space c o": "call_hierarchy::ShowOutgoingCalls",
       "space e": "pane::RevealInProjectPanel",
       // Git
       "space g b": "git::Blame",

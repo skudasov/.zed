@@ -20,7 +20,7 @@
  * agent iterating on a .d2 file just calls this again after each edit and the
  * picture beside it updates. Focus never moves — you keep typing where you were.
  *
- * Install d2 and timg with `just install-diagrams`.
+ * Install d2 and timg with `just diagrams`.
  */
 
 import { $ } from "bun";

@@ -1,4 +1,4 @@
--- Managed by ~/.config/zed — `just install-configs` overwrites this file.
+-- Managed by ~/.config/zed — `just configs` overwrites this file.
 --
 -- LazyVim loads its own autocmds first, then this file, so everything here is
 -- additive.

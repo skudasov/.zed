@@ -1,4 +1,4 @@
--- Managed by ~/.config/zed — `just install-configs` overwrites this file.
+-- Managed by ~/.config/zed — `just configs` overwrites this file.
 
 -- d2 is whitespace-indented and two spaces is what the language's own examples
 -- use, so a diagram edited here stays diffable against one written anywhere else.

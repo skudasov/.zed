@@ -10,7 +10,7 @@
  * The tab is reused: one "zoe" tab per workspace. If zoetrope was quit in it,
  * the tab is a plain shell and focusing it just puts you back at the prompt.
  *
- * Install zoetrope with `just install-zoetrope`.
+ * Install zoetrope with `just zoetrope`.
  */
 
 import { createTab, focusTab, listPanes, listTabs, runInPane } from "./herdr.ts";

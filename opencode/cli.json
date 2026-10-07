@@ -14,5 +14,9 @@
   "tabs": {
     "mode": "off"
   },
+  "keybinds": {
+    "prompt.editor": "ctrl+g",
+    "session.first": "home,alt+home"
+  },
   "plugins": ["./plugins/minimal-footer"]
 }

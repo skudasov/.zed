@@ -22,7 +22,7 @@ declares and adding a language needs no wiring:
 1. write `semgrep/<lang>.yml`
 2. write `semgrep/tests/<lang>.<ext>`, marking each case with a `// ruleid: <id>`
    or `// ok: <id>` comment on the line above it
-3. `just test-semgrep`, then `just install-semgrep-rules`
+3. `just test-semgrep`, then `just semgrep-rules`
 
 Semgrep pairs a rule file with the fixture of the same basename, so the names
 have to match. A rule scoped to test files (`paths.include: "*_test.*"`) falls
@@ -41,11 +41,11 @@ title, prompt, reply or tool call. `Enter` resumes a session in its own
 directory, or focuses its pane when it is already running.
 
 ```bash
-just install-herdr-transcripts
+just herdr-transcripts
 ```
 
 `prefix+f` opens the picker (bound in `herdr/config.toml`). The keybind uses
-`$HERDR_BIN_PATH`, which `just install-configs` rewrites to the absolute herdr
+`$HERDR_BIN_PATH`, which `just configs` rewrites to the absolute herdr
 path for the same reason the `herdr/bin` shebangs are rewritten: herdr runs
 `[[keys.command]]` detached and expands nothing itself.
 
@@ -59,7 +59,7 @@ defaults low enough to delete the sessions you would search for.
 ## Agent skills
 
 `skills/manifest.txt` pins external agent skills by repo and git ref.
-`just install-skills` clones each one and copies it into every harness that
+`just skills` clones each one and copies it into every harness that
 reads a skills directory:
 
 - `~/.claude/skills/<name>`
@@ -94,7 +94,7 @@ It adds `/ponytail` commands (`-audit`, `-review`, `-debt`, `-gain`) and injects
 its rules each turn.
 
 ```bash
-just install-ponytail
+just ponytail
 ```
 
 `ponytail_version` in the Justfile pins both harnesses to the same release:
@@ -111,7 +111,7 @@ It repaints the tab strip, toolbar, bookmarks bar and New Tab Page only — web
 pages and `chrome://` pages are untouched.
 
 ```bash
-just install-chrome-theme
+just chrome-theme
 ```
 
 Then, once:

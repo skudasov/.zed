@@ -1,0 +1,7 @@
+# Multi-select repo files with fzf and type them into the agent in the pane you
+# launched from as @path mentions — scopes its context before you write the
+# prompt. Nothing is submitted; you finish the prompt and press Enter.
+name = "Files (pick files)"
+description = "fzf multi-select files, insert as @mentions in the launching pane"
+type = "command"
+command = "~/.config/herdr/bin/pick-files.ts '{{.WorkDir}}'"

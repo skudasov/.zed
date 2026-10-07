@@ -4,7 +4,7 @@
  * from, for a file in the repo or for whatever is on the clipboard.
  *
  * The humanizer skill (github.com/blader/humanizer, installed into every
- * harness by `just install-skills`) is plain markdown with a description, so
+ * harness by `just skills`) is plain markdown with a description, so
  * plain-language prompts trigger it in claude and opencode alike. Nothing here
  * is harness-specific — no `/humanizer`, no plugin command.
  *

@@ -129,7 +129,7 @@ changed rather than opening a second view of it.
 ## When this is not available
 
 `diagram.ts` needs `herdr` running with `d2` and `timg` installed (`just
-install-diagrams` in the user's config repo). If the script is missing or
+diagrams` in the user's config repo). If the script is missing or
 reports no focused pane, fall back to `d2 --ascii-mode extended --stdout-format
 ascii arch.d2 -` and print that, or write the `.d2` and tell the user how to
 render it.

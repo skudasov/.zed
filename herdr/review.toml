@@ -1,6 +1,6 @@
 # PR review inbox (herdr/bin/ai-review.ts inbox) — source of truth lives here in
 # ~/.config/zed/herdr/review.toml
-# Install: `just install-configs` from ~/.config/zed (copies to ~/.config/herdr/review.toml)
+# Install: `just configs` from ~/.config/zed (copies to ~/.config/herdr/review.toml)
 
 # Repos whose PRs appear in the inbox, as owner/name.
 # With both repos and orgs empty, the inbox searches all of GitHub.

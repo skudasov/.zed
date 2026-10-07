@@ -1,5 +1,5 @@
 # Ghostty config — source of truth lives here in ~/.config/zed/ghostty/config
-# Install: `just install-configs` from ~/.config/zed (copies, does not symlink)
+# Install: `just configs` from ~/.config/zed (copies, does not symlink)
 # Edits made directly in ~/.config/ghostty/config are overwritten on install.
 
 # ── Theme ────────────────────────────────────────────────────────────────────

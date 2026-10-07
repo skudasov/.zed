@@ -41,7 +41,7 @@ const INSTRUCTIONS = 'Review for correctness only. Do not read, grep, or review 
 const OCR_INSTRUCTIONS =
   'Report findings as file:line, correctness bugs first, then simplifications, and name the rule each one breaks. Do not edit any files.'
 
-// Installed by `just install-semgrep-rules` from ~/.config/zed/semgrep/. A directory,
+// Installed by `just semgrep-rules` from ~/.config/zed/semgrep/. A directory,
 // not a file: semgrep applies each rule only to the languages it declares, so
 // pointing at all of them and letting the changed files decide is the same scan
 // as picking go.yml by hand — and it keeps working as more languages land here.
@@ -271,7 +271,7 @@ const reviewDiff = (agent: string, dir: string) =>
  */
 function reviewOcr(agent: string, dir: string): Promise<void> {
   if (!Bun.which('ocr')) {
-    exit('ocr not on PATH: npm install -g @alibaba-group/open-code-review (or `just install-ocr`)')
+    exit('ocr not on PATH: npm install -g @alibaba-group/open-code-review (or `just ocr`)')
   }
   return branchReview(agent, dir, 'ocr', (root, base) => {
     const scope = `--repo '${root}' --from ${base} --to HEAD`
@@ -297,9 +297,9 @@ function reviewOcr(agent: string, dir: string): Promise<void> {
  * time.
  */
 async function reviewSemgrep(agent: string, dir: string): Promise<void> {
-  if (!Bun.which('semgrep')) exit('semgrep not on PATH: brew install semgrep (or `just install-semgrep`)')
+  if (!Bun.which('semgrep')) exit('semgrep not on PATH: brew install semgrep (or `just semgrep`)')
   if (!(await Bun.file(SEMGREP_RULES).exists())) {
-    exit(`no rules at ${SEMGREP_RULES}: run \`just install-semgrep-rules\` in ~/.config/zed`)
+    exit(`no rules at ${SEMGREP_RULES}: run \`just semgrep-rules\` in ~/.config/zed`)
   }
 
   const root = (await repoRoot(dir)) ?? exit(`not a git repo: ${dir}`)

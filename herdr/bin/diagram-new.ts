@@ -24,7 +24,7 @@
  * both go. Worth keeping means renaming it before the next launch.
  *
  * This is the human's way in; an agent draws with diagram.ts instead.
- * Install the binaries with `just install-diagrams`.
+ * Install the binaries with `just diagrams`.
  */
 
 import { $ } from "bun";
@@ -76,7 +76,7 @@ const dir = dirArg || focused.foreground_cwd || focused.cwd;
 
 for (const binary of ["d2", "timg", "nvim", ...(browser ? ["terminal-browser", "curl"] : [])]) {
   const found = await $`command -v ${binary}`.quiet().nothrow();
-  if (found.exitCode !== 0) fail(`${binary} is not on PATH — see \`just install-diagrams\``);
+  if (found.exitCode !== 0) fail(`${binary} is not on PATH — see \`just diagrams\``);
 }
 
 const source = join(dir, SOURCE);

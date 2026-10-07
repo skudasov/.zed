@@ -4,7 +4,7 @@
 # matcher cannot reach. Every language's rules are passed every time — semgrep
 # only applies a rule to the languages it declares. Rules are mechanical and
 # free; the agent's context goes on the rest.
-# Install semgrep with `just install-semgrep`.
+# Install semgrep with `just semgrep`.
 name = "Review: semgrep"
 description = "semgrep's findings first, then a fresh agent reviews merge-base..HEAD"
 type = "select"
