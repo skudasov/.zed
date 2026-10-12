@@ -14,9 +14,16 @@ hammerspoon:
 # ~/.zshenv is read by every zsh (login, interactive, scripts) and Zed loads the
 # shell env, so one line reaches claude/opencode (Ctrl+g opens $EDITOR) anywhere.
 # Appended only if missing: the rest of ~/.zshenv is machine-specific.
-[doc("Set EDITOR=nvim in ~/.zshenv")]
+#
+# Caveat that ships with that line: zsh links its `main` keymap to `viins`
+# whenever $VISUAL/$EDITOR contains the substring "vi" — and "nvim" does. That
+# maps Ctrl+R to `redisplay` and Ctrl+P to `self-insert`, so reverse-history
+# search dies in every terminal. ~/.zshrc gets `bindkey -e` to force the emacs
+# keymap back; appended there too, idempotently.
+[doc("Set EDITOR=nvim in ~/.zshenv, keep zsh's emacs keymap")]
 shell-env:
     grep -qxF 'export EDITOR=nvim' ~/.zshenv 2>/dev/null || echo 'export EDITOR=nvim' >> ~/.zshenv
+    grep -qxF 'bindkey -e' ~/.zshrc 2>/dev/null || printf '\n# zsh selects the viins keymap when $EDITOR contains "vi" (EDITOR=nvim above);\n# force emacs so Ctrl+R/Ctrl+P stay history search.\nbindkey -e\n' >> ~/.zshrc
 
 # JetBrains Mono is the font for Zed (buffer + UI) and Ghostty (and so herdr).
 fonts:
