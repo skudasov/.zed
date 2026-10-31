@@ -15,8 +15,7 @@ name = "one-dark"
 # Override individual color tokens on top of the base theme.
 # Accepts: hex (#rrggbb), named colors, rgb(r,g,b), or panel_bg = "reset"
 # Every token mirrors Zed "Ultimate Dark Neo" (with settings.json's
-# editor.background #303135). Herdr UI uses them too: its config-gpui.local.toml
-# sets theme = "Follow Herdr".
+# editor.background #303135).
 [theme.custom]
 panel_bg = "#303135"       # editor.background override; Zed panels/title bar show it
 sidebar_bg = "#303135"
@@ -161,16 +160,6 @@ key = "cmd+e"
 type = "plugin_action"
 command = "cloudmanic.herdr-plus.quick-actions"
 description = "herdr-plus: quick actions"
-
-# Herdr UI: cmd+2 flips the side panel between Pull requests and Workspaces.
-# Herdr UI cannot report the open panel, so the last one set here is kept in
-# ~/.cache/herdr-panel; after switching panels by mouse, one press may repeat.
-# Herdr UI frees cmd-2 (config-gpui.local.toml); Ghostty forwards it.
-[[keys.command]]
-key = "cmd+2"
-type = "shell"
-command = 'f=$HOME/.cache/herdr-panel; p=pull-requests; [ "$(cat "$f" 2>/dev/null)" = pull-requests ] && p=workspaces; /Applications/Herdr.app/Contents/MacOS/Herdr ui panel $p && mkdir -p "${f%/*}" && echo $p > "$f"'
-description = "Herdr UI: pull requests <-> workspaces"
 
 # Agent layout — new workspace for the current repo with a plan tab and an impl
 # tab, both running the same agent. Re-running focuses the existing one, so each

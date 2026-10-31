@@ -36,7 +36,7 @@ hs.hotkey.bind({ "cmd" }, "i", function()
     win:focus()
 end)
 
--- cmd+u : focus Herdr UI; when already there, next tab (Herdr's cmd-shift-]).
+-- cmd+u : focus herdr-app; when already there, next tab (Herdr's cmd-shift-]).
 hs.hotkey.bind({ "cmd" }, "u", function()
     if hs.application.frontmostApplication():name() == "Herdr" then
         hs.eventtap.keyStroke({ "cmd", "shift" }, "]", 10000)

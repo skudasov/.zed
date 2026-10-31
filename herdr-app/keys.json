@@ -1,0 +1,14 @@
+{
+  "global": {
+    "cmd-1": "layout.toggle:sidebar",
+    "cmd-j": "space.new",
+    "cmd-k": "tab.new",
+    "cmd-l": "pane.split:down",
+    "cmd-z": "space.next",
+    "cmd-shift-z": "space.prev",
+    "cmd-x": "tab.next",
+    "cmd-shift-x": "tab.prev",
+    "cmd-3": "mod.open:prs",
+    "ctrl-b": "mod.open:prefix"
+  }
+}
