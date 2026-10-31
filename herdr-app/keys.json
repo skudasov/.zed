@@ -8,7 +8,8 @@
     "cmd-shift-z": "space.prev",
     "cmd-x": "tab.next",
     "cmd-shift-x": "tab.prev",
-    "cmd-3": "mod.open:prs",
-    "ctrl-b": "mod.open:prefix"
+    "cmd-3": "mod.open:zed-changes",
+    "ctrl-b": "mod.open:prefix",
+    "cmd-2": "mod.open:prs"
   }
 }

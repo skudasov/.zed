@@ -24,6 +24,11 @@ function toggleSidebar() {
 }
 
 export default class WorkspaceChrome extends View {
+  init() {
+    // No Files/Changes buttons in the tab bar: Changes opens as a popover on cmd-3.
+    // The shipped tabs mod draws only the panels listed here.
+    if (shared("workspace.panels")?.length !== 0) setShared("workspace.panels", []);
+  }
   button(id, label, action) {
     const t = theme();
     return div().id(id).size(26).flex_none().flex().items_center().justify_center().rounded(6).text_color(t.muted).hover(s => s.bg(t.hover).text_color(t.foreground))

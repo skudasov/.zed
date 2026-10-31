@@ -1,15 +1,33 @@
 require("hs.ipc")
 
+-- herdr-app (~/Applications/Herdr.app), matched by bundle ID: its name
+-- "Herdr" is shared with other Herdr builds.
+local HERDR = "dev.herdr.app"
+
+-- name: an app name, or a bundle ID (contains a dot).
 local function focusApp(name)
+    local byID = name:find("%.") ~= nil
     for _, win in ipairs(hs.window.filter.defaultCurrentSpace:getWindows()) do
-        if win:application():name() == name then
+        local app = win:application()
+        if (byID and app:bundleID() or app:name()) == name then
             win:focus()
             return
         end
     end
 
-    -- No window on current space: launch or switch to it
-    hs.application.launchOrFocus(name)
+    -- No window on current space: launch or switch to it. herdr-app's own
+    -- binary does both, and opens a window when the app runs without one.
+    if name == HERDR then
+        hs.task.new(os.getenv("HOME") .. "/Applications/Herdr.app/Contents/MacOS/Herdr", nil):start()
+    elseif byID then
+        hs.application.launchOrFocusByBundleID(name)
+    else
+        hs.application.launchOrFocus(name)
+    end
+end
+
+local function frontIs(id)
+    return hs.application.frontmostApplication():bundleID() == id
 end
 
 hs.hotkey.bind({ "cmd" }, "i", function()
@@ -36,12 +54,12 @@ hs.hotkey.bind({ "cmd" }, "i", function()
     win:focus()
 end)
 
--- cmd+u : focus herdr-app; when already there, next tab (Herdr's cmd-shift-]).
+-- cmd+u : focus herdr-app; when already there, next tab (its cmd-shift-]).
 hs.hotkey.bind({ "cmd" }, "u", function()
-    if hs.application.frontmostApplication():name() == "Herdr" then
+    if frontIs(HERDR) then
         hs.eventtap.keyStroke({ "cmd", "shift" }, "]", 10000)
     else
-        focusApp("Herdr")
+        focusApp(HERDR)
     end
 end)
 
@@ -54,10 +72,10 @@ hs.hotkey.bind({ "cmd" }, "p", function()
 end)
 
 hs.hotkey.bind({ "cmd", "shift" }, "u", function()
-    if hs.application.frontmostApplication():name() == "Herdr" then
+    if frontIs(HERDR) then
         hs.eventtap.keyStroke({ "cmd", "shift" }, "[", 10000)
     else
-        focusApp("Herdr")
+        focusApp(HERDR)
     end
 end)
 
