@@ -4,13 +4,16 @@
 
 import { View, div } from "gpui-kit";
 import { v_flex } from "gpui-base";
-import { run, theme, props, closeOverlay } from "herdr";
+import { run, theme, props, closeOverlay, openOverlay } from "herdr";
 
-// Next keystroke -> [command, args]. Matches herdr/config.toml's prefix keys.
+// Next keystroke -> what it does. x/W/T match herdr/config.toml's prefix keys.
+// C opens Changes (zed-changes, the git diff of the focused pane's repo) filling
+// the window; cmd-3 opens it as a popover. Esc closes either.
 const KEYS = {
-  "x": ["tab.close", {}],
-  "shift-w": ["space.rename", {}],
-  "shift-t": ["tab.rename", {}],
+  "x": () => run("tab.close", {}),
+  "shift-w": () => run("space.rename", {}),
+  "shift-t": () => run("tab.rename", {}),
+  "shift-c": () => openOverlay({ mod: "zed-changes", kind: "dialog", width: 1, height: 1 }),
 };
 
 export default class Prefix extends View {
@@ -35,9 +38,9 @@ export default class Prefix extends View {
         cx.stop_propagation();
         closeOverlay(props().overlay);
         const hit = KEYS[e.keystroke];
-        if (hit) run(...hit);
+        if (hit) hit();
       })
       .child(div().text_color(t.foreground).child("ctrl+b"))
-      .child(div().child("x close tab · W rename workspace · T rename tab"));
+      .child(div().child("x close tab · W/T rename workspace/tab · C changes full"));
   }
 }
