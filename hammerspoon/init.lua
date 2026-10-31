@@ -36,11 +36,12 @@ hs.hotkey.bind({ "cmd" }, "i", function()
     win:focus()
 end)
 
-hs.hotkey.bind({ "cmd" }, "u", function() 
-    if hs.application.frontmostApplication():name() == "Ghostty" then
-        hs.eventtap.keyStroke({ "ctrl" }, "tab", 10000)
+-- cmd+u : focus Herdr UI; when already there, next tab (Herdr's cmd-shift-]).
+hs.hotkey.bind({ "cmd" }, "u", function()
+    if hs.application.frontmostApplication():name() == "Herdr" then
+        hs.eventtap.keyStroke({ "cmd", "shift" }, "]", 10000)
     else
-        focusApp("Ghostty")
+        focusApp("Herdr")
     end
 end)
 
@@ -53,10 +54,10 @@ hs.hotkey.bind({ "cmd" }, "p", function()
 end)
 
 hs.hotkey.bind({ "cmd", "shift" }, "u", function()
-    if hs.application.frontmostApplication():name() == "Ghostty" then
-        hs.eventtap.keyStroke({ "ctrl", "shift" }, "tab", 10000)
+    if hs.application.frontmostApplication():name() == "Herdr" then
+        hs.eventtap.keyStroke({ "cmd", "shift" }, "[", 10000)
     else
-        focusApp("Ghostty")
+        focusApp("Herdr")
     end
 end)
 
@@ -92,13 +93,13 @@ hs.hotkey.bind({ "cmd" }, "'", function()
     focused:focus()
 end)
 
--- cmd+; : maximize Chrome / Zed / Ghostty to full size on the current screen.
+-- cmd+; : maximize Chrome / Zed / Herdr to full size on the current screen.
 hs.hotkey.bind({ "cmd" }, ";", function()
     hs.window.animationDuration = 0
     local focused = hs.window.focusedWindow()
     local screen = (focused and focused:screen()) or hs.screen.mainScreen()
     local f = screen:frame()
-    local apps = { ["Google Chrome"] = true, ["Zed"] = true, ["Ghostty"] = true }
+    local apps = { ["Google Chrome"] = true, ["Zed"] = true, ["Herdr"] = true }
     for _, win in ipairs(hs.window.filter.defaultCurrentSpace:getWindows()) do
         if apps[win:application():name()] then
             win:setFrame(f)
