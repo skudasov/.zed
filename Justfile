@@ -3,7 +3,7 @@ default:
     @just --list
 
 # Everything (except tuicr), configs before the recipes that build on them.
-install: shell-env fonts hammerspoon harlequin lazydocker k9s flux9s sofka ocr semgrep semgrep-rules configs herdr-plus herdr-transcripts zoetrope diagrams lazyvim skills ponytail chrome-theme
+install: shell-env fonts hammerspoon harlequin lazydocker k9s flux9s sofka ocr semgrep semgrep-rules herdr configs herdr-plus herdr-transcripts zoetrope diagrams lazyvim skills ponytail chrome-theme
 
 # Hammerspoon config, reloaded in place.
 hammerspoon:
@@ -190,10 +190,21 @@ flux9s:
 sofka:
     brew install nklmilojevic/sofka/sofka
 
+# The apps the configs below are for: herdr (TUI + server), Herdr UI (its
+# desktop client), Ghostty, and bun for herdr/bin/*.ts. An app already in
+# /Applications is left alone, since brew refuses to adopt one it didn't install.
+# bun uses its own installer (~/.bun), as on the main machine.
+[doc("herdr, Herdr UI, Ghostty and bun")]
+herdr:
+    brew install herdr
+    [ -d /Applications/Herdr.app ] || brew install --cask penso/tap/herdr-gpui
+    [ -d /Applications/Ghostty.app ] || brew install --cask ghostty
+    command -v bun >/dev/null || [ -x ~/.bun/bin/bun ] || curl -fsSL https://bun.sh/install | bash
+
 # Copy (never symlink) the herdr + Ghostty configs into place.
 # rm -f first: cp through an existing symlink would write back into this repo
 # instead of replacing the link with a real file.
-[doc("Copy herdr, Ghostty and nvim configs into place")]
+[doc("Copy herdr, Herdr UI, Ghostty and nvim configs into place")]
 configs:
     mkdir -p ~/.config/herdr ~/.config/ghostty
     rm -f ~/.config/herdr/config.toml ~/.config/ghostty/config
@@ -205,14 +216,16 @@ configs:
     sed -e "s|~/.config/herdr/bin/|$HOME/.config/herdr/bin/|g" \
         -e "s|\$HERDR_BIN_PATH|$(command -v herdr || echo herdr)|g" \
         herdr/config.toml > ~/.config/herdr/config.toml
+    cp herdr/config-gpui.local.toml ~/.config/herdr/config-gpui.local.toml
     cp ghostty/config ~/.config/ghostty/config
     # The scripts run under bun. The repo keeps `#!/usr/bin/env bun` so it stays
     # portable; the installed copies get an absolute shebang, because herdr runs
-    # [[keys.command]] detached and its PATH may not include ~/.bun/bin.
+    # [[keys.command]] detached and its PATH may not include ~/.bun/bin (nor does
+    # this shell's, right after `just herdr` installed bun there).
     mkdir -p ~/.config/herdr/bin
     rm -f ~/.config/herdr/bin/*.ts
     cp herdr/bin/*.ts ~/.config/herdr/bin/
-    sed -i '' "1s|#!/usr/bin/env bun|#!$(command -v bun)|" ~/.config/herdr/bin/*.ts
+    sed -i '' "1s|#!/usr/bin/env bun|#!$(command -v bun || echo $HOME/.bun/bin/bun)|" ~/.config/herdr/bin/*.ts
     chmod +x ~/.config/herdr/bin/*.ts
     # The repo's slice of the Neovim config: LazyVim reads lua/config/*.lua after
     # its own defaults, so these files only add to it. They are copied rather
@@ -232,6 +245,7 @@ configs:
     cp herdr/review-prompts/*.md ~/.config/herdr/review-prompts/
     cp herdr/review.toml ~/.config/herdr/review.toml
     @echo "Installed herdr config to ~/.config/herdr/config.toml"
+    @echo "Installed Herdr UI config to ~/.config/herdr/config-gpui.local.toml"
     @echo "Installed herdr scripts to ~/.config/herdr/bin/"
     @echo "Installed skill snippets to ~/.config/herdr/skill-snippets/"
     @echo "Installed review prompts + review.toml to ~/.config/herdr/"
