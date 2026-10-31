@@ -162,14 +162,15 @@ type = "plugin_action"
 command = "cloudmanic.herdr-plus.quick-actions"
 description = "herdr-plus: quick actions"
 
-# Activity bar (Pull requests, Issues, Overview…) — cmd+2 shows or hides
-# it in Herdr UI. Its panels only open while it is on; it starts hidden
-# ([sidebar] activity_bar in config-gpui.local.toml).
+# Herdr UI: cmd+2 flips the side panel between Pull requests and Workspaces.
+# Herdr UI cannot report the open panel, so the last one set here is kept in
+# ~/.cache/herdr-panel; after switching panels by mouse, one press may repeat.
+# Herdr UI frees cmd-2 (config-gpui.local.toml); Ghostty forwards it.
 [[keys.command]]
 key = "cmd+2"
 type = "shell"
-command = '[ "$(/Applications/Herdr.app/Contents/MacOS/Herdr config get sidebar.activity_bar)" = true ] && /Applications/Herdr.app/Contents/MacOS/Herdr config set sidebar.activity_bar false || /Applications/Herdr.app/Contents/MacOS/Herdr config set sidebar.activity_bar true'
-description = "Herdr UI: toggle activity bar"
+command = 'f=$HOME/.cache/herdr-panel; p=pull-requests; [ "$(cat "$f" 2>/dev/null)" = pull-requests ] && p=workspaces; /Applications/Herdr.app/Contents/MacOS/Herdr ui panel $p && mkdir -p "${f%/*}" && echo $p > "$f"'
+description = "Herdr UI: pull requests <-> workspaces"
 
 # Agent layout — new workspace for the current repo with a plan tab and an impl
 # tab, both running the same agent. Re-running focuses the existing one, so each
