@@ -3,7 +3,7 @@ default:
     @just --list
 
 # Everything (except tuicr), configs before the recipes that build on them.
-install: shell-env fonts hammerspoon harlequin lazydocker k9s flux9s sofka ocr semgrep semgrep-rules herdr configs herdr-plus herdr-transcripts zoetrope diagrams lazyvim skills ponytail chrome-theme
+install: shell-env fonts hammerspoon harlequin lazydocker k9s flux9s sofka ocr semgrep semgrep-rules herdr configs herdr-app herdr-plus herdr-transcripts zoetrope diagrams lazyvim skills ponytail chrome-theme
 
 # Hammerspoon config, reloaded in place.
 hammerspoon:
@@ -190,21 +190,50 @@ flux9s:
 sofka:
     brew install nklmilojevic/sofka/sofka
 
-# The apps the configs below are for: herdr (TUI + server), Herdr UI (its
-# desktop client), Ghostty, and bun for herdr/bin/*.ts. An app already in
-# /Applications is left alone, since brew refuses to adopt one it didn't install.
+# The apps the configs below are for: herdr (TUI + server), Ghostty, and bun
+# for herdr/bin/*.ts. An app already in /Applications is left alone, since brew
+# refuses to adopt one it didn't install.
 # bun uses its own installer (~/.bun), as on the main machine.
-[doc("herdr, Herdr UI, Ghostty and bun")]
+[doc("herdr, Ghostty and bun")]
 herdr:
     brew install herdr
-    [ -d /Applications/Herdr.app ] || brew install --cask penso/tap/herdr-gpui
     [ -d /Applications/Ghostty.app ] || brew install --cask ghostty
     command -v bun >/dev/null || [ -x ~/.bun/bin/bun ] || curl -fsSL https://bun.sh/install | bash
+
+# herdr-app (the official desktop app, home ~/.config/herdr-app): the Zed
+# theme, the minimal "zed" layout, keys matching herdr/config.toml, and mods.
+# Installed to ~/Applications, where the existing copy lives. The app writes its default keys.json and
+# settings.json on first start; the repo's fragments are merged over them, so
+# the app's defaults and anything not set here survive (.bak kept per file).
+[doc("herdr-app: install, Zed theme, minimal layout, keys, mods")]
+herdr-app:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    home=~/.config/herdr-app
+    [ -d ~/Applications/Herdr.app ] || brew install --cask --appdir="$HOME/Applications" herdr-app
+    command -v jq >/dev/null || brew install jq
+    if [ ! -f "$home/keys.json" ] || [ ! -f "$home/settings.json" ]; then
+    	open ~/Applications/Herdr.app
+    	for _ in $(seq 60); do [ -f "$home/keys.json" ] && [ -f "$home/settings.json" ] && break; sleep 1; done
+    	[ -f "$home/keys.json" ] || { echo "herdr-app did not write $home/keys.json; start it once and re-run"; exit 1; }
+    fi
+    app=~/Applications/Herdr.app/Contents/MacOS/Herdr
+    mkdir -p "$home/mods" "$home/themes" "$home/layouts"
+    cp -R herdr-app/mods/ "$home/mods/"
+    cp herdr-app/themes/*.json "$home/themes/"
+    cp herdr-app/layouts/*.json "$home/layouts/"
+    for f in keys settings; do
+    	cp "$home/$f.json" "$home/$f.json.bak"
+    	jq -s '.[0] * .[1]' "$home/$f.json.bak" "herdr-app/$f.json" > "$home/$f.json"
+    done
+    for m in herdr-app/mods/*/; do "$app" check "$home/mods/$(basename "$m")"; done
+    "$app" do layout.switch '{"name":"zed"}' >/dev/null || echo "Open herdr-app, then: herdr-app do layout.switch '{\"name\":\"zed\"}'"
+    echo "Installed herdr-app theme, layout, keys, settings and mods to $home"
 
 # Copy (never symlink) the herdr + Ghostty configs into place.
 # rm -f first: cp through an existing symlink would write back into this repo
 # instead of replacing the link with a real file.
-[doc("Copy herdr, Herdr UI, Ghostty and nvim configs into place")]
+[doc("Copy herdr, Ghostty and nvim configs into place")]
 configs:
     mkdir -p ~/.config/herdr ~/.config/ghostty
     rm -f ~/.config/herdr/config.toml ~/.config/ghostty/config
@@ -216,7 +245,6 @@ configs:
     sed -e "s|~/.config/herdr/bin/|$HOME/.config/herdr/bin/|g" \
         -e "s|\$HERDR_BIN_PATH|$(command -v herdr || echo herdr)|g" \
         herdr/config.toml > ~/.config/herdr/config.toml
-    cp herdr/config-gpui.local.toml ~/.config/herdr/config-gpui.local.toml
     cp ghostty/config ~/.config/ghostty/config
     # The scripts run under bun. The repo keeps `#!/usr/bin/env bun` so it stays
     # portable; the installed copies get an absolute shebang, because herdr runs
@@ -245,7 +273,6 @@ configs:
     cp herdr/review-prompts/*.md ~/.config/herdr/review-prompts/
     cp herdr/review.toml ~/.config/herdr/review.toml
     @echo "Installed herdr config to ~/.config/herdr/config.toml"
-    @echo "Installed Herdr UI config to ~/.config/herdr/config-gpui.local.toml"
     @echo "Installed herdr scripts to ~/.config/herdr/bin/"
     @echo "Installed skill snippets to ~/.config/herdr/skill-snippets/"
     @echo "Installed review prompts + review.toml to ~/.config/herdr/"
