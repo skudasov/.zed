@@ -10,18 +10,33 @@ onboarding = true
 # Built-in themes: catppuccin, terminal, tokyo-night, dracula, nord,
 #                  gruvbox, one-dark, solarized, kanagawa, rose-pine,
 #                  vesper
-name = "gruvbox"
+name = "one-dark"
 
 # Override individual color tokens on top of the base theme.
 # Accepts: hex (#rrggbb), named colors, rgb(r,g,b), or panel_bg = "reset"
-# Sidebar matches Zed "Ultimate Dark Neo" elevated_surface.background; Herdr UI reads
-# these overrides too (its Ghostty theme: herdr/themes/ultimate-dark-neo).
+# Every token mirrors Zed "Ultimate Dark Neo" (with settings.json's
+# editor.background #303135). Herdr UI uses them too: its config-gpui.local.toml
+# sets theme = "Follow Herdr".
 [theme.custom]
-sidebar_bg = "#292c2e"
-# panel_bg = "reset"
-# accent = "#f5c2e7"
-# red = "#ff6188"
-# green = "#a6e3a1"
+panel_bg = "#303135"       # editor.background override; Zed panels/title bar show it
+sidebar_bg = "#303135"
+active_row_bg = "#3c464d"  # tab.active_background
+selection_bg = "#464a4a"   # element.selected
+surface0 = "#3c464d"       # border.focused
+surface1 = "#434748"       # element.background
+surface_dim = "#292c2e"    # elevated_surface.background
+overlay0 = "#525763"       # terminal.ansi.bright_black
+overlay1 = "#6f757f"       # players[0]
+text = "#fff9ec"           # text
+subtext0 = "#afaca4"       # text.muted blended over #303135
+accent = "#ffe9d1"         # text.accent
+red = "#cb5e65"            # terminal.ansi.*
+green = "#a0c791"
+yellow = "#f4c37b"
+blue = "#82a9ca"
+teal = "#7ec6ba"
+mauve = "#b88aac"
+peach = "#bf956a"          # players[2]
 
 [terminal]
 # Executable used for new interactive panes.
@@ -146,6 +161,15 @@ key = "cmd+e"
 type = "plugin_action"
 command = "cloudmanic.herdr-plus.quick-actions"
 description = "herdr-plus: quick actions"
+
+# Activity bar (Pull requests, Issues, Overview…) — cmd+2 shows or hides
+# it in Herdr UI. Its panels only open while it is on; it starts hidden
+# ([sidebar] activity_bar in config-gpui.local.toml).
+[[keys.command]]
+key = "cmd+2"
+type = "shell"
+command = '[ "$(/Applications/Herdr.app/Contents/MacOS/Herdr config get sidebar.activity_bar)" = true ] && /Applications/Herdr.app/Contents/MacOS/Herdr config set sidebar.activity_bar false || /Applications/Herdr.app/Contents/MacOS/Herdr config set sidebar.activity_bar true'
+description = "Herdr UI: toggle activity bar"
 
 # Agent layout — new workspace for the current repo with a plan tab and an impl
 # tab, both running the same agent. Re-running focuses the existing one, so each
