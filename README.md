@@ -126,3 +126,5 @@ Chrome re-loads it on every start, so this is a one-time step. After editing
 Chrome will not sideload a packed `.crx` on macOS and the `ExtensionSettings`
 policy requires a Web Store `update_url`, so "Load unpacked" is the only way to
 install this without publishing it.
+
+Test PR
