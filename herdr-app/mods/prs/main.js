@@ -7,7 +7,7 @@ import { View, div } from "gpui-kit";
 import { h_flex, v_flex } from "gpui-base";
 import { exec, theme } from "herdr";
 
-const REPOS = ["cli/cli", "skudasov/.zed", "smartcontractkit/chainlink"];
+const REPOS = ["skudasov/.zed"];
 const SHOWN = 24; // rows on screen; the list follows the selection instead of scrolling
 
 async function list(repo) {
