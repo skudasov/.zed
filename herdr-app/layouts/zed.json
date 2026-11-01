@@ -109,13 +109,13 @@
           ]
         },
         {
-          "id": "timer",
+          "id": "schedule",
           "type": "block",
           "size": {
             "px": 22
           },
           "content": {
-            "mod": "timer"
+            "mod": "schedule"
           },
           "hidden": true
         }
