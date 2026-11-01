@@ -1,6 +1,6 @@
 // Schedule. One mod, two copies:
 // - the layout's "schedule" footer block (zed.json): one line for the whole day, 0:00 to 24:00,
-//   each interval a colored segment, a ▼ marks the time of day now;
+//   each interval a faint segment, the running one solid;
 // - the dialog (launcher, cmd-e: "Schedule"): type "1000 1200 deep work" (10:00 12:00 / 1000-1200 work too)
 //   + enter to add, j/k select, x removes the selected one, esc closes.
 // Intervals are a daily plan: minutes of the day, repeating every day until x removes them.
@@ -8,11 +8,12 @@
 
 import { View, div } from "gpui-kit";
 import { v_flex, h_flex } from "gpui-base";
-import { shared, setShared, notify, theme, props, run } from "herdr";
+import { shared, setShared, notify, theme, props, run, settings } from "herdr";
 
 const DAY_START = 0; // hours shown on the line
 const DAY_END = 24;
-const COLORS = ["ansi1", "ansi2", "ansi3", "ansi4", "ansi5", "ansi6"];
+// Same order as tab-jump's space chips.
+const COLORS = ["ansi5", "ansi6", "ansi4", "ansi3", "ansi2", "ansi1"];
 const KEY = "schedule";
 
 const items = () => shared(KEY) ?? [];
@@ -34,7 +35,7 @@ const endOf = (x) => today(0, x.to);
 const dayKey = () => new Date().toDateString();
 function status(x, now = Date.now()) {
   if (now < startOf(x)) return `in ${mins(startOf(x) - now)}m`;
-  if (now < endOf(x)) return `${mins(endOf(x) - now)}m left`;
+  if (now < endOf(x)) return `${mins(endOf(x) - now)}m`;
   return "done";
 }
 
@@ -136,7 +137,6 @@ export default class Schedule extends View {
     const now = Date.now();
     const all = items();
     const current = all.find((x) => startOf(x) <= now && now < endOf(x));
-    const inDay = now >= today(DAY_START) && now <= today(DAY_END);
     return h_flex()
       .size_full()
       .px(10)
@@ -144,13 +144,14 @@ export default class Schedule extends View {
       .items_center()
       .border_t(1)
       .border_color(t.border)
-      .text_size(11)
+      .font_family(settings().font_family ?? "JetBrains Mono")
+      .text_size(13)
       .child(div().flex_none().text_color(t.dim).child(`${DAY_START}`))
       .child(
         div()
           .relative()
           .flex_1()
-          .h(16)
+          .h(20)
           .rounded(3)
           .overflow_hidden()
           .bg(t.border)
@@ -158,7 +159,9 @@ export default class Schedule extends View {
             all.map((x) => {
               const left = pos(startOf(x));
               const width = pos(endOf(x)) - left;
-              const fill = x === current ? "99" : "44";
+              // tab-jump's chip look: the running block tinted with a border, the rest faded.
+              const on = x === current;
+              const c = t[x.color];
               return div()
                 .absolute()
                 .top_0()
@@ -168,30 +171,20 @@ export default class Schedule extends View {
                 .flex()
                 .items_center()
                 .overflow_hidden()
-                .border_l(1)
-                .border_color(t.background)
-                .bg(t[x.color] + fill)
-                .child(div().px(4).truncate().text_size(10).text_color(t.foreground).child(x.name));
+                .rounded(3)
+                .border_1()
+                .text_color(c)
+                .when(on, (el) => el.bg(c + "26").border_color(c).font_semibold())
+                .when(!on, (el) => el.bg(c + "14").border_color("#00000000").opacity(0.7))
+                .child(div().px(4).truncate().text_size(12).child(x.name));
             }),
           )
-          // Now: ▼ pinned at the time of day; zero-width anchor so the glyph centers on it.
-          .when(inDay, (el) =>
-            el.child(
-              div()
-                .absolute()
-                .top_0()
-                .h_full()
-                .w(0)
-                .left(`${pos(now) * 100}%`)
-                .child(div().absolute().top(-2).left(-4).text_size(10).text_color(t.foreground).child("▼")),
-            ),
-          ),
       )
       .child(div().flex_none().text_color(t.dim).child(`${DAY_END}`))
       .child(
         div()
           .flex_none()
-          .text_color(current ? t[current.color] : t.foreground)
+          .text_color(t.ansi3)
           .child(current ? `${hhmm(now)} · ${status(current, now)}` : hhmm(now)),
       );
   }
@@ -208,7 +201,8 @@ export default class Schedule extends View {
       .p(12)
       .gap(4)
       .bg(t.popover)
-      .text_size(13)
+      .font_family(settings().font_family ?? "JetBrains Mono")
+      .text_size(15)
       .child(
         div()
           .px(8)
@@ -220,7 +214,7 @@ export default class Schedule extends View {
           .text_color(this.q ? t.foreground : t.dim)
           .child(`${this.q || "from to name, e.g. 1000 1200 focus"}▏`),
       )
-      .when(Boolean(this.err), (el) => el.child(div().px(8).text_size(11).text_color(t.ansi1).child(this.err)))
+      .when(Boolean(this.err), (el) => el.child(div().px(8).text_size(13).text_color(t.ansi1).child(this.err)))
       // Rows grow with their name (it wraps, never truncates); the list scrolls past the dialog.
       .child(
         v_flex()
@@ -238,7 +232,7 @@ export default class Schedule extends View {
                 .gap(8)
                 .rounded(6)
                 .bg(i === this.at ? t.selected : t.popover)
-                .child(div().flex_none().mt(5).w(8).h(8).rounded(4).bg(t[x.color]))
+                .child(div().flex_none().mt(6).w(8).h(8).rounded(4).bg(t[x.color]))
                 .child(div().flex_none().text_color(t.dim).child(`${hhmm(startOf(x))}–${hhmm(endOf(x))}`))
                 .child(div().flex_1().min_w(0).text_color(t.foreground).child(x.name))
                 .child(div().flex_none().text_color(t[x.color]).child(status(x))),
@@ -246,6 +240,6 @@ export default class Schedule extends View {
           ),
       )
       .when(!all.length, (el) => el.child(div().px(8).text_color(t.muted).child("Nothing scheduled")))
-      .child(div().mt_auto().px(8).text_size(11).text_color(t.dim).child("enter add · j/k select · x remove · esc close"));
+      .child(div().mt_auto().px(8).text_size(13).text_color(t.dim).child("enter add · j/k select · x remove · esc close"));
   }
 }

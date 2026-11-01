@@ -8,8 +8,8 @@ import { spaces, panes, run, theme, settings, props, closeOverlay } from "herdr"
 const COLORS = ["ansi5", "ansi6", "ansi4", "ansi3", "ansi2", "ansi1"];
 const STEP = { j: 1, down: 1, k: -1, up: -1 };
 
-// Typing filters the list (shown in the header). Enter stops typing and gives the
-// keys back to the list, esc clears the filter. `own`: the list's keys, they don't start typing.
+// Typing filters the list (shown in the header). Enter stops typing and opens the
+// selected item, esc clears the filter. `own`: the list's keys, they don't start typing.
 // True when the key was taken. Copied in launcher, snippets, prs and tab-jump (mods can't share files).
 function filterKey(s, e, own) {
   const k = e.keystroke;
@@ -20,7 +20,7 @@ function filterKey(s, e, own) {
     s.typing = false;
   } else if (k === "enter" && s.typing) {
     s.typing = false;
-    return true;
+    return false; // fall through: the caller's enter opens the selected item
   } else if (k === "backspace" && s.q) s.q = s.q.slice(0, -1);
   else if (typed && (s.typing || !own.includes(k))) {
     s.q = (s.q ?? "") + typed;

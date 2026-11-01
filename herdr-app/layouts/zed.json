@@ -112,7 +112,7 @@
           "id": "schedule",
           "type": "block",
           "size": {
-            "px": 22
+            "px": 28
           },
           "content": {
             "mod": "schedule"

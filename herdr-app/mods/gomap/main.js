@@ -198,9 +198,12 @@ export default class GoMap extends View {
       const step = { down: 1, up: -1 }[e.key];
       if (step) this.move(step);
       else if (e.key === "escape" || e.key === "enter") {
-        // Picking: escape cancels, enter picks. Filtering: both keep the filter
-        // and hand the keys back to the list.
-        if (!this.picking) this.typing = false;
+        // Picking: escape cancels, enter picks. Filtering: both keep the filter and
+        // hand the keys back to the list; enter also opens the selected row.
+        if (!this.picking) {
+          this.typing = false;
+          if (e.key === "enter") this.openSel();
+        }
         else if (e.key === "enter") this.pick();
         else this.stopPicking();
       } else if (e.key === "backspace") {
