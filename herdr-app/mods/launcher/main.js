@@ -34,6 +34,7 @@ const MODS = [
   ["zed-changes", "Changes"],
   ["gomap", "Go map"],
   ["tab-jump", "Tab jump"],
+  ["timer", "Timer"],
 ];
 
 export default class Launcher extends View {

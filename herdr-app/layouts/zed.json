@@ -107,6 +107,17 @@
               }
             }
           ]
+        },
+        {
+          "id": "timer",
+          "type": "block",
+          "size": {
+            "px": 22
+          },
+          "content": {
+            "mod": "timer"
+          },
+          "hidden": true
         }
       ]
     }
