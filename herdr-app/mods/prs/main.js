@@ -5,7 +5,8 @@
 
 import { View, div } from "gpui-kit";
 import { h_flex, v_flex } from "gpui-base";
-import { exec, theme } from "herdr";
+import { exec, theme, props, closeOverlay } from "herdr";
+import { startReview, reviewKey, reviewView } from "./review.js";
 
 const REPOS = ["skudasov/.zed"];
 const SHOWN = 24; // rows on screen; the list follows the selection instead of scrolling
@@ -29,7 +30,7 @@ async function list(repo) {
       "number,title,author,url,isDraft,statusCheckRollup",
     ]);
     return r.code === 0
-      ? { repo, prs: JSON.parse(r.stdout) }
+      ? { repo, prs: JSON.parse(r.stdout).map((pr) => ({ ...pr, repo })) }
       : {
           repo,
           prs: [],
@@ -161,7 +162,12 @@ export default class Prs extends View {
       .text_size(13)
       .on_key_down((e, cx) => {
         const k = e.keystroke;
-        if (k === "j" || k === "down") {
+        if (this.review) {
+          const next = reviewKey(this.review, k);
+          if (next === "done") closeOverlay(props().overlay);
+          this.review = next === "done" ? null : next;
+        } else if (k === "r" && sel) this.review = startReview(sel, checks(sel).fail, cx);
+        else if (k === "j" || k === "down") {
           this.at = Math.min(this.at + 1, all.length - 1);
           this.open = false;
         } else if (k === "k" || k === "up") {
@@ -188,9 +194,10 @@ export default class Prs extends View {
             div()
               .text_size(11)
               .text_color(t.dim)
-              .child("j/k move · c failing checks · enter open"),
+              .child("j/k move · c failing checks · r review · enter open"),
           ),
       )
-      .children(rows.slice(start, start + SHOWN));
+      .when(Boolean(this.review), (el) => el.child(reviewView(this.review, t)))
+      .when(!this.review, (el) => el.children(rows.slice(start, start + SHOWN)));
   }
 }
