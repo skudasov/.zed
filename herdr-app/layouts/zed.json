@@ -53,6 +53,16 @@
       "resizable": false,
       "children": [
         {
+          "id": "ask-name",
+          "type": "block",
+          "size": {
+            "px": 0
+          },
+          "content": {
+            "mod": "ask-name"
+          }
+        },
+        {
           "id": "tabs",
           "type": "block",
           "size": {

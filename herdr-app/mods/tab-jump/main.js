@@ -1,6 +1,6 @@
-import { View, div } from "gpui-kit";
+import { View, div, svg, image } from "gpui-kit";
 import { v_flex, h_flex } from "gpui-base";
-import { spaces, run, theme, settings, props, closeOverlay } from "herdr";
+import { spaces, panes, run, theme, settings, props, closeOverlay } from "herdr";
 
 // Every space on a row: its name, then its tabs left to right (keys.json: "cmd-s").
 // j/k (or arrows) move through all tabs, enter (or a click) opens one, typing filters
@@ -70,9 +70,19 @@ export default class TabJump extends View {
     if (this.at >= flat.length) this.at = Math.max(0, flat.length - 1);
     const selTab = flat[this.at]?.[1];
     // A colored label: tinted fill and border when on, faded when off.
-    const chip = (id, c, on, label) =>
+    // The tab's program icon, picked like Herdr's own tabs: its agent, else its first pane.
+    const ps = panes();
+    const icon = (tab) => {
+      const p = (ps.find((x) => x.tab === tab.id && x.program?.agent) ?? ps.find((x) => x.tab === tab.id))?.program;
+      if (!p?.icon) return null;
+      return p.tint ? svg(p.icon).size(13).flex_none() : image(p.icon).w(13).h(13).flex_none();
+    };
+    const chip = (id, c, on, label, glyph = null) =>
       div()
         .id(id)
+        .flex()
+        .items_center()
+        .gap(5)
         .flex_none()
         .px(8)
         .py(2)
@@ -81,6 +91,7 @@ export default class TabJump extends View {
         .text_color(t[c])
         .when(on, (el) => el.bg(t[c] + "26").border_color(t[c]))
         .when(!on, (el) => el.border_color("#00000000").opacity(0.7))
+        .when(Boolean(glyph), (el) => el.child(glyph))
         .child(label);
     const panel = v_flex()
       .id("tab-jump")
@@ -119,7 +130,7 @@ export default class TabJump extends View {
                 .child(chip(`s-${s.id}`, COLORS[i % COLORS.length], true, s.name).font_semibold().min_w(120))
                 .children(
                   tabs.map((tab) =>
-                    chip(`t-${tab.id}`, tab.active && s.active ? "accent" : "ansi4", tab === selTab, tab.name)
+                    chip(`t-${tab.id}`, tab.active && s.active ? "accent" : "ansi4", tab === selTab, tab.name, icon(tab))
                       .cursor_pointer()
                       .on_click(() => this.open(s, tab)),
                   ),
