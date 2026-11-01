@@ -8,12 +8,13 @@ import { run, theme, props, closeOverlay, openOverlay } from "herdr";
 
 // Next keystroke -> what it does. x/W/T match herdr/config.toml's prefix keys.
 // C opens Changes (zed-changes, the git diff of the focused pane's repo) filling
-// the window; cmd-3 opens it as a popover. Esc closes either.
+// the window; cmd-2 opens it as a popover. Esc closes either.
 const KEYS = {
-  "x": () => run("tab.close", {}),
+  x: () => run("tab.close", {}),
   "shift-w": () => run("space.rename", {}),
   "shift-t": () => run("tab.rename", {}),
-  "shift-c": () => openOverlay({ mod: "zed-changes", kind: "dialog", width: 1, height: 1 }),
+  "shift-c": () =>
+    openOverlay({ mod: "zed-changes", kind: "dialog", width: 1, height: 1 }),
 };
 
 export default class Prefix extends View {
@@ -41,6 +42,8 @@ export default class Prefix extends View {
         if (hit) hit();
       })
       .child(div().text_color(t.foreground).child("ctrl+b"))
-      .child(div().child("x close tab · W/T rename workspace/tab · C changes full"));
+      .child(
+        div().child("x close tab · W/T rename workspace/tab · C changes full"),
+      );
   }
 }

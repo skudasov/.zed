@@ -25,7 +25,7 @@ function toggleSidebar() {
 
 export default class WorkspaceChrome extends View {
   init() {
-    // No Files/Changes buttons in the tab bar: Changes opens as a popover on cmd-3.
+    // No Files/Changes buttons in the tab bar: Changes opens as a popover on cmd-2.
     // The shipped tabs mod draws only the panels listed here.
     if (shared("workspace.panels")?.length !== 0) setShared("workspace.panels", []);
   }
