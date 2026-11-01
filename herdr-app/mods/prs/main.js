@@ -8,6 +8,29 @@ import { h_flex, v_flex } from "gpui-base";
 import { exec, theme, props, closeOverlay } from "herdr";
 import { startReview, reviewKey, reviewView } from "./review.js";
 
+// Typing filters the list (shown in the header). Enter stops typing and gives the
+// keys back to the list, esc clears the filter. `own`: the list's keys, they don't start typing.
+// True when the key was taken. Copied in launcher, snippets and prs (mods can't share files).
+function filterKey(s, e, own) {
+  const k = e.keystroke;
+  // Enter's key_char is a carriage return: only real characters type.
+  const typed = e.key_char >= " " && !e.modifiers?.platform && !e.modifiers?.control ? e.key_char : "";
+  if (k === "escape" && s.q) {
+    s.q = "";
+    s.typing = false;
+  } else if (k === "enter" && s.typing) {
+    s.typing = false;
+    return true;
+  } else if (k === "backspace" && s.q) s.q = s.q.slice(0, -1);
+  else if (typed && (s.typing || !own.includes(k))) {
+    s.q = (s.q ?? "") + typed;
+    s.typing = true;
+  } else return false;
+  s.at = 0;
+  return true;
+}
+const matches = (q, text) => !q || text.toLowerCase().includes(q.toLowerCase());
+
 const REPOS = ["skudasov/.zed"];
 const SHOWN = 24; // rows on screen; the list follows the selection instead of scrolling
 
@@ -81,20 +104,24 @@ export default class Prs extends View {
 
   render(_cx) {
     const t = theme();
-    const all = (this.groups ?? []).flatMap((g) => g.prs);
+    const groups = (this.groups ?? []).map((g) => ({
+      ...g,
+      prs: g.prs.filter((pr) => matches(this.q, `#${pr.number} ${pr.title} ${pr.author?.login ?? ""}`)),
+    }));
+    const all = groups.flatMap((g) => g.prs);
     const sel = all[this.at];
     const rows = [];
     let selRow = 0;
     if (this.groups === null)
       rows.push(div().text_color(t.muted).child("Loading…"));
-    for (const g of this.groups ?? []) {
+    for (const g of groups) {
       rows.push(
         div().pt(8).font_semibold().text_color(t.foreground).child(g.repo),
       );
       if (g.error)
         rows.push(div().truncate().text_color(t.blocked).child(g.error));
       else if (g.prs.length === 0)
-        rows.push(div().text_color(t.muted).child("No open pull requests"));
+        rows.push(div().text_color(t.muted).child(this.q ? "No matches" : "No open pull requests"));
       for (const pr of g.prs) {
         const on = pr === sel;
         const c = checks(pr);
@@ -166,7 +193,8 @@ export default class Prs extends View {
           const next = reviewKey(this.review, k);
           if (next === "done") closeOverlay(props().overlay);
           this.review = next === "done" ? null : next;
-        } else if (k === "r" && sel) this.review = startReview(sel, checks(sel).fail, cx);
+        } else if (filterKey(this, e, ["j", "k", "c", "r"])) this.open = false;
+        else if (k === "r" && sel) this.review = startReview(sel, checks(sel).fail, cx);
         else if (k === "j" || k === "down") {
           this.at = Math.min(this.at + 1, all.length - 1);
           this.open = false;
@@ -194,9 +222,10 @@ export default class Prs extends View {
             div()
               .text_size(11)
               .text_color(t.dim)
-              .child("j/k move · c failing checks · r review · enter open"),
+              .child("j/k move · type to search · c checks · r review · enter open"),
           ),
       )
+      .when(!this.review && Boolean(this.q), (el) => el.child(div().text_color(t.muted).child(`${this.q}${this.typing ? "▏" : ""}`)))
       .when(Boolean(this.review), (el) => el.child(reviewView(this.review, t)))
       .when(!this.review, (el) => el.children(rows.slice(start, start + SHOWN)));
   }

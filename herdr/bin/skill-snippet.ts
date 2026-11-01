@@ -1,7 +1,7 @@
 #!/usr/bin/env bun
 /**
  * skill-snippet — pick one of the markdown snippets in
- * ~/.config/herdr/skill-snippets/ and insert it into the pane you launched
+ * ~/.config/herdr-app/mods/snippets/snippets/ and insert it into the pane you launched
  * from.
  *
  * Runs inside the quick-actions overlay pane (which has a real tty), so fzf
@@ -12,7 +12,7 @@
  */
 import { $ } from 'bun'
 
-const dir = process.env.SKILL_SNIPPETS_DIR ?? `${process.env.HOME}/.config/herdr/skill-snippets`
+const dir = process.env.SKILL_SNIPPETS_DIR ?? `${process.env.HOME}/.config/herdr-app/mods/snippets/snippets`
 
 const files = (await $`find ${dir} -maxdepth 1 -name '*.md' -type f`.nothrow().quiet().text())
   .trim()
