@@ -32,6 +32,7 @@ const MODS = [
   ["prs", "Pull requests"],
   ["snippets", "Snippets"],
   ["zed-changes", "Changes"],
+  ["gomap", "Go map"],
 ];
 
 export default class Launcher extends View {

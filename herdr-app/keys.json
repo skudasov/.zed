@@ -11,6 +11,7 @@
     "cmd-2": "mod.open:zed-changes",
     "ctrl-b": "mod.open:prefix",
     "cmd-3": "mod.open:prs",
-    "cmd-e": "mod.open:launcher"
+    "cmd-e": "mod.open:launcher",
+    "cmd-5": "mod.open:gomap"
   }
 }

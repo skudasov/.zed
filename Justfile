@@ -190,6 +190,8 @@ herdr-app:
     app=~/Applications/Herdr.app/Contents/MacOS/Herdr
     mkdir -p "$home/mods" "$home/themes" "$home/layouts"
     cp -R herdr-app/mods/ "$home/mods/"
+    # gomap's Go helper: the mod runs this binary on the focused folder.
+    (cd herdr-app/mods/gomap/helper && go build -o "$home/mods/gomap/gomap" .)
     cp herdr-app/themes/*.json "$home/themes/"
     cp herdr-app/layouts/*.json "$home/layouts/"
     for f in keys settings; do
