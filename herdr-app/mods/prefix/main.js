@@ -6,7 +6,7 @@ import { View, div } from "gpui-kit";
 import { v_flex } from "gpui-base";
 import { run, theme, props, closeOverlay, openOverlay } from "herdr";
 
-// Next keystroke -> what it does. x/W/T match herdr/config.toml's prefix keys.
+// Next keystroke -> what it does.
 // C opens Changes (zed-changes, the git diff of the focused pane's repo) filling
 // the window; cmd-2 opens it as a popover. Esc closes either.
 const KEYS = {

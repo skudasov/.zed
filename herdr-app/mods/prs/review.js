@@ -1,5 +1,5 @@
 // AI review of a PR, two picker steps inside the PRs dialog: agent, then prompt preset.
-// Prompts live in ./prompts/*.md (copied from herdr/review-prompts) with {{var}} placeholders.
+// Prompts live in ./prompts/*.md with {{var}} placeholders.
 // Launch: new tab running the agent, prompt handed over as its first message.
 
 import { div } from "gpui-kit";
@@ -20,7 +20,7 @@ async function loadPresets() {
   return out;
 }
 
-// Same vars as herdr/bin/ai-review.ts. herdr pane run presses Enter, so newlines become spaces.
+// {{var}} placeholders; newlines become spaces so the prompt is one message.
 function render(text, pr, failed) {
   const vars = {
     ref: `${pr.repo}#${pr.number}`,

@@ -3,7 +3,7 @@ default:
     @just --list
 
 # Everything (except tuicr), configs before the recipes that build on them.
-install: shell-env fonts hammerspoon harlequin lazydocker k9s flux9s sofka ocr semgrep semgrep-rules herdr configs herdr-app herdr-plus herdr-transcripts zoetrope diagrams lazyvim skills ponytail chrome-theme
+install: shell-env fonts hammerspoon harlequin lazydocker k9s flux9s sofka ocr semgrep semgrep-rules configs herdr-app lazyvim skills ponytail chrome-theme
 
 # Hammerspoon config, reloaded in place.
 hammerspoon:
@@ -25,7 +25,7 @@ shell-env:
     grep -qxF 'export EDITOR=nvim' ~/.zshenv 2>/dev/null || echo 'export EDITOR=nvim' >> ~/.zshenv
     grep -qxF 'bindkey -e' ~/.zshrc 2>/dev/null || printf '\n# zsh selects the viins keymap when $EDITOR contains "vi" (EDITOR=nvim above);\n# force emacs so Ctrl+R/Ctrl+P stay history search.\nbindkey -e\n' >> ~/.zshrc
 
-# JetBrains Mono is the font for Zed (buffer + UI) and Ghostty (and so herdr).
+# JetBrains Mono is the font for Zed (buffer + UI) and Ghostty (and the herdr app).
 fonts:
     brew install --cask font-jetbrains-mono
 
@@ -43,19 +43,19 @@ lazydocker:
 tuicr:
     brew install tuicr
 
-# OpenCodeReview (`ocr`), used by the "Review: OCR" quick action.
+# OpenCodeReview (`ocr`).
 # Delegate mode runs no LLM itself, so no provider or API key needs configuring.
-[doc("OpenCodeReview, for the Review: OCR quick action")]
+[doc("OpenCodeReview")]
 ocr:
     npm install -g @alibaba-group/open-code-review
 
-# Pattern matcher behind the "Review: semgrep" quick action; rules in semgrep/.
+# Pattern matcher; rules in semgrep/.
 semgrep:
     brew install semgrep
 
 # Install the rules; the tests/ fixtures next to them stay in the repo.
 # They belong to no one tool — anything can point --config at the installed
-# directory — so they do not live under ~/.config/herdr with the review wiring.
+# directory.
 [doc("Copy semgrep rules to ~/.config/semgrep")]
 semgrep-rules:
     mkdir -p ~/.config/semgrep
@@ -134,34 +134,7 @@ opencode-plugins:
         echo "Installed OpenCode plugin $name to ~/.config/opencode/plugins/$name"
     done
 
-# zoetrope (github.com/furkankly/zoetrope) — draws a Claude Code or Codex
-# session as a live flow graph of agents, subagents and tool calls. Binary is
-# `zoe`; herdr/bin/zoe.ts opens it in a "zoe" tab (prefix+a, or quick actions).
-[doc("zoetrope: live graph of an agent session")]
-zoetrope:
-    brew install furkankly/tap/zoetrope
-
-# d2 (d2lang.com) compiles a text diagram source to PNG/SVG, and timg draws that
-# image in the terminal with the kitty graphics protocol Ghostty speaks — so a
-# diagram shows up as a real image, not block-character art. Wired together by
-# herdr/bin/diagram.ts, bound to prefix+d and driven by the `diagram` skill.
-[doc("d2, timg and terminal-browser for terminal diagrams")]
-diagrams:
-    #!/usr/bin/env bash
-    set -euo pipefail
-    brew install d2 timg neovim
-    # terminal-browser (github.com/zenbu-labs/terminal-browser) is a real browser
-    # in a terminal pane — the live preview half of the "Diagram: new" workbench.
-    # Its own installer puts it under ~/.local, so an existing copy is left alone
-    # rather than ending up with two of them on PATH.
-    if command -v terminal-browser >/dev/null; then
-    	echo "$(terminal-browser --version) already installed"
-    else
-    	brew install terminal-browser
-    fi
-
-# LazyVim (github.com/LazyVim/LazyVim) — the editor half of the diagram
-# workbench, and a usable Neovim everywhere else. Installed from the upstream
+# LazyVim (github.com/LazyVim/LazyVim) — a usable Neovim. Installed from the upstream
 # starter, which is a template and not a dependency: its .git is dropped so
 # ~/.config/nvim is yours to edit. An existing config is left alone.
 [doc("LazyVim starter config, plugins synced")]
@@ -176,9 +149,7 @@ lazyvim:
     	rm -rf ~/.config/nvim/.git
     	echo "Installed LazyVim starter to ~/.config/nvim"
     fi
-    just configs >/dev/null
-    # Plugins are fetched on first start otherwise, which means the diagram
-    # workbench's first launch is spent watching a package manager.
+    # Plugins are fetched on first start otherwise.
     nvim --headless "+Lazy! sync" +qa 2>&1 | tail -3 || true
     echo "LazyVim ready"
 
@@ -190,18 +161,17 @@ flux9s:
 sofka:
     brew install nklmilojevic/sofka/sofka
 
-# The apps the configs below are for: herdr (TUI + server), Ghostty, and bun
-# for herdr/bin/*.ts. An app already in /Applications is left alone, since brew
-# refuses to adopt one it didn't install.
-# bun uses its own installer (~/.bun), as on the main machine.
-[doc("herdr, Ghostty and bun")]
-herdr:
-    brew install herdr
-    [ -d /Applications/Ghostty.app ] || brew install --cask ghostty
-    command -v bun >/dev/null || [ -x ~/.bun/bin/bun ] || curl -fsSL https://bun.sh/install | bash
+# Copy (never symlink) the Ghostty config into place. rm -f first: cp through an
+# existing symlink would write back into this repo.
+[doc("Copy the Ghostty config into place")]
+configs:
+    mkdir -p ~/.config/ghostty
+    rm -f ~/.config/ghostty/config
+    cp ghostty/config ~/.config/ghostty/config
+    @echo "Installed Ghostty config to ~/.config/ghostty/config (reload: cmd+shift+,)"
 
 # herdr-app (the official desktop app, home ~/.config/herdr-app): the Zed
-# theme, the minimal "zed" layout, keys matching herdr/config.toml, and mods.
+# theme, the minimal "zed" layout, keys and mods.
 # Installed to ~/Applications, where the existing copy lives. The app writes its default keys.json and
 # settings.json on first start; the repo's fragments are merged over them, so
 # the app's defaults and anything not set here survive (.bak kept per file).
@@ -229,87 +199,6 @@ herdr-app:
     for m in herdr-app/mods/*/; do "$app" check "$home/mods/$(basename "$m")"; done
     "$app" do layout.switch '{"name":"zed"}' >/dev/null || echo "Open herdr-app, then: herdr-app do layout.switch '{\"name\":\"zed\"}'"
     echo "Installed herdr-app theme, layout, keys, settings and mods to $home"
-
-# Copy (never symlink) the herdr + Ghostty configs into place.
-# rm -f first: cp through an existing symlink would write back into this repo
-# instead of replacing the link with a real file.
-[doc("Copy herdr, Ghostty and nvim configs into place")]
-configs:
-    mkdir -p ~/.config/herdr ~/.config/ghostty
-    rm -f ~/.config/herdr/config.toml ~/.config/ghostty/config
-    # Expand ~ in script paths: herdr may hand [[keys.command]] straight to
-    # execve, which would not expand it. The repo keeps ~ so it stays portable.
-    # $HERDR_BIN_PATH is the path herdr-transcripts documents for its keybind;
-    # resolve it here for the same reason, falling back to a bare `herdr` when
-    # the binary is not installed yet.
-    sed -e "s|~/.config/herdr/bin/|$HOME/.config/herdr/bin/|g" \
-        -e "s|\$HERDR_BIN_PATH|$(command -v herdr || echo herdr)|g" \
-        herdr/config.toml > ~/.config/herdr/config.toml
-    cp ghostty/config ~/.config/ghostty/config
-    # The scripts run under bun. The repo keeps `#!/usr/bin/env bun` so it stays
-    # portable; the installed copies get an absolute shebang, because herdr runs
-    # [[keys.command]] detached and its PATH may not include ~/.bun/bin (nor does
-    # this shell's, right after `just herdr` installed bun there).
-    mkdir -p ~/.config/herdr/bin
-    rm -f ~/.config/herdr/bin/*.ts
-    cp herdr/bin/*.ts ~/.config/herdr/bin/
-    sed -i '' "1s|#!/usr/bin/env bun|#!$(command -v bun || echo $HOME/.bun/bin/bun)|" ~/.config/herdr/bin/*.ts
-    chmod +x ~/.config/herdr/bin/*.ts
-    # The repo's slice of the Neovim config: LazyVim reads lua/config/*.lua after
-    # its own defaults, so these files only add to it. They are copied rather
-    # than merged, so anything hand-edited there is replaced — put your own
-    # settings in lua/plugins/ instead, which this never touches.
-    if [ -d ~/.config/nvim/lua/config ]; then \
-    	cp herdr/nvim/lua/config/*.lua ~/.config/nvim/lua/config/; \
-    	echo "Installed nvim config to ~/.config/nvim/lua/config/"; \
-    else \
-    	echo "No ~/.config/nvim yet — run \`just lazyvim\`"; \
-    fi
-    mkdir -p ~/.config/herdr/review-prompts
-    rm -f ~/.config/herdr/review-prompts/* ~/.config/herdr/review.toml
-    cp herdr/review-prompts/*.md ~/.config/herdr/review-prompts/
-    cp herdr/review.toml ~/.config/herdr/review.toml
-    @echo "Installed herdr config to ~/.config/herdr/config.toml"
-    @echo "Installed herdr scripts to ~/.config/herdr/bin/"
-    @echo "Installed review prompts + review.toml to ~/.config/herdr/"
-    @echo "Installed Ghostty config to ~/.config/ghostty/config"
-    @command -v herdr >/dev/null && herdr server reload-config 2>/dev/null || true
-    @echo "Reload Ghostty config (cmd+shift+,) for keybind changes to take effect."
-
-# Install the herdr-plus plugin and push this repo's plugin config into the
-# plugin's managed config dir. Repo is the source of truth: rsync --delete
-# means anything added directly under the managed dir is removed on install.
-[doc("herdr-plus plugin plus this repo's config for it")]
-herdr-plus:
-    #!/usr/bin/env bash
-    set -euo pipefail
-    command -v herdr >/dev/null || { echo "herdr not on PATH"; exit 1; }
-    if ! herdr plugin list --json 2>/dev/null | grep -q 'cloudmanic.herdr-plus'; then
-    	herdr plugin install cloudmanic/herdr-plus --yes
-    fi
-    dir="$(herdr plugin config-dir cloudmanic.herdr-plus 2>/dev/null || true)"
-    dir="${dir:-$HOME/.config/herdr/plugins/config/cloudmanic.herdr-plus}"
-    mkdir -p "$dir"
-    rsync -a --delete --exclude=.gitkeep herdr/plus/ "$dir/"
-    echo "Installed herdr-plus config to $dir"
-    herdr server reload-config 2>/dev/null || true
-
-# herdr-transcripts (github.com/hxreborn/herdr-transcripts) — fzf over every
-# Claude Code and Codex session, bound to prefix+f in herdr/config.toml. The
-# plugin keeps its own index in ~/.cache/herdr-transcripts and its own picker
-# state in the plugin config dir, so there is nothing for this repo to install
-# besides the plugin itself.
-[doc("herdr-transcripts: fzf picker over agent sessions")]
-herdr-transcripts:
-    #!/usr/bin/env bash
-    set -euo pipefail
-    command -v herdr >/dev/null || { echo "herdr not on PATH"; exit 1; }
-    command -v fzf >/dev/null || brew install fzf
-    if ! herdr plugin list --json 2>/dev/null | grep -q 'herdr-transcripts\|\.transcripts'; then
-    	herdr plugin install hxreborn/herdr-transcripts --yes
-    fi
-    herdr server reload-config 2>/dev/null || true
-    echo "Installed herdr-transcripts; prefix+f opens the picker"
 
 # External agent skills, from skills/manifest.txt into every harness that reads
 # a skills directory. A skill is portable markdown, so the same file serves
