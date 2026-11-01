@@ -13,6 +13,7 @@
     "cmd-3": "mod.open:prs",
     "cmd-e": "mod.open:launcher",
     "cmd-5": "mod.open:gomap",
+    "cmd-.": "mod.open:snippets",
     "cmd-s": "mod.open:tab-jump"
   }
 }
