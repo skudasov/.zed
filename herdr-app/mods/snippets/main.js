@@ -1,6 +1,5 @@
 // Markdown snippets (./snippets/*.md) for agents: j/k move, enter copies the
 // selected one to the clipboard and closes, then paste it into any agent.
-// Also used by herdr/bin/skill-snippet.ts (TUI), which reads the installed copy.
 
 import { View, div } from "gpui-kit";
 import { v_flex } from "gpui-base";

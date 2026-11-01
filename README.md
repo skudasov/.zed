@@ -15,8 +15,8 @@ Enable `Hammerspoon` to access window API.
 ## Semgrep rules
 
 `semgrep/` holds one rule file per language — `go.yml` today — plus the fixtures
-that test them. The `Review: semgrep` quick action passes the whole installed
-directory to `--config`, so a rule only ever runs against the languages it
+that test them. Pass the whole installed directory
+(`semgrep --config ~/.config/semgrep`), so a rule only ever runs against the languages it
 declares and adding a language needs no wiring:
 
 1. write `semgrep/<lang>.yml`
@@ -32,29 +32,6 @@ The review scans the files the branch touched, not the repo: a whole-repo scan
 reports everything that was already there, which buries the branch's own bugs.
 Use `semgrep --config ~/.config/semgrep --baseline-commit <ref> .` for a
 whole-repo scan that still only reports what the branch introduced.
-
-## Session transcripts
-
-[herdr-transcripts](https://github.com/hxreborn/herdr-transcripts) is an `fzf`
-picker over every Claude Code and Codex session on the machine, searchable by
-title, prompt, reply or tool call. `Enter` resumes a session in its own
-directory, or focuses its pane when it is already running.
-
-```bash
-just herdr-transcripts
-```
-
-`prefix+f` opens the picker (bound in `herdr/config.toml`). The keybind uses
-`$HERDR_BIN_PATH`, which `just configs` rewrites to the absolute herdr
-path for the same reason the `herdr/bin` shebangs are rewritten: herdr runs
-`[[keys.command]]` detached and expands nothing itself.
-
-The plugin keeps its index in `~/.cache/herdr-transcripts` and its picker state
-(scope, sort, filters, resume flags) in
-`~/.config/herdr/plugins/config/transcripts/`, so this repo installs the plugin
-and nothing else. `Ctrl+D` in the picker shows diagnostics, including Claude
-Code's transcript retention — worth checking, since `cleanupPeriodDays`
-defaults low enough to delete the sessions you would search for.
 
 ## Agent skills
 
@@ -81,9 +58,7 @@ changes under you.
 against 25 patterns without changing the facts. Because it triggers off its
 description rather than a slash command, plain language reaches it in any
 harness — "humanize the prose in docs/launch-post.md" works in claude and
-opencode alike. The **Humanize** quick action (`cmd+e`) sends that request to
-the agent in the pane you launched from, for either a tracked prose file picked
-with `fzf` or whatever is on the clipboard.
+opencode alike.
 
 ## ponytail
 
