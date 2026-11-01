@@ -1,4 +1,4 @@
-# Go rules for `Review: semgrep` — the mechanical half of ~/.config/herdr/skill-snippets/go-*.md.
+# Go rules for `Review: semgrep` — the mechanical half of ~/.config/herdr-app/mods/snippets/snippets/go-*.md.
 # Source of truth lives in ~/.config/zed/semgrep/go.yml; `just semgrep-rules` copies it.
 # Self-test: `just test-semgrep` (fixtures in tests/go.go carry ruleid:/ok: annotations).
 rules:

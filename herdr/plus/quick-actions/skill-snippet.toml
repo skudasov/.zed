@@ -1,4 +1,4 @@
-# Pick one of the markdown snippets in ~/.config/herdr/skill-snippets/ and copy
+# Pick one of the markdown snippets in ~/.config/herdr-app/mods/snippets/snippets/ and copy
 # it to the clipboard. The fzf picker runs inside the overlay pane (real tty),
 # so the action needs no further input from the quick-actions launcher.
 name = "skill-snippet"
