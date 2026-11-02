@@ -65,8 +65,10 @@ func findRoot(dir string) (string, error) {
 		if _, err := os.Stat(filepath.Join(d, "go.mod")); err == nil {
 			return d, nil
 		}
+		// No module above: walk the dir itself, its nested modules still show
+		// and p can pick among them.
 		if filepath.Dir(d) == d {
-			return "", fmt.Errorf("no go.mod above %s", dir)
+			return dir, nil
 		}
 	}
 }
@@ -87,7 +89,7 @@ func run(dir string) (*Out, error) {
 			if path == root {
 				return nil
 			}
-						// Nested modules are walked too: a repo of several (chainlink:
+			// Nested modules are walked too: a repo of several (chainlink:
 			// devenv, deployment, …) shows as one tree, and p narrows it.
 			if strings.HasPrefix(name, ".") || name == "vendor" || name == "testdata" || name == "node_modules" {
 				return filepath.SkipDir

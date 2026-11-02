@@ -3,6 +3,8 @@ package main
 import (
 	"fmt"
 	"go/token"
+	"os"
+	"path/filepath"
 	"slices"
 	"testing"
 )
@@ -28,6 +30,19 @@ func TestRun(t *testing.T) {
 	}
 	if !slices.Equal(got, want) {
 		t.Errorf("rows:\n%q\nwant:\n%q", got, want)
+	}
+}
+
+func TestRunNoModule(t *testing.T) {
+	dir := t.TempDir()
+	os.MkdirAll(filepath.Join(dir, "a"), 0o755)
+	os.WriteFile(filepath.Join(dir, "a", "a.go"), []byte("package a\nfunc A() {}\n"), 0o644)
+	out, err := run(filepath.Join(dir, "a", ".."))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(out.Rows) != 1 || out.Rows[0].Pkg != "a" {
+		t.Errorf("rows: %+v", out.Rows)
 	}
 }
 
