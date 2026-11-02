@@ -31,7 +31,7 @@ function filterKey(s, e, own) {
 }
 const matches = (q, text) => !q || text.toLowerCase().includes(q.toLowerCase());
 
-const REPOS = ["skudasov/.zed"];
+const REPOS = ["skudasov/.zed", "smartcontractkit/nop-management"];
 const SHOWN = 24; // rows on screen; the list follows the selection instead of scrolling
 
 async function list(repo) {

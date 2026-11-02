@@ -1,5 +1,5 @@
 // Schedule. One mod, two copies:
-// - the layout's "schedule" footer block (zed.json): one line for the whole day, 0:00 to 24:00,
+// - the layout's "schedule" footer block (zed.json): one line for the whole day, 10:00 to 24:00,
 //   each interval a faint segment, the running one solid;
 // - the dialog (launcher, cmd-e: "Schedule"): type "1000 1200 deep work" (10:00 12:00 / 1000-1200 work too)
 //   + enter to add, j/k select, x removes the selected one, esc closes.
@@ -10,7 +10,7 @@ import { View, div } from "gpui-kit";
 import { v_flex, h_flex } from "gpui-base";
 import { shared, setShared, notify, theme, props, run, settings } from "herdr";
 
-const DAY_START = 0; // hours shown on the line
+const DAY_START = 10; // hours shown on the line
 const DAY_END = 24;
 // Same order as tab-jump's space chips.
 const COLORS = ["ansi5", "ansi6", "ansi4", "ansi3", "ansi2", "ansi1"];
