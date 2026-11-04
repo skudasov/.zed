@@ -1,11 +1,11 @@
 // Open pull requests of several repos, grouped by repo, with their checks
 // (keys.json: "cmd-3": "mod.open:prs").
-// j/k move, c shows the selected PR's failing checks, enter opens the PR in the
-// browser, esc or cmd-3 again closes.
+// j/k move, c shows the selected PR's failing checks, d checks the PR out and
+// opens its diff in zed-changes, enter opens the PR in the browser, esc or cmd-3 again closes.
 
 import { View, div } from "gpui-kit";
 import { h_flex, v_flex } from "gpui-base";
-import { exec, theme, props, closeOverlay } from "herdr";
+import { exec, theme, props, closeOverlay, openOverlay } from "herdr";
 import { startReview, reviewKey, reviewView } from "./review.js";
 
 // Typing filters the list (shown in the header). Enter stops typing and opens the
@@ -50,7 +50,7 @@ async function list(repo) {
       "--limit",
       "100",
       "--json",
-      "number,title,author,url,isDraft,statusCheckRollup",
+      "number,title,author,url,isDraft,statusCheckRollup,baseRefName",
     ]);
     return r.code === 0
       ? { repo, prs: JSON.parse(r.stdout).map((pr) => ({ ...pr, repo })) }
@@ -86,6 +86,38 @@ function checks(pr) {
       );
   }
   return c;
+}
+
+// Own clone per repo under ~/.cache/herdr-prs (your working copies stay untouched),
+// PR branch checked out there; prints the merge base with the PR's base, then the dir.
+const CHECKOUT = `set -e
+d="$HOME/.cache/herdr-prs/$(echo "$1" | tr / _)"
+[ -d "$d/.git" ] || gh repo clone "$1" "$d" -- -q
+cd "$d"
+gh pr checkout "$2" --force >&2
+git fetch -q origin "$3"
+git merge-base "origin/$3" HEAD
+pwd`;
+
+function diff(view, pr, cx) {
+  view.status = `Checking out #${pr.number}…`;
+  cx.spawn(async (cx) => {
+    const r = await exec("/bin/zsh", ["-lc", CHECKOUT, "zsh", pr.repo, String(pr.number), pr.baseRefName]);
+    const [base, root] = r.stdout.trim().split("\n");
+    if (r.code !== 0 || !root) {
+      view.status = (r.stderr.trim() || `checkout exited ${r.code}`).split("\n").pop();
+      return cx.notify();
+    }
+    closeOverlay(props().overlay);
+    openOverlay({
+      mod: "zed-changes",
+      kind: "window",
+      frame: "none",
+      width: 1,
+      height: 1,
+      props: { pr: { root, base, title: `#${pr.number} ${pr.title}` } },
+    });
+  });
 }
 
 export default class Prs extends View {
@@ -193,7 +225,8 @@ export default class Prs extends View {
           const next = reviewKey(this.review, k);
           if (next === "done") closeOverlay(props().overlay);
           this.review = next === "done" ? null : next;
-        } else if (filterKey(this, e, ["j", "k", "c", "r"])) this.open = false;
+        } else if (filterKey(this, e, ["j", "k", "c", "r", "d"])) this.open = false;
+        else if (k === "d" && sel) diff(this, sel, cx);
         else if (k === "r" && sel) this.review = startReview(sel, checks(sel).fail, cx);
         else if (k === "j" || k === "down") {
           this.at = Math.min(this.at + 1, all.length - 1);
@@ -222,9 +255,10 @@ export default class Prs extends View {
             div()
               .text_size(11)
               .text_color(t.dim)
-              .child("j/k move · type to search · c checks · r review · enter open"),
+              .child("j/k move · type to search · c checks · d diff · r review · enter open"),
           ),
       )
+      .when(Boolean(this.status), (el) => el.child(div().truncate().text_color(t.muted).child(this.status)))
       .when(!this.review && Boolean(this.q), (el) => el.child(div().text_color(t.muted).child(`${this.q}${this.typing ? "▏" : ""}`)))
       .when(Boolean(this.review), (el) => el.child(reviewView(this.review, t)))
       .when(!this.review, (el) => el.children(rows.slice(start, start + SHOWN)));
