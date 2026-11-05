@@ -14,6 +14,7 @@
     "cmd-e": "mod.open:launcher",
     "cmd-5": "mod.open:gomap",
     "cmd-.": "app.palette",
-    "cmd-s": "mod.open:tab-jump"
+    "cmd-s": "mod.open:tab-jump",
+    "cmd-4": "mod.open:plan"
   }
 }
