@@ -3,7 +3,7 @@ default:
     @just --list
 
 # Everything (except tuicr), configs before the recipes that build on them.
-install: shell-env fonts hammerspoon harlequin lazydocker k9s flux9s sofka ocr semgrep semgrep-rules configs herdr-app lazyvim skills ponytail chrome-theme
+install: shell-env fonts hammerspoon harlequin lazydocker k9s flux9s sofka ocr semgrep semgrep-rules configs atuin herdr-app lazyvim skills ponytail chrome-theme
 
 # Hammerspoon config, reloaded in place.
 hammerspoon:
@@ -169,6 +169,15 @@ configs:
     rm -f ~/.config/ghostty/config
     cp ghostty/config ~/.config/ghostty/config
     @echo "Installed Ghostty config to ~/.config/ghostty/config (reload: cmd+shift+,)"
+
+# atuin records agent sessions as "threads"; the atuin-threads herdr mod (a copy of
+# github.com/atuinsh/herdr-atuin-threads) lists and resumes them. Needs >= 18.24.3.
+# Only sessions run after threads are on get captured.
+[doc("atuin, with threads enabled (for the herdr atuin-threads mod)")]
+atuin:
+    brew list atuin >/dev/null 2>&1 || brew install atuin
+    atuin config enable threads
+    atuin --version
 
 # herdr-app (the official desktop app, home ~/.config/herdr-app): the Zed
 # theme, the minimal "zed" layout, keys and mods.
