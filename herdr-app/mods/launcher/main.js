@@ -35,7 +35,6 @@ const MODS = [
   ["gomap", "Go map"],
   ["tab-jump", "Tab jump"],
   ["schedule", "Schedule"],
-  ["plan", "Plan"],
   ["duo", "Duo"],
 ];
 
