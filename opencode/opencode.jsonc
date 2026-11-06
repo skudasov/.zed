@@ -4,5 +4,8 @@
   // `just harness-configs` fills in the __PLACEHOLDER__ tokens for this
   // machine and copies the result to ~/.config/opencode/opencode.jsonc.
   // ponytail is pinned by `ponytail_version` in the Justfile, shared with claude.
+  "model": "fireworks-ai/accounts/fireworks/models/deepseek-v4p1-flash-1017",
+  // Duo reads the paired Claude transcript, outside the project folder.
+  "permission": { "external_directory": { "~/.claude/projects/**": "allow" } },
   "plugin": ["@dietrichgebert/ponytail@__PONYTAIL_VERSION__"]
 }
