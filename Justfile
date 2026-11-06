@@ -3,7 +3,7 @@ default:
     @just --list
 
 # Everything (except tuicr), configs before the recipes that build on them.
-install: shell-env fonts hammerspoon harlequin lazydocker k9s flux9s sofka ocr semgrep semgrep-rules configs atuin herdr-app lazyvim skills ponytail chrome-theme
+install: shell-env fonts hammerspoon harlequin lazydocker k9s flux9s sofka ocr semgrep semgrep-rules configs atuin herdr-app lazyvim skills ponytail claude-quiet chrome-theme
 
 # Hammerspoon config, reloaded in place.
 hammerspoon:
@@ -97,6 +97,17 @@ ponytail:
     claude plugin marketplace add "https://github.com/DietrichGebert/ponytail.git#v{{ponytail_version}}"
     claude plugin install ponytail@ponytail
     just harness-configs
+
+# Merged into ~/.claude/settings.json, so hooks/plugins/model set elsewhere stay.
+# viewMode "focus" = prompt, one-line tool summaries, final answer; Ctrl+O shows all.
+[doc("Quiet Claude UI: answers, not tool noise")]
+claude-quiet:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    f="$HOME/.claude/settings.json"
+    mkdir -p "$(dirname "$f")"; [ -f "$f" ] || echo '{}' > "$f"
+    jq '. * {tui:"fullscreen",viewMode:"focus",verbose:false,showThinkingSummaries:false,spinnerTipsEnabled:false,showTurnDuration:false,awaySummaryEnabled:false,prefersReducedMotion:true,env:{CLAUDE_CODE_DISABLE_FEEDBACK_SURVEY:"1"}}' "$f" > "$f.tmp"
+    mv "$f.tmp" "$f"
 
 # Agent harness configs that are not skills. opencode/cli.json is copied as is;
 # opencode/opencode.jsonc carries __PLACEHOLDER__ tokens for machine-specific
