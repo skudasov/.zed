@@ -18,5 +18,5 @@
     "prompt.editor": "ctrl+g",
     "session.first": "home,alt+home"
   },
-  "plugins": ["./plugins/minimal-footer"]
+  "plugins": ["./plugins/minimal-footer", "./herdr-opencode"]
 }

@@ -85,7 +85,7 @@ k9s:
 # YAGNI, stdlib first, no unrequested abstractions. Claude gets it as a plugin
 # from a marketplace pinned to the tag; opencode as the npm package of the same
 # version, via harness-configs. One version for both, bumped here.
-ponytail_version := "4.10.0"
+ponytail_version := "5.3.3"
 
 # Install the ponytail plugin for Claude, then harness configs for opencode.
 ponytail:
@@ -126,7 +126,13 @@ harness-configs:
     echo "Installed opencode TUI settings to ~/.config/opencode/cli.json"
     # cli.json's "plugins" loads them by path from ~/.config/opencode/plugins/,
     # so the plugin files install with the config that references them.
+    # "./herdr-opencode" is Herdr's V2 TUI plugin. Herdr writes that directory;
+    # this copy only keeps the registration, which `herdr integration install`
+    # also adds. Copy first so a Herdr rewrite cannot drop the other settings,
+    # then reinstall so the managed files match the registration.
     just opencode-plugins
+    just herdr-opencode
+    cp opencode/cli.json ~/.config/opencode/cli.json
 
 # OpenCode TUI plugins, one directory per plugin under opencode/plugins/,
 # laid out like a published package (package.json + tui.tsx) and referenced
@@ -144,6 +150,19 @@ opencode-plugins:
         cp -R "${src%/}" ~/.config/opencode/plugins/"$name"
         echo "Installed OpenCode plugin $name to ~/.config/opencode/plugins/$name"
     done
+
+# Herdr owns these files and overwrites them on reinstall. Integration v11 is a
+# V1 named export, which OpenCode V2 refuses to load. Herdr 0.9.5 ships v13:
+# a default export with id + setup, plus ./herdr-opencode for the TUI.
+[doc("Reinstall Herdr's OpenCode integration")]
+herdr-opencode:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    if ! command -v herdr >/dev/null; then
+        echo "herdr not installed; skip OpenCode integration"
+        exit 0
+    fi
+    herdr integration install opencode
 
 # LazyVim (github.com/LazyVim/LazyVim) — a usable Neovim. Installed from the upstream
 # starter, which is a template and not a dependency: its .git is dropped so

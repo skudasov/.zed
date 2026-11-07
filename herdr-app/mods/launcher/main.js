@@ -36,6 +36,7 @@ const MODS = [
   ["tab-jump", "Tab jump"],
   ["schedule", "Schedule"],
   ["duo", "Duo"],
+  ["todo", "TODO"],
 ];
 
 export default class Launcher extends View {

@@ -74,9 +74,14 @@ just ponytail
 
 `ponytail_version` in the Justfile pins both harnesses to the same release:
 Claude Code gets the plugin from a marketplace added at that git tag, opencode
-gets the npm package of that version through `opencode/opencode.jsonc`. To
-upgrade, bump the variable and rerun. Check with `claude plugin list` and
-`opencode debug config`.
+gets the npm package of that version through `opencode/opencode.jsonc`. OpenCode
+V2 does not run the V1 plugin in 4.x; 5.3.3 exports both APIs. To upgrade, bump
+the variable and rerun. Check with `claude plugin list` and `opencode plugin list`.
+
+Herdr's OpenCode integration is not copied from this repo. `just harness-configs`
+reinstalls it (`herdr integration install opencode`) so the server plugin is v13
+or newer. v11 has no default export and OpenCode V2 will not load it. `cli.json`
+keeps `./herdr-opencode`, the V2 TUI plugin Herdr writes beside that config.
 
 ## Chrome theme
 
