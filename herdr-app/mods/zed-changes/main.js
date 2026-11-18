@@ -32,10 +32,15 @@ import {
   settings,
   props,
   closeOverlay,
+  layout,
 } from "herdr";
 import { splitRows } from "./split.js";
 
+// Opened from the PRs mod: props().pr = { root, base, title } diffs the PR's
+// merge base against that checkout instead of HEAD against the focused pane's.
+const pr = () => props()?.pr ?? null;
 function location() {
+  if (pr()) return { cwd: pr().root, on: null };
   const space = spaces().find((s) => s.active),
     f = focused();
   const pane = f?.pane ? panes().find((p) => p.pane === f.pane) : null;
@@ -60,6 +65,16 @@ const READ = [
 const countLines = (text) =>
   text ? text.split("\n").length - Number(text.endsWith("\n")) : 0;
 const ROW = 20;
+// Long lines wrap: hard-split into chunks of `cols` monospace columns, so each
+// row's height is known up front for the virtual list.
+// ponytail: CHAR is an estimate of the 11px mono advance; bump it if text clips.
+const CHAR = 6.7;
+const chunks = (cell, cols) => {
+  const text = (cell?.text ?? "").replaceAll("\t", "    ") || " ";
+  const out = [];
+  for (let i = 0; i < text.length; i += cols) out.push(text.slice(i, i + cols));
+  return out;
+};
 // Translucent tints of the theme's own colors, Zed style, so the diff sits on
 // the #303135 background and follows the theme: green/red rows with a
 // stronger gutter, blue cursor and selection. Backgrounds only: a border
@@ -78,6 +93,28 @@ const STORE = () => `${home()}/.local/share/zed-changes`;
 // ponytail: fixed half page; measure the list height if it feels off.
 const HALF = 15;
 
+// Where the layout's terminal area (block "main") sits: the px sizes of the
+// visible blocks beside it, per side, so the panel covers exactly that area.
+// No "main" (another layout): zero insets, the whole window.
+// ponytail: px-sized siblings only; a weighted sibling next to main is ignored.
+function insets() {
+  const out = { left: 0, top: 0, right: 0, bottom: 0 },
+    gap = layout()?.divider?.width ?? 0;
+  const walk = (node) => {
+    if (node.id === "main") return true;
+    const kids = node.children ?? [];
+    const i = kids.findIndex((c) => !c.hidden && walk(c));
+    if (i < 0) return false;
+    const [a, b] = node.type === "row" ? ["left", "right"] : ["top", "bottom"];
+    kids.forEach((s, j) => {
+      if (j !== i && !s.hidden && s.size?.px) out[j < i ? a : b] += s.size.px + gap;
+    });
+    return true;
+  };
+  walk(layout() ?? {});
+  return out;
+}
+
 // The agent in the tab under this dialog: the focused one, else the latest.
 function target() {
   const tab = focused()?.tab;
@@ -89,7 +126,9 @@ function target() {
 
 function format(root, notes) {
   const out = [
-    `Review comments on uncommitted changes in ${root} (old = HEAD, new = working tree):`,
+    pr()
+      ? `Review comments on PR "${pr().title}" checked out in ${root} (old = merge base ${pr().base}, new = working tree):`
+      : `Review comments on uncommitted changes in ${root} (old = HEAD, new = working tree):`,
   ];
   for (const n of notes) {
     const at = n.from === n.to ? n.from : `${n.from}-${n.to}`;
@@ -111,10 +150,13 @@ export default class Changes extends View {
     this.rows = [];
     this.notes = [];
     this.cursor = { row: 0, side: "r" };
+    this.cols = 80; // per side, from the diff area's width
     this.anchor = null; // {row, side} while selecting
     this.sel = null; // {side, from, to} rows, waiting for a comment
     this.handle = cx.focus_handle();
     this.scroll = VirtualListScrollHandle.new();
+    this.fileScroll = VirtualListScrollHandle.new();
+    this.base = pr()?.base ?? "HEAD";
     this.input = InputState.new({ placeholder: "Comment · Enter save · Esc cancel" });
     this.input.on("submit", (_e, cx) => this.save(cx));
     this.input.on("focus", (_e, cx) => {
@@ -195,15 +237,17 @@ export default class Changes extends View {
         }
         const root = top.stdout.trim(),
           git = (args) => exec("git", [...READ, ...args], { cwd: root, on });
-        const status = await git([
-          "status",
-          "--porcelain=v1",
-          "-z",
-          "--no-renames",
-          "--untracked-files=all",
-        ]);
+        // PR: the files changed since the merge base, as "XY path" like status.
+        const status = await git(
+          this.base === "HEAD"
+            ? ["status", "--porcelain=v1", "-z", "--no-renames", "--untracked-files=all"]
+            : ["diff", this.base, "--name-status", "-z", "--no-renames"],
+        );
         if (status.code !== 0) throw new Error(status.stderr);
-        const head = await git(["rev-parse", "--verify", "HEAD"]);
+        let entries = status.stdout.split("\0").filter(Boolean);
+        if (this.base !== "HEAD")
+          entries = entries.flatMap((x, i) => (i % 2 ? [] : [`${x.padEnd(2)} ${entries[i + 1]}`]));
+        const head = await git(["rev-parse", "--verify", this.base]);
         const branch = (await git(["branch", "--show-current"])).stdout.trim() || "detached";
         // Notes live per checkout and branch: ~/.local/share/zed-changes/<root>@<branch>.json
         const store = `${STORE()}/${root.replaceAll("/", "_")}@${branch.replaceAll("/", "_")}.json`;
@@ -222,7 +266,7 @@ export default class Changes extends View {
         const stats = {};
         const results =
           head.code === 0
-            ? [await git(["diff", "HEAD", "--numstat", "-z", "--no-renames"])]
+            ? [await git(["diff", this.base, "--numstat", "-z", "--no-renames"])]
             : [
                 await git(["diff", "--cached", "--numstat", "-z", "--no-renames"]),
                 await git(["diff", "--numstat", "-z", "--no-renames"]),
@@ -242,7 +286,6 @@ export default class Changes extends View {
           }
         }
         const files = [];
-        const entries = status.stdout.split("\0").filter(Boolean);
         for (const entry of entries.slice(0, 1000)) {
           const xy = entry.slice(0, 2),
             path = entry.slice(3),
@@ -317,7 +360,7 @@ export default class Changes extends View {
         [
           ...READ,
           "diff",
-          ...(this.hasHead ? ["HEAD"] : []),
+          ...(this.hasHead ? [this.base] : []),
           "--no-ext-diff",
           "--no-textconv",
           "--no-color",
@@ -350,6 +393,7 @@ export default class Changes extends View {
   pick(path, cx) {
     if (this.open === path) return;
     this.open = path;
+    this.fileScroll.scroll_to_item(Math.max(0, this.files.findIndex((f) => f.path === path)));
     this.setLines([]);
     this.cursor = { row: 0, side: "r" };
     this.cancel();
@@ -553,7 +597,7 @@ export default class Changes extends View {
     }
   }
 
-  half(i, row, side, t) {
+  half(i, row, side, t, h) {
     const cell = row[side],
       at = this.inDiff && this.cursor.row === i && this.cursor.side === side;
     const lit =
@@ -566,7 +610,7 @@ export default class Changes extends View {
     return h_flex()
       .flex_1()
       .min_w(0)
-      .h(ROW)
+      .h(h)
       .gap(8)
       .when(Boolean(bg), (e) => e.bg(bg))
       .child(
@@ -580,10 +624,48 @@ export default class Changes extends View {
           .text_color(tone && !lit ? tone.num : t.dim)
           .child(cell ? String(cell.n) : ""),
       )
-      .child(div().flex_1().min_w(0).truncate().child(cell ? cell.text || " " : ""));
+      .child(
+        v_flex()
+          .flex_1()
+          .min_w(0)
+          .children(cell ? chunks(cell, this.cols).map((c) => div().h(ROW).whitespace_nowrap().child(c)) : []),
+      );
   }
 
-  diffRow(i, t) {
+  // No handlers here: the list renderer forbids them (see on_item_click).
+  fileRow(f, t) {
+    const parts = f.path.split("/"),
+      name = parts.pop(),
+      noted = this.notes.filter((n) => n.path === f.path).length;
+    return h_flex()
+      .h(28)
+      .flex_none()
+      .px(8)
+      .gap(8)
+      .items_center()
+      .rounded(7)
+      .when(this.open === f.path, (e) => e.bg(t.selected))
+      .when(this.open === f.path && !this.inDiff, (e) => e.border_1().border_color(t.accent))
+      .child(
+        div()
+          .w(14)
+          .text_size(11)
+          .text_color(f.status === "A" ? t.ansi2 : f.status === "M" ? t.blocked : t.ansi1)
+          .child(f.status),
+      )
+      .child(
+        h_flex()
+          .flex_1()
+          .min_w(0)
+          .child(div().text_color(t.dim).truncate().child(parts.length ? parts.join("/") + "/" : ""))
+          .child(div().max_w(260).min_w(0).truncate().child(name)),
+      )
+      .when(noted > 0, (e) => e.child(div().text_size(11).text_color(t.accent).child(`✎${noted}`)))
+      .when(f.add > 0, (e) => e.child(div().text_size(11).text_color(t.ansi2).child(`+${f.add}`)))
+      .when(f.del > 0, (e) => e.child(div().text_size(11).text_color(t.ansi1).child(`−${f.del}`)));
+  }
+
+  diffRow(i, t, h) {
     const row = this.rows[i];
     if (row.head)
       return div()
@@ -597,11 +679,11 @@ export default class Changes extends View {
         .child(row.head);
     return h_flex()
       .w_full()
-      .h(ROW)
+      .h(h)
       .flex_none()
-      .child(this.half(i, row, "l", t))
+      .child(this.half(i, row, "l", t, h))
       .child(div().w(1).h_full().bg(t.border))
-      .child(this.half(i, row, "r", t));
+      .child(this.half(i, row, "r", t, h));
   }
 
   // Diff rows with each saved note's card after its last line, and where each
@@ -617,9 +699,10 @@ export default class Changes extends View {
     }
     const view = [],
       at = [];
-    this.rows.forEach((_r, i) => {
+    this.rows.forEach((r, i) => {
       at[i] = view.length;
-      view.push({ i });
+      const lines = r.head ? 1 : Math.max(chunks(r.l, this.cols).length, chunks(r.r, this.cols).length);
+      view.push({ i, h: ROW * lines });
       for (const note of after.get(i) ?? []) view.push({ note });
     });
     return { view, at, notes };
@@ -665,10 +748,8 @@ export default class Changes extends View {
           : "j/k file · Enter diff · ⇧Enter send";
     const panel = v_flex()
       .id("changes")
-      .w("80%")
-      .h("85%")
+      .size_full()
       .min_h(0)
-      .rounded(10)
       .overflow_hidden()
       .bg(t.background)
       .border_1()
@@ -688,7 +769,7 @@ export default class Changes extends View {
           .items_center()
           .border_b(1)
           .border_color(t.border)
-          .child(div().font_semibold().child("Changes"))
+          .child(div().font_semibold().truncate().child(pr() ? pr().title : "Changes"))
           .child(
             div()
               .px(5)
@@ -726,69 +807,15 @@ export default class Changes extends View {
             ),
           ),
       )
+      // A virtual list with its own handle, so j/k keep the open file in view.
       .child(
-        v_flex()
-          .id("changes-list")
+        div()
           .flex_none()
           .h(Math.min(200, Math.max(44, this.files.length * 28 + 12)))
-          .overflow_y_scrollbar()
+          .relative()
           .p(6)
           .border_b(1)
           .border_color(t.border)
-          .children(
-            this.files.map((f) => {
-              const parts = f.path.split("/"),
-                name = parts.pop(),
-                noted = this.notes.filter((n) => n.path === f.path).length;
-              return h_flex()
-                .id(`change-${f.path}`)
-                .h(28)
-                .flex_none()
-                .px(8)
-                .gap(8)
-                .items_center()
-                .rounded(7)
-                .cursor_pointer()
-                .when(this.open === f.path, (e) => e.bg(t.selected))
-                .when(this.open === f.path && !this.inDiff, (e) => e.border_1().border_color(t.accent))
-                .hover((s) => s.bg(t.hover))
-                .on_click((_e, cx) => this.pick(f.path, cx))
-                .child(
-                  div()
-                    .w(14)
-                    .text_size(11)
-                    .text_color(
-                      f.status === "A"
-                        ? t.ansi2
-                        : f.status === "M"
-                          ? t.blocked
-                          : t.ansi1,
-                    )
-                    .child(f.status),
-                )
-                .child(
-                  h_flex()
-                    .flex_1()
-                    .min_w(0)
-                    .child(
-                      div()
-                        .text_color(t.dim)
-                        .truncate()
-                        .child(parts.length ? parts.join("/") + "/" : ""),
-                    )
-                    .child(div().max_w(260).min_w(0).truncate().child(name)),
-                )
-                .when(noted > 0, (e) =>
-                  e.child(div().text_size(11).text_color(t.accent).child(`✎${noted}`)),
-                )
-                .when(f.add > 0, (e) =>
-                  e.child(div().text_size(11).text_color(t.ansi2).child(`+${f.add}`)),
-                )
-                .when(f.del > 0, (e) =>
-                  e.child(div().text_size(11).text_color(t.ansi1).child(`−${f.del}`)),
-                );
-            }),
-          )
           .when(!this.files.length, (e) =>
             e.child(
               div()
@@ -799,10 +826,26 @@ export default class Changes extends View {
                     (this.loading
                       ? "Loading changes…"
                       : this.root
-                        ? "No uncommitted changes"
+                        ? pr() ? "No changes against the merge base" : "No uncommitted changes"
                         : "No folder"),
                 ),
             ),
+          )
+          .when(this.files.length > 0, (e) =>
+            e
+              .child(
+                v_virtual_list(
+                  "changes-list",
+                  this.files.length,
+                  28,
+                  (i) => this.files[i].path,
+                  (range) => this.files.slice(range.start, range.end).map((f) => this.fileRow(f, t)),
+                )
+                  .track_scroll(this.fileScroll)
+                  .on_item_click((path, cx) => this.pick(path, cx))
+                  .size_full(),
+              )
+              .child(Scrollbar.vertical("changes-list").viewport_from_layout().absolute().inset_0()),
           ),
       )
       .when(this.limited, (el) =>
@@ -817,22 +860,31 @@ export default class Changes extends View {
       )
       .child(
         div()
+          .id("diff-area")
           .flex_1()
           .w_full()
           .min_h(0)
           .relative()
+          // Text columns per side: half the width minus the divider, gutter and gap.
+          .on_size_change((size, cx) => {
+            const cols = Math.max(20, Math.floor(((size.width - 1) / 2 - 40 - 8 - 12) / CHAR));
+            if (cols !== this.cols) {
+              this.cols = cols;
+              cx.notify();
+            }
+          })
           .font_family(settings().font_family ?? "JetBrains Mono")
           .text_size(11)
           .child(
             v_virtual_list(
               "changes-diff",
               view.length,
-              view.map((v) => (v.note ? NOTE_H : ROW)),
+              view.map((v) => (v.note ? NOTE_H : v.h)),
               (j) => (view[j].note ? `n${j}` : String(view[j].i)),
               (range) => {
                 const out = [];
                 for (let j = range.start; j < range.end; j++)
-                  out.push(view[j].note ? this.noteRow(view[j].note, t) : this.diffRow(view[j].i, t));
+                  out.push(view[j].note ? this.noteRow(view[j].note, t) : this.diffRow(view[j].i, t, view[j].h));
                 return out;
               },
             )
@@ -887,14 +939,16 @@ export default class Changes extends View {
         ),
       );
     // A window overlay (mod.json), so Esc reaches the mod instead of closing
-    // a dialog: it draws its own dim, and a click on the dim closes it.
+    // a dialog. It covers the whole window but draws only over the terminal
+    // area; a click on the rest (sidebar, tabs) closes it.
+    const at = insets();
     return div()
       .id("dim")
       .size_full()
-      .flex()
-      .items_center()
-      .justify_center()
-      .bg("#00000066")
+      .pl(at.left)
+      .pt(at.top)
+      .pr(at.right)
+      .pb(at.bottom)
       .on_mouse_down("left", (_e, cx) => {
         cx.stop_propagation();
         closeOverlay(props().overlay);
