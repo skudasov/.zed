@@ -3,7 +3,7 @@ default:
     @just --list
 
 # Everything (except tuicr), configs before the recipes that build on them.
-install: shell-env fonts hammerspoon harlequin lazydocker k9s flux9s sofka ocr semgrep semgrep-rules configs atuin herdr-app lazyvim skills ponytail claude-quiet chrome-theme
+install: shell-env fonts hammerspoon harlequin lazydocker gh-stack k9s flux9s sofka ocr semgrep semgrep-rules configs atuin herdr-app lazyvim skills ponytail claude-quiet chrome-theme
 
 # Hammerspoon config, reloaded in place.
 hammerspoon:
@@ -76,6 +76,21 @@ test-semgrep:
     # pairs with its rule file, so those fixtures get a plain scan instead.
     semgrep --config . --quiet --error tests/*_test.* >/dev/null \
       && { echo "test-only rules did not fire"; exit 1; } || echo "test-only rules ✓"
+
+# GitHub CLI, kept at the latest release, plus gh-stack (stacked PRs, preview):
+# github.github.com/gh-stack. Re-run to upgrade both.
+[doc("GitHub CLI (latest) + gh-stack extension")]
+gh-stack:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    if brew list gh >/dev/null 2>&1; then brew upgrade gh; else brew install gh; fi
+    if gh extension list | grep -q 'github/gh-stack'; then
+    	gh extension upgrade stack
+    else
+    	gh extension install github/gh-stack
+    fi
+    gh --version | head -1
+    gh stack --help >/dev/null && echo "gh stack ready"
 
 # Kubernetes TUI.
 k9s:
